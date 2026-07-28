@@ -79,6 +79,11 @@ export const api = {
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
   brokers: () => apiFetch<Array<{ broker: string; status: string; account_id: string | null }>>('/v1/me/brokers'),
   tradierAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/tradier/authorize'),
+  tradierConnectToken: (body: { access_token: string; account_id?: string }) =>
+    apiFetch<{ broker: string; status: string; account_id: string | null }>(
+      '/v1/me/brokers/tradier/token',
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
