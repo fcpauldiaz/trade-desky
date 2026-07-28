@@ -64,3 +64,85 @@ skills:
   - when: "Programmatic route tree building as an alternative to filesystem conventions: rootRoute, index, route, layout, physical, defineVirtualSubtreeConfig. Use with TanStack Router plugin's virtualRouteConfig option."
     use: "@tanstack/virtual-file-routes#virtual-file-routes"
 <!-- intent-skills:end -->
+
+# Trade Platform — Agent Guide
+
+## Design system (JobAlert-inspired)
+
+Reference site: [jobalert.world](https://jobalert.world). The product uses a **light-only**, **neo-brutalist** UI: white/gray backgrounds, **yellow (`#facc15`) + black borders**, hard offset shadows (`4px 4px 0 #000`), **Inter** font, `font-weight: 900` headlines.
+
+**Do not** reintroduce dark mode, lagoon/teal gradients, Fraunces serif, or glassmorphism.
+
+### Global (all routes)
+
+- `src/styles.css` — design tokens and component classes
+- `src/routes/__root.tsx` — forces `light` theme; shared header/footer
+- `src/components/Header.tsx`, `src/components/Footer.tsx` — JobAlert-style chrome
+
+CSS variables (also aliased for legacy code):
+
+| Token | Value / role |
+|-------|----------------|
+| `--ja-yellow` | Primary CTA / highlights |
+| `--ja-pink` | Secondary highlight underline |
+| `--ja-black` | Borders, headline text |
+| `--ja-gray-600` | Muted body copy |
+| `--lagoon-deep` | Alias → yellow (legacy buttons still work) |
+
+### Use these classes for new marketing / public UI
+
+| Class | Use |
+|-------|-----|
+| `marketing-page` | Public page wrapper (white bg) |
+| `marketing-section`, `section-head`, `section-badge` | Content sections |
+| `btn-primary`, `btn-secondary`, `btn-black` | CTAs (yellow + black border + shadow) |
+| `feature-item` | Bordered cards |
+| `hero-highlight` + `HeroHighlight` | Title marker underlines (yellow/pink) |
+| `SocialProof` | “Join N+ traders!” bar (live count) |
+| `demo-input`, `demo-button` | Forms on auth pages |
+
+Marketing components live in `src/components/marketing/`.
+
+### Style coverage by route
+
+| Route | Status | Notes |
+|-------|--------|-------|
+| `/` | **Full** | Hero, features, FAQ, social proof, CTA band |
+| `/pricing` | **Full** | `marketing-page`, pricing cards, `btn-primary` |
+| `/login`, `/signup` | **Full** | `marketing-page`, `feature-item` forms |
+| `/reviews`, `/support` | **Full** | Marketing headers and cards |
+| `/privacy`, `/terms` | **Partial** | Plain `prose` only — not yet neo-brutalist |
+| `/dashboard` | **Partial** | `island-shell` cards; generic headings; inline Tailwind buttons |
+| `/connections`, `/settings`, `/billing` | **Partial** | Same as dashboard |
+| `/onboarding` | **Partial** | `island-shell`; old `rounded-full bg-[var(--lagoon-deep)]` buttons |
+
+When touching **app/authenticated pages**, prefer migrating to `btn-primary`, `feature-item`, and `marketing-page-header` for consistency.
+
+### Hero title pattern
+
+Use `HeroHighlight` (`src/components/marketing/HeroHighlight.tsx`), not CSS `::after`:
+
+```tsx
+<HeroHighlight variant="yellow">broker orders</HeroHighlight>
+<HeroHighlight variant="pink">automatically</HeroHighlight>
+```
+
+Underline = thick absolute bar (`height: 1rem`), rotated ±1deg, text on `z-index: 1`.
+
+### Social proof
+
+- Component: `src/components/marketing/SocialProof.tsx`
+- Fetches `GET {VITE_RECEIVER_API_URL}/v1/stats/public` → `{ user_count }`
+- Formatting: `src/lib/public-stats.ts` (`formatSocialProofCount`)
+- Hidden when count is 0 or API fails
+- **Requires trade-receiver deployed** with stats endpoint
+
+### Auth & data (not visual)
+
+- Better Auth + shared Turso DB with trade-receiver
+- Desktop ingest via device token; no per-user webhook URLs
+- Receiver API client: `src/lib/api-client.ts`
+
+### Outdated docs
+
+`DESIGN.md` still describes the old lagoon palette — treat **this file** and `src/styles.css` as source of truth for UI work.
