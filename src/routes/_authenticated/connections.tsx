@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { api } from '#/lib/api-client'
+import { api, type BrokerConnection, type TradierEnvironment } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 
 export const Route = createFileRoute('/_authenticated/connections')({ component: ConnectionsPage })
 
 function ConnectionsPage() {
   const navigate = useNavigate()
-  const [brokers, setBrokers] = useState<Awaited<ReturnType<typeof api.brokers>>>([])
+  const [brokers, setBrokers] = useState<BrokerConnection[]>([])
   const [canTrade, setCanTrade] = useState(false)
   const [defaultBroker, setDefaultBroker] = useState<string | null>(null)
   const [testMsg, setTestMsg] = useState<Record<string, string>>({})
@@ -15,12 +15,20 @@ function ConnectionsPage() {
   const [error, setError] = useState('')
   const [tradierToken, setTradierToken] = useState('')
   const [tradierAccountId, setTradierAccountId] = useState('')
+  const [tradierEnvironment, setTradierEnvironment] = useState<TradierEnvironment>('sandbox')
   const [savingTradier, setSavingTradier] = useState(false)
+
+  const tradier = brokers.find((b) => b.broker === 'tradier')
+  const tradierConnected = tradier?.status === 'connected'
 
   async function refreshBrokers() {
     const [list, settings] = await Promise.all([api.brokers(), api.settings()])
     setBrokers(list)
     setDefaultBroker(settings.default_broker)
+    const connected = list.find((b) => b.broker === 'tradier' && b.status === 'connected')
+    if (connected?.environment === 'sandbox' || connected?.environment === 'live') {
+      setTradierEnvironment(connected.environment)
+    }
   }
 
   useEffect(() => {
@@ -37,7 +45,7 @@ function ConnectionsPage() {
 
   async function connectTradierOAuth() {
     try {
-      const { url } = await api.tradierAuthorize()
+      const { url } = await api.tradierAuthorize(tradierEnvironment)
       window.location.href = url
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Tradier OAuth connect failed')
@@ -52,11 +60,14 @@ function ConnectionsPage() {
       await api.tradierConnectToken({
         access_token: tradierToken.trim(),
         account_id: tradierAccountId.trim() || undefined,
+        environment: tradierEnvironment,
       })
       setTradierToken('')
       setTradierAccountId('')
       await refreshBrokers()
-      navigate({ to: '/onboarding', search: { broker: 'tradier' } })
+      if (!tradierConnected) {
+        navigate({ to: '/onboarding', search: { broker: 'tradier' } })
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Tradier token connect failed')
     } finally {
@@ -95,6 +106,12 @@ function ConnectionsPage() {
     await refreshBrokers()
   }
 
+  function environmentLabel(environment: string | null | undefined) {
+    if (environment === 'live') return 'live'
+    if (environment === 'sandbox') return 'paper'
+    return null
+  }
+
   return (
     <main className="page-wrap max-w-2xl space-y-6 px-4 py-10">
       <h1 className="text-3xl font-bold">Broker connections</h1>
@@ -105,7 +122,9 @@ function ConnectionsPage() {
           <li key={b.broker} className="island-shell rounded-xl px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span>
-                {b.broker}: {b.status} {b.account_id && `(${b.account_id})`}
+                {b.broker}: {b.status}
+                {b.account_id && ` (${b.account_id})`}
+                {environmentLabel(b.environment) && ` — ${environmentLabel(b.environment)}`}
                 {defaultBroker === b.broker && ' — default'}
               </span>
               {b.status === 'connected' && canTrade && (
@@ -132,19 +151,44 @@ function ConnectionsPage() {
             <div>
               <h2 className="font-semibold">Tradier</h2>
               <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                Use your personal API token from{' '}
-                <a
-                  href="https://dash.tradier.com/settings/api"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Tradier API settings
-                </a>
-                . Match sandbox vs live with the receiver&apos;s <code>TRADIER_API_BASE</code>.
+                {tradierConnected
+                  ? 'Switch paper/live by selecting an environment and pasting the matching API token.'
+                  : 'Connect with your personal API token from '}
+                {!tradierConnected && (
+                  <a
+                    href="https://dash.tradier.com/settings/api"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Tradier API settings
+                  </a>
+                )}
+                {!tradierConnected && '. Sandbox token for paper, production token for live.'}
               </p>
             </div>
             <form onSubmit={connectTradierToken} className="space-y-3">
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium">Environment</legend>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="tradier-environment"
+                    checked={tradierEnvironment === 'sandbox'}
+                    onChange={() => setTradierEnvironment('sandbox')}
+                  />
+                  Paper (sandbox)
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="tradier-environment"
+                    checked={tradierEnvironment === 'live'}
+                    onChange={() => setTradierEnvironment('live')}
+                  />
+                  Live (production)
+                </label>
+              </fieldset>
               <label className="block text-sm">
                 Access token
                 <input
@@ -153,7 +197,11 @@ function ConnectionsPage() {
                   className="demo-input mt-1 w-full"
                   value={tradierToken}
                   onChange={(e) => setTradierToken(e.target.value)}
-                  placeholder="Paste sandbox or production API token"
+                  placeholder={
+                    tradierEnvironment === 'sandbox'
+                      ? 'Paste sandbox API token'
+                      : 'Paste production API token'
+                  }
                   required
                 />
               </label>
@@ -173,7 +221,11 @@ function ConnectionsPage() {
                 disabled={savingTradier || !tradierToken.trim()}
                 className="rounded-full bg-[var(--lagoon-deep)] px-4 py-2 text-sm text-white disabled:opacity-50"
               >
-                {savingTradier ? 'Connecting…' : 'Connect with API token'}
+                {savingTradier
+                  ? 'Saving…'
+                  : tradierConnected
+                    ? `Switch to ${tradierEnvironment === 'sandbox' ? 'paper' : 'live'}`
+                    : 'Connect with API token'}
               </button>
             </form>
             <div className="border-t border-[var(--line)] pt-4">
@@ -181,7 +233,7 @@ function ConnectionsPage() {
                 Partner OAuth (requires TRADIER_CLIENT_ID / SECRET on the server):
               </p>
               <button type="button" onClick={connectTradierOAuth} className="rounded-full border px-4 py-2 text-sm">
-                Connect via OAuth
+                Connect via OAuth ({tradierEnvironment === 'sandbox' ? 'paper' : 'live'})
               </button>
             </div>
           </div>

@@ -28,6 +28,15 @@ export type Trade = {
   created_at: string
 }
 
+export type TradierEnvironment = 'sandbox' | 'live'
+
+export type BrokerConnection = {
+  broker: string
+  status: string
+  account_id: string | null
+  environment: string | null
+}
+
 let cachedToken: string | null = null
 let cachedTokenExpiresAt = 0
 
@@ -77,13 +86,20 @@ export const api = {
       onboarding_completed: boolean
     }>('/v1/me'),
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
-  brokers: () => apiFetch<Array<{ broker: string; status: string; account_id: string | null }>>('/v1/me/brokers'),
-  tradierAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/tradier/authorize'),
-  tradierConnectToken: (body: { access_token: string; account_id?: string }) =>
-    apiFetch<{ broker: string; status: string; account_id: string | null }>(
-      '/v1/me/brokers/tradier/token',
-      { method: 'POST', body: JSON.stringify(body) },
-    ),
+  brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),
+  tradierAuthorize: (environment: TradierEnvironment = 'sandbox') =>
+    apiFetch<{ url: string }>(`/v1/me/brokers/tradier/authorize?environment=${environment}`),
+  tradierConnectToken: (body: {
+    access_token: string
+    account_id?: string
+    environment: TradierEnvironment
+  }) =>
+    apiFetch<{
+      broker: string
+      status: string
+      account_id: string | null
+      environment: TradierEnvironment
+    }>('/v1/me/brokers/tradier/token', { method: 'POST', body: JSON.stringify(body) }),
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
