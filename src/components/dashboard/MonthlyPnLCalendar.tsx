@@ -33,7 +33,10 @@ export default function MonthlyPnLCalendar({ dailyPnl, month, trades = [] }: Pro
   }
 
   const dayTrades = selectedDay
-    ? trades.filter((t) => t.created_at.startsWith(selectedDay))
+    ? trades.filter((t) => {
+        const day = t.created_at.slice(0, 10)
+        return day === selectedDay
+      })
     : []
 
   return (

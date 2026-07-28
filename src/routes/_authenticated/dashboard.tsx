@@ -15,7 +15,10 @@ function DashboardPage() {
   const [daily, setDaily] = useState<Record<string, number>>({})
   const [trades, setTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [error, setError] = useState('')
-  const month = useMemo(() => new Date().toISOString().slice(0, 7), [])
+  const month = useMemo(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  }, [])
 
   useEffect(() => {
     api.billing()
@@ -25,7 +28,10 @@ function DashboardPage() {
         setError('Could not load billing status')
       })
     api.summary().then(setSummary).catch(() => setError('Could not load performance summary'))
-    api.dailyPnl(month).then(setDaily).catch(() => {})
+    api
+      .dailyPnl(month)
+      .then(setDaily)
+      .catch(() => setError('Could not load daily P&L'))
     api.trades(mode || undefined).then(setTrades).catch(() => setError('Could not load trades'))
   }, [mode, month])
 
