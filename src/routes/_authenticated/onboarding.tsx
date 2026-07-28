@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import type { UserSettings } from '#/lib/sizing-types'
+import OnboardingDesktopStep from '#/components/onboarding/OnboardingDesktopStep'
 import OnboardingSizingStep from '#/components/onboarding/OnboardingSizingStep'
 import OnboardingTestStep from '#/components/onboarding/OnboardingTestStep'
 
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/_authenticated/onboarding')({
 function OnboardingPage() {
   const navigate = useNavigate()
   const { broker } = Route.useSearch()
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [settings, setSettings] = useState<UserSettings>({
     default_mode: 'paper',
     max_contracts: 1,
@@ -41,7 +42,7 @@ function OnboardingPage() {
     setError('')
     try {
       await api.updateSettings(settings)
-      setStep(2)
+      setStep(3)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save settings')
     } finally {
@@ -59,11 +60,13 @@ function OnboardingPage() {
       <header>
         <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Set up trading</h1>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
-          {broker ? `${broker} connected — ` : ''}configure sizing and verify your broker connection.
+          {broker ? `${broker} connected — ` : ''}install the desktop app, configure sizing, and verify your broker.
         </p>
       </header>
 
-      {step === 1 && (
+      {step === 1 && <OnboardingDesktopStep onContinue={() => setStep(2)} />}
+
+      {step === 2 && (
         <OnboardingSizingStep
           settings={settings}
           onChange={setSettings}
@@ -73,7 +76,7 @@ function OnboardingPage() {
         />
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <OnboardingTestStep
           broker={broker || 'broker'}
           defaultMode={settings.default_mode}

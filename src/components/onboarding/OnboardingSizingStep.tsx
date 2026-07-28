@@ -30,7 +30,7 @@ export default function OnboardingSizingStep({ settings, onChange, onContinue, s
   return (
     <div className="island-shell space-y-5 rounded-2xl p-6">
       <div>
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 1 of 2</p>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 2 of 3</p>
         <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Choose your trade sizing</h2>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
           Pick how many contracts to trade when an alert comes in. You can change this later in Settings.

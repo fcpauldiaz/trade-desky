@@ -32,7 +32,7 @@ export default function OnboardingTestStep({ broker, defaultMode, onSkip, onComp
   return (
     <div className="island-shell space-y-5 rounded-2xl p-6">
       <div>
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 2 of 2</p>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 3 of 3</p>
         <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Test your connection</h2>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
           We&apos;ll place a 1-share SPY market buy through your connected <strong>{broker}</strong> broker using your
@@ -63,14 +63,6 @@ export default function OnboardingTestStep({ broker, defaultMode, onSkip, onComp
 
       {result && <p className="text-sm text-green-700">{result}</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
-
-      <div className="rounded-xl border border-[var(--line)] bg-[var(--chip-bg)] p-4 text-sm text-[var(--sea-ink-soft)]">
-        <p className="m-0 font-semibold text-[var(--sea-ink)]">Next: install the desktop app</p>
-        <p className="mt-2 mb-0">
-          Download Notification Watcher for macOS or Windows, then sign in with the same email and password.
-          Alerts will forward automatically — no webhook URL to copy.
-        </p>
-      </div>
 
       <div className="flex flex-wrap gap-3 pt-2">
         <button type="button" onClick={onSkip} className="rounded-full border border-[var(--line)] px-4 py-2 text-sm">
