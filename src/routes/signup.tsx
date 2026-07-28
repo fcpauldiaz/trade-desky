@@ -30,9 +30,22 @@ function SignupPage() {
       </header>
       <form onSubmit={onSubmit} className="feature-item mx-auto max-w-md space-y-4">
         <label className="block text-sm">
+          Name
+          <input
+            name="name"
+            type="text"
+            autoComplete="name"
+            className="demo-input mt-1"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
+        <label className="block text-sm">
           Email
           <input
+            name="email"
             type="email"
+            autoComplete="email"
             className="demo-input mt-1"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -42,20 +55,14 @@ function SignupPage() {
         <label className="block text-sm">
           Password
           <input
+            name="password"
             type="password"
+            autoComplete="new-password"
             className="demo-input mt-1"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
             required
-          />
-        </label>
-        <label className="block text-sm">
-          Name
-          <input
-            className="demo-input mt-1"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
           />
         </label>
         {error && <p className="text-sm text-red-600">{error}</p>}

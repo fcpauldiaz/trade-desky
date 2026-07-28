@@ -31,7 +31,9 @@ function LoginPage() {
         <label className="block text-sm">
           Email
           <input
+            name="email"
             type="email"
+            autoComplete="username"
             className="demo-input mt-1"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -41,7 +43,9 @@ function LoginPage() {
         <label className="block text-sm">
           Password
           <input
+            name="password"
             type="password"
+            autoComplete="current-password"
             className="demo-input mt-1"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
