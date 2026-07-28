@@ -17,9 +17,13 @@ export default function Header() {
     <header className="site-header">
       <nav className="page-wrap site-header-inner px-4 sm:px-6 lg:px-8">
         <Link to="/" className="site-brand">
-          <span className="site-logo-mark" aria-hidden="true">
-            TP
-          </span>
+          <img
+            src="/logo192.png"
+            alt=""
+            width={40}
+            height={40}
+            className="site-logo-mark"
+          />
           <span className="site-logo-text">Trade Platform</span>
         </Link>
         <div className="site-nav">

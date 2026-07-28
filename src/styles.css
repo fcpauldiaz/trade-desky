@@ -123,17 +123,12 @@ a:hover {
 }
 
 .site-logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.5rem;
-  background: var(--ja-yellow);
-  border: 2px solid var(--ja-black);
   box-shadow: 2px 2px 0 var(--ja-black);
-  font-weight: 900;
-  font-size: 0.875rem;
+  object-fit: cover;
 }
 
 .site-logo-text {
