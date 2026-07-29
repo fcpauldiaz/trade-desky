@@ -10,33 +10,11 @@ import { api } from '#/lib/api-client'
 
 export const Route = createFileRoute('/pricing')({ component: PricingPage })
 
-type PlanId = 'free' | 'pro'
-
-const PLANS = [
-  {
-    id: 'free' as const,
-    name: 'Free',
-    billing: 'Explore the platform',
-    price: '$0',
-    period: '/mo',
-    features: ['Dashboard access', 'No trade processing', 'No desktop automation'],
-  },
-  {
-    id: 'pro' as const,
-    name: 'Pro',
-    billing: 'Billed monthly via Lemon Squeezy',
-    price: 'Pro',
-    period: ' plan',
-    badge: 'Most Popular',
-    offer: 'Full automation',
-    featured: true,
-    features: [
-      'AI trade parsing + execution',
-      'Paper and live trading',
-      'Desktop app automation',
-      'Performance dashboards',
-    ],
-  },
+const PRO_FEATURES = [
+  'AI trade parsing + execution',
+  'Paper and live trading',
+  'Desktop app automation',
+  'Performance dashboards',
 ] as const
 
 const BEFORE_ITEMS = [
@@ -79,7 +57,6 @@ function PricingPage() {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
   const [email, setEmail] = useState('')
-  const [selected, setSelected] = useState<PlanId>('pro')
 
   useEffect(() => {
     if (!session?.user) return
@@ -93,13 +70,6 @@ function PricingPage() {
   }, [session?.user])
 
   function renderCta() {
-    if (selected === 'free') {
-      return (
-        <Link to="/signup" className="btn-primary btn-primary-lg pricing-cta">
-          Get Started
-        </Link>
-      )
-    }
     if (session?.user && userId) {
       return (
         <a href={checkoutUrl(userId, email)} className="btn-primary btn-primary-lg pricing-cta">
@@ -123,49 +93,33 @@ function PricingPage() {
               Simple, <HeroHighlight variant="yellow">Transparent</HeroHighlight> Pricing
             </h1>
             <p className="marketing-section-subtitle pricing-hero-sub">
-              Start free, upgrade when you are ready to automate execution. Cancel anytime.
+              One plan for automated alert capture and broker execution. Cancel anytime.
             </p>
           </div>
 
-          <div className="pricing-plan-grid" role="radiogroup" aria-label="Choose a plan">
-            {PLANS.map((plan) => {
-              const isSelected = selected === plan.id
-              return (
-                <button
-                  key={plan.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`pricing-plan-card${'featured' in plan && plan.featured ? ' is-featured' : ''}${isSelected ? ' is-selected' : ''}`}
-                  onClick={() => setSelected(plan.id)}
-                >
-                  {'badge' in plan && plan.badge ? (
-                    <span className="pricing-plan-badge">{plan.badge}</span>
-                  ) : null}
-                  <div className="pricing-plan-top">
-                    <div>
-                      <h2 className="pricing-plan-name">{plan.name}</h2>
-                      <p className="pricing-plan-billing">{plan.billing}</p>
-                    </div>
-                    <span className="pricing-plan-radio" aria-hidden="true">
-                      {isSelected ? '✓' : ''}
-                    </span>
-                  </div>
-                  <p className="pricing-plan-price">
-                    <span className="pricing-plan-price-main">{plan.price}</span>
-                    {plan.period ? <span className="pricing-plan-price-period">{plan.period}</span> : null}
-                  </p>
-                  {'offer' in plan && plan.offer ? (
-                    <span className="pricing-plan-offer">{plan.offer}</span>
-                  ) : null}
-                  <ul className="pricing-plan-features">
-                    {plan.features.map((feature) => (
-                      <li key={feature}>{feature}</li>
-                    ))}
-                  </ul>
-                </button>
-              )
-            })}
+          <div className="pricing-plan-grid pricing-plan-grid-single">
+            <article className="pricing-plan-card is-featured is-selected">
+              <span className="pricing-plan-badge">Most Popular</span>
+              <div className="pricing-plan-top">
+                <div>
+                  <h2 className="pricing-plan-name">Pro</h2>
+                  <p className="pricing-plan-billing">Billed monthly via Lemon Squeezy</p>
+                </div>
+                <span className="pricing-plan-radio" aria-hidden="true">
+                  ✓
+                </span>
+              </div>
+              <p className="pricing-plan-price">
+                <span className="pricing-plan-price-main">Pro</span>
+                <span className="pricing-plan-price-period"> plan</span>
+              </p>
+              <span className="pricing-plan-offer">Full automation</span>
+              <ul className="pricing-plan-features">
+                {PRO_FEATURES.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            </article>
           </div>
 
           <div className="pricing-cta-block">
@@ -227,7 +181,7 @@ function PricingPage() {
             <h2 className="marketing-section-title">Your advantage over time</h2>
             <p className="marketing-section-subtitle">
               Traders who automate alert capture spend less time babysitting Discord and more time
-              managing risk. Pro unlocks execution; Free lets you explore the dashboard first.
+              managing risk.
             </p>
           </div>
           <div className="pricing-advantage-list">

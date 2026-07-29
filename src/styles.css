@@ -880,6 +880,11 @@ a:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
   }
+
+  .pricing-plan-grid-single {
+    grid-template-columns: minmax(0, 28rem);
+    justify-content: center;
+  }
 }
 
 .pricing-plan-card {
