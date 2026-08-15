@@ -17,9 +17,9 @@ function ensureLocalDatabaseDirectory(url: string): void {
 const config = resolveLibsqlConfig()
 ensureLocalDatabaseDirectory(config.url)
 
-const client = createClient({
+export const dbClient = createClient({
   url: config.url,
   authToken: config.authToken,
 })
 
-export const db = drizzle(client)
+export const db = drizzle(dbClient)

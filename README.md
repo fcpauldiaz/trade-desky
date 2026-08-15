@@ -16,7 +16,7 @@ Also run [trade-receiver](https://github.com/fcpauldiaz/trade-receiver) on port 
 
 ## Auth
 
-Sign up and log in use **Better Auth** (email + password). Auth tables (`user`, `session`, `account`, `jwks`, …) live in the **same libSQL database** as trade-receiver (`users`, `subscriptions`, trades, …). On signup, the platform provisions a linked receiver row via `POST /v1/internal/provision`.
+Sign up and log in use **Better Auth** (email + password). Auth lives in the **same libSQL `users` table** as trade-receiver (plus `session` / `account` / `jwks`). On signup, the platform ensures a receiver subscription row via `POST /v1/internal/provision`.
 
 API calls to trade-receiver use a **Better Auth JWT** (`Authorization: Bearer …`), not cookies.
 
