@@ -9,12 +9,12 @@ user. Migration 010 remaps existing ids and drops the leftover `user` table.
 ---
  AGENTS.md                                |   2 +-
  README.md                                |   2 +-
- alembic/versions/010_unify_auth_users.py | 117 +++++++++++++++++++++++
+ alembic/versions/010_unify_auth_users.py | 201 +++++++++++++++++++++++
  app/api/deps.py                          |   2 +-
  app/api/internal.py                      |  23 +++--
  app/models/tables.py                     |   4 +-
  tests/test_provision.py                  |  25 ++++-
- 7 files changed, 160 insertions(+), 15 deletions(-)
+ 7 files changed, 276 insertions(+), 15 deletions(-)
  create mode 100644 alembic/versions/010_unify_auth_users.py
 
 diff --git a/AGENTS.md b/AGENTS.md
@@ -100,7 +100,126 @@ index 0000000..3acc776
 +            )
 +
 +
-+def upgrade() -> None:
++def _session_user_id_expr(has_user_table: bool) -> str:
++    if has_user_table:
++        return """
++            COALESCE(
++                (SELECT users.id FROM users
++                 JOIN user ON user.email = users.email
++                 WHERE user.id = session.user_id),
++                (SELECT users.id FROM users WHERE users.id = session.user_id),
++                session.user_id
++            )
++        """
++    return """
++        COALESCE(
++            (SELECT users.id FROM users WHERE users.id = session.user_id),
++            session.user_id
++        )
++    """
++
++
++def _account_user_id_expr(has_user_table: bool) -> str:
++    if has_user_table:
++        return """
++            COALESCE(
++                (SELECT users.id FROM users
++                 JOIN user ON user.email = users.email
++                 WHERE user.id = account.user_id),
++                (SELECT users.id FROM users WHERE users.id = account.user_id),
++                account.user_id
++            )
++        """
++    return """
++        COALESCE(
++            (SELECT users.id FROM users WHERE users.id = account.user_id),
++            account.user_id
++        )
++    """
++
++
++def _recreate_auth_foreign_keys_to_users(conn) -> None:
++    tables = _table_names()
++    has_user_table = "user" in tables
++    conn.execute(text("PRAGMA foreign_keys=OFF"))
++
++    if "session" in tables:
++        conn.execute(text("""
++            CREATE TABLE session_new (
++                id text PRIMARY KEY NOT NULL,
++                expires_at integer NOT NULL,
++                token text NOT NULL,
++                created_at integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
++                updated_at integer NOT NULL,
++                ip_address text,
++                user_agent text,
++                user_id text NOT NULL,
++                FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE no action ON DELETE cascade
++            )
++        """))
++        conn.execute(
++            text(
++                f"""
++                INSERT INTO session_new (
++                    id, expires_at, token, created_at, updated_at, ip_address, user_agent, user_id
++                )
++                SELECT session.id, session.expires_at, session.token, session.created_at,
++                       session.updated_at, session.ip_address, session.user_agent,
++                       {_session_user_id_expr(has_user_table)}
++                FROM session
++                """
++            )
++        )
++        conn.execute(text("DROP TABLE session"))
++        conn.execute(text("ALTER TABLE session_new RENAME TO session"))
++        conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS session_token_unique ON session (token)"))
++        conn.execute(text("CREATE INDEX IF NOT EXISTS session_userId_idx ON session (user_id)"))
++
++    tables = _table_names()
++    if "account" in tables:
++        conn.execute(text("""
++            CREATE TABLE account_new (
++                id text PRIMARY KEY NOT NULL,
++                account_id text NOT NULL,
++                provider_id text NOT NULL,
++                user_id text NOT NULL,
++                access_token text,
++                refresh_token text,
++                id_token text,
++                access_token_expires_at integer,
++                refresh_token_expires_at integer,
++                scope text,
++                password text,
++                created_at integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
++                updated_at integer NOT NULL,
++                FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE no action ON DELETE cascade
++            )
++        """))
++        conn.execute(
++            text(
++                f"""
++                INSERT INTO account_new (
++                    id, account_id, provider_id, user_id, access_token, refresh_token,
++                    id_token, access_token_expires_at, refresh_token_expires_at, scope,
++                    password, created_at, updated_at
++                )
++                SELECT account.id, account.account_id, account.provider_id,
++                       {_account_user_id_expr(has_user_table)},
++                       account.access_token, account.refresh_token, account.id_token,
++                       account.access_token_expires_at, account.refresh_token_expires_at,
++                       account.scope, account.password, account.created_at, account.updated_at
++                FROM account
++                """
++            )
++        )
++        conn.execute(text("DROP TABLE account"))
++        conn.execute(text("ALTER TABLE account_new RENAME TO account"))
++        conn.execute(text("CREATE INDEX IF NOT EXISTS account_userId_idx ON account (user_id)"))
++
++    conn.execute(text("PRAGMA foreign_keys=ON"))
++
++
+ def upgrade() -> None:
 +    conn = op.get_bind()
 +    tables = _table_names()
 +    if "users" not in tables:
@@ -142,7 +261,6 @@ index 0000000..3acc776
 +        if "ix_users_better_auth_id" in _index_names("users"):
 +            op.drop_index("ix_users_better_auth_id", table_name="users")
 +        op.drop_column("users", "better_auth_id")
-+        conn.execute(text("PRAGMA foreign_keys=ON"))
 +
 +    tables = _table_names()
 +    if "user" in tables:
@@ -152,7 +270,13 @@ index 0000000..3acc776
 +                "SELECT id, name, email, email_verified, image, created_at, updated_at FROM user"
 +            )
 +        )
++        tables = _table_names()
++        if "session" in tables or "account" in tables:
++            _recreate_auth_foreign_keys_to_users(conn)
++        conn.execute(text("PRAGMA foreign_keys=OFF"))
 +        op.drop_table("user")
++
++    conn.execute(text("PRAGMA foreign_keys=ON"))
 +
 +
 +def downgrade() -> None:
