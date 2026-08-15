@@ -1,4 +1,4 @@
-# Trade Platform — Product Register
+# Trade Desky — Product Register
 
 ## Audience
 Active options traders who follow Discord alert channels and want automated execution with guardrails.

@@ -65,7 +65,7 @@ skills:
     use: "@tanstack/virtual-file-routes#virtual-file-routes"
 <!-- intent-skills:end -->
 
-# Trade Platform — Agent Guide
+# Trade Desky — Agent Guide
 
 ## Design system (JobAlert-inspired)
 

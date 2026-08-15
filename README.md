@@ -1,11 +1,11 @@
-# Trade Platform
+# Trade Desky
 
 TanStack Start marketing site and logged-in app for broker connections, desktop app sign-in, billing, and performance dashboards.
 
 ## Quick start
 
 ```bash
-cd trade-platform
+cd trade-desky
 cp .env.example .env
 npm install
 npm run db:migrate

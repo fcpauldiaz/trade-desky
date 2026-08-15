@@ -1,6 +1,6 @@
 const FAQ = [
   {
-    q: 'Why use Trade Platform instead of copying alerts manually?',
+    q: 'Why use Trade Desky instead of copying alerts manually?',
     a: 'The desktop app captures notifications as they arrive, AI parses the trade intent, and your broker can execute before you finish switching apps.',
   },
   {

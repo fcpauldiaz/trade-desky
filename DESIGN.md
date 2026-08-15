@@ -1,7 +1,7 @@
-# Trade Platform — Design Register
+# Trade Desky — Design Register
 
 ## Brand
-- Name: Trade Platform
+- Name: Trade Desky
 - Tone: Calm, precise, trustworthy (not hype trading bro)
 - Palette: Sea/lagoon OKLCH tokens from starter (`--sea-ink`, `--lagoon-deep`, `--chip-bg`, `--line`)
 

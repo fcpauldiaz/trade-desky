@@ -140,7 +140,7 @@ function PricingPage() {
         <div className="page-wrap px-4 sm:px-6 lg:px-8">
           <div className="section-head">
             <h2 className="marketing-section-title">
-              What you get with <HeroHighlight variant="yellow">Trade Platform</HeroHighlight>
+              What you get with <HeroHighlight variant="yellow">Trade Desky</HeroHighlight>
             </h2>
           </div>
           <div className="pricing-compare-grid">
@@ -158,7 +158,7 @@ function PricingPage() {
               </ul>
             </article>
             <article className="pricing-compare-card pricing-compare-with">
-              <span className="pricing-compare-tag pricing-compare-tag-with">With Trade Platform</span>
+              <span className="pricing-compare-tag pricing-compare-tag-with">With Trade Desky</span>
               <ul className="pricing-compare-list">
                 {WITH_ITEMS.map((item) => (
                   <li key={item.text}>

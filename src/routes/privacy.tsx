@@ -8,7 +8,7 @@ function PrivacyPage() {
       <h1>Privacy Policy</h1>
       <p>We store your email, API key hash, broker OAuth tokens (encrypted), trade history, and subscription status.</p>
       <p>Broker tokens are encrypted at rest. We do not sell your data.</p>
-      <p>Notification Watcher runs on your device; when signed in, alert text is sent to the Trade Platform ingest endpoint.</p>
+      <p>Notification Watcher runs on your device; when signed in, alert text is sent to the Trade Desky ingest endpoint.</p>
     </main>
   )
 }

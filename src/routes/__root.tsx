@@ -19,7 +19,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Trade Platform',
+        title: 'Trade Desky',
       },
     ],
     links: [
@@ -28,9 +28,9 @@ export const Route = createRootRoute({
         href: appCss,
       },
       // Prefer PNG first; cache-bust so browsers drop the old CRA/React favicon.ico
-      { rel: 'icon', href: '/favicon-32.png?v=2', type: 'image/png', sizes: '32x32' },
-      { rel: 'icon', href: '/favicon-v2.ico?v=2', sizes: 'any' },
-      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png?v=2', sizes: '180x180' },
+      { rel: 'icon', href: '/favicon-32.png?v=3', type: 'image/png', sizes: '32x32' },
+      { rel: 'icon', href: '/favicon-v2.ico?v=3', sizes: 'any' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png?v=3', sizes: '180x180' },
       { rel: 'manifest', href: '/manifest.json' },
     ],
   }),

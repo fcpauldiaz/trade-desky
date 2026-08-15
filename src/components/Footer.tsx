@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="page-wrap site-footer-inner px-4 sm:px-6 lg:px-8">
         <div className="site-footer-brand">
-          <h2>Trade Platform</h2>
+          <h2>Trade Desky</h2>
           <p>Notification alerts → AI parsing → broker execution. Not financial advice.</p>
         </div>
         <div className="site-footer-col">
@@ -37,7 +37,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="page-wrap site-footer-bottom px-4 sm:px-6 lg:px-8">
-        &copy; {year} Trade Platform. Trading involves risk.
+        &copy; {year} Trade Desky. Trading involves risk.
       </div>
     </footer>
   )

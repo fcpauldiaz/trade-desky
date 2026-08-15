@@ -24,7 +24,7 @@ export default function Header() {
             height={40}
             className="site-logo-mark"
           />
-          <span className="site-logo-text">Trade Platform</span>
+          <span className="site-logo-text">Trade Desky</span>
         </Link>
         <div className="site-nav">
           <Link to="/" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
