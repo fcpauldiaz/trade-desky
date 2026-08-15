@@ -21,7 +21,7 @@ Active options traders who follow Discord alert channels and want automated exec
 | Route | Purpose |
 |-------|---------|
 | `/` | Marketing |
-| `/pricing` | Lemon Squeezy checkout |
+| `/pricing` | Creem checkout |
 | `/dashboard` | Performance |
 | `/connections` | Broker OAuth |
 | `/settings` | Paper/live, caps, tickers |
