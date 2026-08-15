@@ -54,7 +54,7 @@ function BillingPage() {
         </div>
       )}
       <div className="flex flex-wrap gap-3">
-        {billing && !billing.can_process_trades ? (
+        {!billing?.can_process_trades ? (
           <button
             type="button"
             className="btn-primary"
