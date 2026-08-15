@@ -4,7 +4,7 @@ import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
-import { checkoutUrl } from '#/lib/lemon-squeezy'
+import { checkoutUrl } from '#/lib/creem'
 import { useSession } from '#/lib/auth-client'
 import { api } from '#/lib/api-client'
 
@@ -103,7 +103,7 @@ function PricingPage() {
               <div className="pricing-plan-top">
                 <div>
                   <h2 className="pricing-plan-name">Pro</h2>
-                  <p className="pricing-plan-billing">Billed monthly via Lemon Squeezy</p>
+                  <p className="pricing-plan-billing">Billed monthly via Creem</p>
                 </div>
                 <span className="pricing-plan-radio" aria-hidden="true">
                   ✓

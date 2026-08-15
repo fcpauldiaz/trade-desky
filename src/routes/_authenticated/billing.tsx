@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
-import { checkoutUrl } from '#/lib/lemon-squeezy'
+import { checkoutUrl } from '#/lib/creem'
 import UpgradeBanner from '#/components/UpgradeBanner'
 
 export const Route = createFileRoute('/_authenticated/billing')({ component: BillingPage })
