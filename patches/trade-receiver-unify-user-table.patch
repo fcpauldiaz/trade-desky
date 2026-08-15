@@ -48,7 +48,7 @@ new file mode 100644
 index 0000000..3acc776
 --- /dev/null
 +++ b/alembic/versions/010_unify_auth_users.py
-@@ -0,0 +1,117 @@
+@@ -0,0 +1,241 @@
 +"""unify Better Auth user into users
 +
 +Revision ID: 010
@@ -219,7 +219,7 @@ index 0000000..3acc776
 +    conn.execute(text("PRAGMA foreign_keys=ON"))
 +
 +
- def upgrade() -> None:
++def upgrade() -> None:
 +    conn = op.get_bind()
 +    tables = _table_names()
 +    if "users" not in tables:
