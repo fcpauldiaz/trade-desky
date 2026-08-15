@@ -1,0 +1,317 @@
+From 95c5761ca9d3bd9673f6dca5bb805c454f707ab3 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Sat, 15 Aug 2026 17:27:50 +0000
+Subject: [PATCH] Use Better Auth user id as the users primary key
+
+Drop better_auth_id and look up JWT `sub` on users.id. Provision now
+ensures a subscription for that same row instead of inserting a second
+user. Migration 010 remaps existing ids and drops the leftover `user` table.
+---
+ AGENTS.md                                |   2 +-
+ README.md                                |   2 +-
+ alembic/versions/010_unify_auth_users.py | 117 +++++++++++++++++++++++
+ app/api/deps.py                          |   2 +-
+ app/api/internal.py                      |  23 +++--
+ app/models/tables.py                     |   4 +-
+ tests/test_provision.py                  |  25 ++++-
+ 7 files changed, 160 insertions(+), 15 deletions(-)
+ create mode 100644 alembic/versions/010_unify_auth_users.py
+
+diff --git a/AGENTS.md b/AGENTS.md
+index f23585c..71b534e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -20,7 +20,7 @@
+   (SQLite at `sqlite:///./data/trade.db`, `INTERNAL_API_SECRET=dev-internal-secret`).
+   The `data/` dir is auto-created; SQLite DB files are gitignored.
+ - Alembic migrations run automatically on app startup (`upgrade head`); there is
+-  no manual migration step for local dev. Current head is `009`.
++  no manual migration step for local dev. Current head is `010`.
+ - `GET /health` returns DB status and the current migration head — use it as a
+   readiness check.
+ 
+diff --git a/README.md b/README.md
+index 26b8357..a2eb147 100644
+--- a/README.md
++++ b/README.md
+@@ -61,7 +61,7 @@ Copy `.env.example` to `.env`. Variables fall into three groups:
+ | `PLATFORM_BASE_URL` | Where OAuth redirects after connect (e.g. `http://localhost:3000`) |
+ | `LEMON_SQUEEZY_WEBHOOK_SECRET` | Subscription webhook verification |
+ | `BETTER_AUTH_URL` | Public platform URL — JWT issuer/JWKS for API auth |
+-| `INTERNAL_API_SECRET` | Shared secret for user provisioning from platform signup |
++| `INTERNAL_API_SECRET` | Shared secret so signup can ensure a `subscriptions` row for the same `users` id |
+ 
+ ### OAuth app registration (your developer apps — not user accounts)
+ 
+diff --git a/alembic/versions/010_unify_auth_users.py b/alembic/versions/010_unify_auth_users.py
+new file mode 100644
+index 0000000..3acc776
+--- /dev/null
++++ b/alembic/versions/010_unify_auth_users.py
+@@ -0,0 +1,117 @@
++"""unify Better Auth user into users
++
++Revision ID: 010
++Revises: 009
++Create Date: 2026-08-15
++
++"""
++from typing import Sequence, Union
++
++import sqlalchemy as sa
++from alembic import op
++from sqlalchemy import inspect, text
++
++revision: str = "010"
++down_revision: Union[str, None] = "009"
++branch_labels: Union[str, Sequence[str], None] = None
++depends_on: Union[str, Sequence[str], None] = None
++
++FK_TABLES = (
++    "subscriptions",
++    "broker_connections",
++    "inbound_alerts",
++    "trade_executions",
++    "reviews",
++    "session",
++    "account",
++)
++
++
++def _table_names() -> set[str]:
++    return set(inspect(op.get_bind()).get_table_names())
++
++
++def _column_names(table: str) -> set[str]:
++    return {column["name"] for column in inspect(op.get_bind()).get_columns(table)}
++
++
++def _index_names(table: str) -> set[str]:
++    return {index["name"] for index in inspect(op.get_bind()).get_indexes(table)}
++
++
++def _repoint_foreign_keys(conn, old_id: str, new_id: str) -> None:
++    tables = _table_names()
++    for table in FK_TABLES:
++        if table in tables:
++            conn.execute(
++                text(f"UPDATE {table} SET user_id = :new_id WHERE user_id = :old_id"),
++                {"new_id": new_id, "old_id": old_id},
++            )
++
++
++def upgrade() -> None:
++    conn = op.get_bind()
++    tables = _table_names()
++    if "users" not in tables:
++        return
++
++    columns = _column_names("users")
++    if "email_verified" not in columns:
++        op.add_column(
++            "users",
++            sa.Column("email_verified", sa.Boolean(), server_default=sa.false(), nullable=False),
++        )
++    if "image" not in columns:
++        op.add_column("users", sa.Column("image", sa.Text(), nullable=True))
++    if "updated_at" not in columns:
++        op.add_column("users", sa.Column("updated_at", sa.DateTime(), nullable=True))
++
++    columns = _column_names("users")
++    if "better_auth_id" in columns:
++        conn.execute(text("PRAGMA foreign_keys=OFF"))
++        rows = conn.execute(
++            text(
++                "SELECT id, better_auth_id FROM users "
++                "WHERE better_auth_id IS NOT NULL AND better_auth_id != id"
++            )
++        ).fetchall()
++        for old_id, auth_id in rows:
++            existing = conn.execute(
++                text("SELECT id FROM users WHERE id = :auth_id"),
++                {"auth_id": auth_id},
++            ).fetchone()
++            _repoint_foreign_keys(conn, old_id, auth_id)
++            if existing:
++                conn.execute(text("DELETE FROM users WHERE id = :old_id"), {"old_id": old_id})
++            else:
++                conn.execute(
++                    text("UPDATE users SET id = :auth_id WHERE id = :old_id"),
++                    {"auth_id": auth_id, "old_id": old_id},
++                )
++        if "ix_users_better_auth_id" in _index_names("users"):
++            op.drop_index("ix_users_better_auth_id", table_name="users")
++        op.drop_column("users", "better_auth_id")
++        conn.execute(text("PRAGMA foreign_keys=ON"))
++
++    tables = _table_names()
++    if "user" in tables:
++        conn.execute(
++            text(
++                "INSERT OR IGNORE INTO users (id, name, email, email_verified, image, created_at, updated_at) "
++                "SELECT id, name, email, email_verified, image, created_at, updated_at FROM user"
++            )
++        )
++        op.drop_table("user")
++
++
++def downgrade() -> None:
++    columns = _column_names("users")
++    if "better_auth_id" not in columns:
++        op.add_column("users", sa.Column("better_auth_id", sa.String(36), nullable=True))
++        op.create_index("ix_users_better_auth_id", "users", ["better_auth_id"], unique=True)
++    if "updated_at" in columns:
++        op.drop_column("users", "updated_at")
++    if "image" in columns:
++        op.drop_column("users", "image")
++    if "email_verified" in columns:
++        op.drop_column("users", "email_verified")
+diff --git a/app/api/deps.py b/app/api/deps.py
+index fabfaae..d80cb60 100644
+--- a/app/api/deps.py
++++ b/app/api/deps.py
+@@ -18,7 +18,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+                 claims = verify_better_auth_jwt(token)
+             except jwt.PyJWTError:
+                 raise HTTPException(status_code=401, detail="Invalid token") from None
+-            user = db.query(User).filter(User.better_auth_id == claims.sub).first()
++            user = db.get(User, claims.sub)
+             if user is None and claims.email:
+                 user = db.query(User).filter(User.email == claims.email).first()
+             if user is not None:
+diff --git a/app/api/internal.py b/app/api/internal.py
+index dff764e..3d01b39 100644
+--- a/app/api/internal.py
++++ b/app/api/internal.py
+@@ -40,7 +40,7 @@ def _verify_internal_secret(x_internal_secret: str = Header(..., alias="X-Intern
+ 
+ def _resolve_user(db: Session, auth_id: str | None, email: str | None) -> User | None:
+     if auth_id:
+-        user = db.query(User).filter(User.better_auth_id == auth_id).first()
++        user = db.get(User, auth_id)
+         if user:
+             return user
+     if email:
+@@ -48,26 +48,33 @@ def _resolve_user(db: Session, auth_id: str | None, email: str | None) -> User |
+     return None
+ 
+ 
++def _ensure_subscription(db: Session, user: User) -> None:
++    if user.subscription is None:
++        db.add(Subscription(user_id=user.id, status="none", plan_name="free"))
++
++
+ @router.post("/provision", response_model=ProvisionResponse, dependencies=[Depends(_verify_internal_secret)])
+ def provision_user(body: ProvisionRequest, db: Session = Depends(get_db)):
+-    by_auth = db.query(User).filter(User.better_auth_id == body.auth_id).first()
+-    if by_auth:
+-        return ProvisionResponse(user_id=by_auth.id, created=False, linked=False)
++    by_id = db.get(User, body.auth_id)
++    if by_id:
++        _ensure_subscription(db, by_id)
++        if body.name and not by_id.name:
++            by_id.name = body.name
++        db.commit()
++        return ProvisionResponse(user_id=by_id.id, created=False, linked=False)
+ 
+     by_email = db.query(User).filter(User.email == body.email).first()
+     if by_email:
+-        if by_email.better_auth_id and by_email.better_auth_id != body.auth_id:
+-            raise HTTPException(status_code=409, detail="Email linked to another auth account")
+-        by_email.better_auth_id = body.auth_id
++        _ensure_subscription(db, by_email)
+         if body.name and not by_email.name:
+             by_email.name = body.name
+         db.commit()
+         return ProvisionResponse(user_id=by_email.id, created=False, linked=True)
+ 
+     user = User(
++        id=body.auth_id,
+         email=body.email,
+         name=body.name,
+-        better_auth_id=body.auth_id,
+         api_key_hash=hash_api_key(generate_api_key()),
+     )
+     db.add(user)
+diff --git a/app/models/tables.py b/app/models/tables.py
+index 22c6acc..2948cb3 100644
+--- a/app/models/tables.py
++++ b/app/models/tables.py
+@@ -17,7 +17,8 @@ class User(Base):
+     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+-    better_auth_id: Mapped[str | None] = mapped_column(String(36), unique=True, index=True, nullable=True)
++    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
++    image: Mapped[str | None] = mapped_column(Text, nullable=True)
+     api_key_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+     default_mode: Mapped[str] = mapped_column(String(16), default="paper")
+     max_contracts: Mapped[int] = mapped_column(Integer, default=1)
+@@ -29,6 +30,7 @@ class User(Base):
+     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+     default_broker: Mapped[str | None] = mapped_column(String(32), nullable=True)
+     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
++    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+ 
+     subscription: Mapped["Subscription | None"] = relationship(back_populates="user", uselist=False)
+     broker_connections: Mapped[list["BrokerConnection"]] = relationship(back_populates="user")
+diff --git a/tests/test_provision.py b/tests/test_provision.py
+index d6844e5..a785f4c 100644
+--- a/tests/test_provision.py
++++ b/tests/test_provision.py
+@@ -42,6 +42,25 @@ def client(monkeypatch):
+     app.dependency_overrides.clear()
+ 
+ 
++def test_provision_is_idempotent_when_auth_row_exists(client):
++    http, db_factory = client
++    db = db_factory()
++    user = User(id="auth-1", email="existing@example.com", name="Existing")
++    db.add(user)
++    db.commit()
++    db.close()
++
++    res = http.post(
++        "/v1/internal/provision",
++        json={"auth_id": "auth-1", "email": "existing@example.com", "name": "Existing"},
++        headers={"X-Internal-Secret": INTERNAL_SECRET},
++    )
++    assert res.status_code == 200
++    body = res.json()
++    assert body["created"] is False
++    assert body["user_id"] == "auth-1"
++
++
+ def test_provision_creates_user(client):
+     http, _ = client
+     res = http.post(
+@@ -93,7 +112,7 @@ def test_api_key_still_works(client):
+     token = secrets.token_urlsafe(32)
+     user = User(
+         email="bearer@example.com",
+-        better_auth_id="auth-bearer",
++        id="auth-bearer",
+         api_key_hash=hashlib.sha256(token.encode()).hexdigest(),
+     )
+     db.add(user)
+@@ -110,7 +129,7 @@ def test_api_key_still_works(client):
+ def test_device_token_issues_api_key(client):
+     http, db_factory = client
+     db = db_factory()
+-    user = User(email="device@example.com", better_auth_id="auth-device")
++    user = User(id="auth-device", email="device@example.com")
+     db.add(user)
+     db.flush()
+     db.add(Subscription(user_id=user.id, status="active", plan_name="pro"))
+@@ -131,7 +150,7 @@ def test_device_token_issues_api_key(client):
+ def test_device_token_requires_active_subscription(client):
+     http, db_factory = client
+     db = db_factory()
+-    user = User(email="free@example.com", better_auth_id="auth-free")
++    user = User(id="auth-free", email="free@example.com")
+     db.add(user)
+     db.flush()
+     db.add(Subscription(user_id=user.id, status="none", plan_name="free"))
+-- 
+2.43.0
+
