@@ -9,7 +9,7 @@ import { useSession } from '#/lib/auth-client'
 import { api, type CheckoutPlan } from '#/lib/api-client'
 import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
-import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL } from '#/lib/site'
+import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL, PRO_YEARLY_SAVINGS_PILL } from '#/lib/site'
 
 export const Route = createFileRoute('/pricing')({
   head: () =>
@@ -148,7 +148,7 @@ function PricingPage() {
               className={`pricing-plan-card is-featured${plan === 'yearly' ? ' is-selected' : ''}`}
               onClick={() => setPlan('yearly')}
             >
-              <span className="pricing-plan-badge">Save vs monthly</span>
+              <span className="pricing-plan-badge">{PRO_YEARLY_SAVINGS_PILL}</span>
               <div className="pricing-plan-top">
                 <div>
                   <h2 className="pricing-plan-name">Yearly</h2>
