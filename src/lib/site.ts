@@ -9,6 +9,16 @@ export const PRO_PRICE_USD = 39.99
 export const PRO_PRICE_LABEL = '$39.99'
 export const PRO_YEARLY_PRICE_USD = 299
 export const PRO_YEARLY_PRICE_LABEL = '$299'
+export const PRO_YEARLY_VS_MONTHLY_SAVINGS_USD = roundUsd(PRO_PRICE_USD * 12 - PRO_YEARLY_PRICE_USD)
+export const PRO_YEARLY_SAVINGS_PERCENT = Math.round(
+  (PRO_YEARLY_VS_MONTHLY_SAVINGS_USD / (PRO_PRICE_USD * 12)) * 100,
+)
+export const PRO_YEARLY_SAVINGS_PILL = `Save $${Math.round(PRO_YEARLY_VS_MONTHLY_SAVINGS_USD)} · ${PRO_YEARLY_SAVINGS_PERCENT}%`
+
+function roundUsd(amount: number): number {
+  return Math.round(amount * 100) / 100
+}
+
 export const LEGAL_UPDATED = 'August 15, 2026'
 export const LEGAL_REGION = 'the United States'
 export const CREEM_TERMS_URL = 'https://www.creem.io/terms'
