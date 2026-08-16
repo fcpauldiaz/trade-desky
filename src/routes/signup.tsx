@@ -1,9 +1,22 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signUp } from '#/lib/auth-client'
+import type { CheckoutPlan } from '#/lib/api-client'
 import { noindexHead } from '#/lib/seo'
 
+type SignupSearch = {
+  plan?: CheckoutPlan
+}
+
+function parsePlanSearch(search: Record<string, unknown>): SignupSearch {
+  const plan = search.plan
+  return {
+    plan: plan === 'monthly' || plan === 'yearly' ? plan : undefined,
+  }
+}
+
 export const Route = createFileRoute('/signup')({
+  validateSearch: parsePlanSearch,
   head: () =>
     noindexHead('Sign up', 'Create a Trade Desky account to automate Discord-style option alerts.'),
   component: SignupPage,
@@ -11,6 +24,7 @@ export const Route = createFileRoute('/signup')({
 
 function SignupPage() {
   const navigate = useNavigate()
+  const { plan } = Route.useSearch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
@@ -24,7 +38,7 @@ function SignupPage() {
       setError(result.error.message || 'Signup failed')
       return
     }
-    navigate({ to: '/pricing' })
+    navigate({ to: '/pricing', search: plan ? { plan } : {} })
   }
 
   return (

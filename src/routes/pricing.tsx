@@ -11,7 +11,19 @@ import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-l
 import { pageHead } from '#/lib/seo'
 import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL } from '#/lib/site'
 
+type PricingSearch = {
+  plan?: CheckoutPlan
+}
+
+function parsePlanSearch(search: Record<string, unknown>): PricingSearch {
+  const plan = search.plan
+  return {
+    plan: plan === 'monthly' || plan === 'yearly' ? plan : undefined,
+  }
+}
+
 export const Route = createFileRoute('/pricing')({
+  validateSearch: parsePlanSearch,
   head: () =>
     pageHead({
       title: `Trade Desky pricing — ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr`,
@@ -66,7 +78,8 @@ const ADVANTAGE_FEATURES = [
 
 function PricingPage() {
   const { data: session } = useSession()
-  const [plan, setPlan] = useState<CheckoutPlan>('yearly')
+  const { plan: planFromSearch } = Route.useSearch()
+  const [plan, setPlan] = useState<CheckoutPlan>(planFromSearch ?? 'yearly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -96,7 +109,7 @@ function PricingPage() {
       )
     }
     return (
-      <Link to="/signup" className="btn-primary btn-primary-lg pricing-cta">
+      <Link to="/signup" search={{ plan }} className="btn-primary btn-primary-lg pricing-cta">
         Get Started
       </Link>
     )
