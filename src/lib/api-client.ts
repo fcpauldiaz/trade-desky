@@ -29,6 +29,8 @@ export type Trade = {
   created_at: string
 }
 
+export type CheckoutPlan = 'monthly' | 'yearly'
+
 export type TradierEnvironment = 'sandbox' | 'live'
 
 export type BrokerConnection = {
@@ -87,9 +89,10 @@ export const api = {
       onboarding_completed: boolean
     }>('/v1/me'),
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
-  createCheckout: () =>
+  createCheckout: (plan: CheckoutPlan = 'monthly') =>
     apiFetch<{ checkout_url: string; checkout_id: string | null }>('/v1/me/billing/checkout', {
       method: 'POST',
+      body: JSON.stringify({ plan }),
     }),
   createBillingPortal: () => apiFetch<{ url: string }>('/v1/me/billing/portal', { method: 'POST' }),
   brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),

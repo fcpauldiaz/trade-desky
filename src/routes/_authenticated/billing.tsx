@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { api } from '#/lib/api-client'
+import { api, type CheckoutPlan } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { SUPPORT_EMAIL } from '#/lib/site'
 
@@ -10,17 +10,17 @@ function BillingPage() {
   const [billing, setBilling] = useState<Awaited<ReturnType<typeof api.billing>> | null>(null)
   const [error, setError] = useState('')
   const [actionError, setActionError] = useState('')
-  const [loadingAction, setLoadingAction] = useState<'checkout' | 'portal' | null>(null)
+  const [loadingAction, setLoadingAction] = useState<'monthly' | 'yearly' | 'portal' | null>(null)
 
   useEffect(() => {
     api.billing().then(setBilling).catch(() => setError('Could not load billing'))
   }, [])
 
-  async function startCheckout() {
+  async function startCheckout(plan: CheckoutPlan) {
     setActionError('')
-    setLoadingAction('checkout')
+    setLoadingAction(plan)
     try {
-      const { checkout_url } = await api.createCheckout()
+      const { checkout_url } = await api.createCheckout(plan)
       window.location.assign(checkout_url)
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not start checkout')
@@ -56,14 +56,24 @@ function BillingPage() {
       )}
       <div className="flex flex-wrap gap-3">
         {!billing?.can_process_trades ? (
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={startCheckout}
-            disabled={loadingAction !== null}
-          >
-            {loadingAction === 'checkout' ? 'Starting checkout…' : 'Subscribe'}
-          </button>
+          <>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => startCheckout('monthly')}
+              disabled={loadingAction !== null}
+            >
+              {loadingAction === 'monthly' ? 'Starting checkout…' : 'Subscribe monthly'}
+            </button>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => startCheckout('yearly')}
+              disabled={loadingAction !== null}
+            >
+              {loadingAction === 'yearly' ? 'Starting checkout…' : 'Subscribe yearly'}
+            </button>
+          </>
         ) : (
           <button
             type="button"

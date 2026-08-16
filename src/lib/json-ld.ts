@@ -1,4 +1,4 @@
-import { COMPANY_NAME, PRODUCT_NAME, PRO_PRICE_USD, SITE_URL, SUPPORT_EMAIL, canonicalUrl } from '#/lib/site'
+import { COMPANY_NAME, PRODUCT_NAME, PRO_PRICE_USD, PRO_YEARLY_PRICE_USD, SITE_URL, SUPPORT_EMAIL, canonicalUrl } from '#/lib/site'
 import type { IndexablePath } from '#/lib/seo'
 
 export type FaqItem = {
@@ -47,11 +47,20 @@ export function softwareApplicationJsonLd() {
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'macOS, Windows, Web',
     url: SITE_URL,
-    offers: {
-      '@type': 'Offer',
-      price: PRO_PRICE_USD.toFixed(2),
-      priceCurrency: 'USD',
-    },
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Pro Monthly',
+        price: PRO_PRICE_USD.toFixed(2),
+        priceCurrency: 'USD',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Pro Yearly',
+        price: PRO_YEARLY_PRICE_USD.toFixed(2),
+        priceCurrency: 'USD',
+      },
+    ],
     description:
       'Desktop app that turns Discord-style notification alerts into Tradier or Schwab option orders.',
   }

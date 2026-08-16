@@ -2,13 +2,13 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 
 import LegalLayout from '#/components/legal/LegalLayout'
 import { pageHead } from '#/lib/seo'
-import { COMPANY_NAME, CREEM_TERMS_URL, PRO_PRICE_LABEL, SUPPORT_EMAIL } from '#/lib/site'
+import { COMPANY_NAME, CREEM_TERMS_URL, PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL, SUPPORT_EMAIL } from '#/lib/site'
 
 export const Route = createFileRoute('/refund')({
   head: () =>
     pageHead({
       title: 'Refund policy',
-      description: `Cancel Pro anytime. ${COMPANY_NAME} decides refund eligibility; Creem processes the payment. ${PRO_PRICE_LABEL}/mo.`,
+      description: `Cancel Pro anytime. ${COMPANY_NAME} decides refund eligibility; Creem processes the payment. ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr.`,
       path: '/refund',
     }),
   component: RefundPage,
@@ -22,7 +22,8 @@ function RefundPage() {
     >
       <h2>1. Price and cancel</h2>
       <p>
-        Pro is {PRO_PRICE_LABEL} per month unless a different price is shown at checkout. Cancel
+        Pro is {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year unless a different
+        price is shown at checkout. Cancel
         anytime: open <Link to="/billing">Billing</Link>, choose Manage subscription, and use the
         Creem customer portal. Cancellation stops the next renewal. Automated execution remains
         available until the current paid period ends, then it stops.
@@ -31,7 +32,7 @@ function RefundPage() {
       <h2>2. Default: no prorated refund</h2>
       <p>
         If you cancel mid-cycle, we do not automatically refund the unused days. That is the default
-        for this monthly plan.
+        for this monthly or yearly plan.
       </p>
 
       <h2>3. When we will refund</h2>
