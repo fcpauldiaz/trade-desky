@@ -47,6 +47,7 @@ export function softwareApplicationJsonLd() {
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'macOS, Windows, Web',
     url: SITE_URL,
+    downloadUrl: `${SITE_URL}/download`,
     offers: [
       {
         '@type': 'Offer',

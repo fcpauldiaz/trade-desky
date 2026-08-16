@@ -20,6 +20,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as DownloadRouteImport } from './routes/download'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IntegrationsIndexRouteImport } from './routes/integrations/index'
@@ -28,6 +29,7 @@ import { Route as IntegrationsTradierRouteImport } from './routes/integrations/t
 import { Route as IntegrationsSchwabRouteImport } from './routes/integrations/schwab'
 import { Route as IntegrationsDiscordRouteImport } from './routes/integrations/discord'
 import { Route as ForDiscordOptionsTradersRouteImport } from './routes/for/discord-options-traders'
+import { Route as DesktopFilenameRouteImport } from './routes/desktop/$filename'
 import { Route as CompareTradelabsRouteImport } from './routes/compare/tradelabs'
 import { Route as CompareNyriaRouteImport } from './routes/compare/nyria'
 import { Route as CompareManualCopyRouteImport } from './routes/compare/manual-copy'
@@ -95,6 +97,11 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -135,6 +142,11 @@ const ForDiscordOptionsTradersRoute =
     path: '/for/discord-options-traders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DesktopFilenameRoute = DesktopFilenameRouteImport.update({
+  id: '/desktop/$filename',
+  path: '/desktop/$filename',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompareTradelabsRoute = CompareTradelabsRouteImport.update({
   id: '/compare/tradelabs',
   path: '/compare/tradelabs',
@@ -194,6 +206,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/download': typeof DownloadRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -214,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/compare/manual-copy': typeof CompareManualCopyRoute
   '/compare/nyria': typeof CompareNyriaRoute
   '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -225,6 +239,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/download': typeof DownloadRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -245,6 +260,7 @@ export interface FileRoutesByTo {
   '/compare/manual-copy': typeof CompareManualCopyRoute
   '/compare/nyria': typeof CompareNyriaRoute
   '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -258,6 +274,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/download': typeof DownloadRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -278,6 +295,7 @@ export interface FileRoutesById {
   '/compare/manual-copy': typeof CompareManualCopyRoute
   '/compare/nyria': typeof CompareNyriaRoute
   '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -291,6 +309,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/download'
     | '/llms.txt'
     | '/login'
     | '/pricing'
@@ -311,6 +330,7 @@ export interface FileRouteTypes {
     | '/compare/manual-copy'
     | '/compare/nyria'
     | '/compare/tradelabs'
+    | '/desktop/$filename'
     | '/for/discord-options-traders'
     | '/integrations/discord'
     | '/integrations/schwab'
@@ -322,6 +342,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/download'
     | '/llms.txt'
     | '/login'
     | '/pricing'
@@ -342,6 +363,7 @@ export interface FileRouteTypes {
     | '/compare/manual-copy'
     | '/compare/nyria'
     | '/compare/tradelabs'
+    | '/desktop/$filename'
     | '/for/discord-options-traders'
     | '/integrations/discord'
     | '/integrations/schwab'
@@ -354,6 +376,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/download'
     | '/llms.txt'
     | '/login'
     | '/pricing'
@@ -374,6 +397,7 @@ export interface FileRouteTypes {
     | '/compare/manual-copy'
     | '/compare/nyria'
     | '/compare/tradelabs'
+    | '/desktop/$filename'
     | '/for/discord-options-traders'
     | '/integrations/discord'
     | '/integrations/schwab'
@@ -387,6 +411,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DownloadRoute: typeof DownloadRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
@@ -402,6 +427,7 @@ export interface RootRouteChildren {
   CompareManualCopyRoute: typeof CompareManualCopyRoute
   CompareNyriaRoute: typeof CompareNyriaRoute
   CompareTradelabsRoute: typeof CompareTradelabsRoute
+  DesktopFilenameRoute: typeof DesktopFilenameRoute
   ForDiscordOptionsTradersRoute: typeof ForDiscordOptionsTradersRoute
   IntegrationsDiscordRoute: typeof IntegrationsDiscordRoute
   IntegrationsSchwabRoute: typeof IntegrationsSchwabRoute
@@ -491,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -545,6 +578,13 @@ declare module '@tanstack/react-router' {
       path: '/for/discord-options-traders'
       fullPath: '/for/discord-options-traders'
       preLoaderRoute: typeof ForDiscordOptionsTradersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desktop/$filename': {
+      id: '/desktop/$filename'
+      path: '/desktop/$filename'
+      fullPath: '/desktop/$filename'
+      preLoaderRoute: typeof DesktopFilenameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare/tradelabs': {
@@ -650,6 +690,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DownloadRoute: DownloadRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
@@ -665,6 +706,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareManualCopyRoute: CompareManualCopyRoute,
   CompareNyriaRoute: CompareNyriaRoute,
   CompareTradelabsRoute: CompareTradelabsRoute,
+  DesktopFilenameRoute: DesktopFilenameRoute,
   ForDiscordOptionsTradersRoute: ForDiscordOptionsTradersRoute,
   IntegrationsDiscordRoute: IntegrationsDiscordRoute,
   IntegrationsSchwabRoute: IntegrationsSchwabRoute,

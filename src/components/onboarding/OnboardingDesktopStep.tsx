@@ -1,4 +1,4 @@
-import { DESKTOP_APP_NAME, DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
+import { DESKTOP_APP_NAME, DESKTOP_MAC_ASSET_PATH, DESKTOP_WIN_ASSET_PATH } from '#/lib/desktop-app'
 
 type Props = {
   onContinue: () => void
@@ -24,17 +24,13 @@ export default function OnboardingDesktopStep({ onContinue }: Props) {
 
       <div className="flex flex-wrap gap-3">
         <a
-          href={DESKTOP_APP_RELEASES_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={DESKTOP_MAC_ASSET_PATH}
           className="rounded-full bg-[var(--lagoon-deep)] px-5 py-2.5 text-sm font-semibold text-white"
         >
           Download for macOS
         </a>
         <a
-          href={DESKTOP_APP_RELEASES_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={DESKTOP_WIN_ASSET_PATH}
           className="rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold"
         >
           Download for Windows

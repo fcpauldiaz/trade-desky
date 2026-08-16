@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router'
+
 import { DESKTOP_APP_NAME } from '#/lib/desktop-app'
 
 const STEPS = [
@@ -37,6 +39,11 @@ export default function HowItWorks() {
             </article>
           ))}
         </div>
+        <p className="mt-8">
+          <Link to="/download" className="btn-primary">
+            Download {DESKTOP_APP_NAME}
+          </Link>
+        </p>
       </div>
     </section>
   )
