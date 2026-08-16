@@ -35,7 +35,7 @@ function CompareManualPage() {
       </SeoSection>
       <SeoSection title="What Trade Desky does">
         <ol className="list-decimal space-y-2 pl-5 text-sm">
-          <li>Notification Watcher captures the banner on the desktop.</li>
+          <li>Trade Desky Watcher captures the banner on the desktop.</li>
           <li>AI parses action, ticker, strike, expiry.</li>
           <li>Chain validation runs; the connected broker places the order if it passes.</li>
         </ol>

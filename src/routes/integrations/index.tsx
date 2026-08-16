@@ -32,7 +32,7 @@ function IntegrationsIndexPage() {
             <Link className="font-semibold underline" to="/integrations/discord">
               Discord-style alerts
             </Link>{' '}
-            via Notification Watcher (macOS and Windows). We read OS notifications, not a Discord bot
+            via Trade Desky Watcher (macOS and Windows). We read OS notifications, not a Discord bot
             invite.
           </li>
           <li>

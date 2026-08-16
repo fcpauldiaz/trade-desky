@@ -1,7 +1,9 @@
+import { DESKTOP_APP_NAME } from '#/lib/desktop-app'
+
 const STEPS = [
   {
     step: '1',
-    title: 'Install Notification Watcher',
+    title: `Install ${DESKTOP_APP_NAME}`,
     description: 'Download the desktop app for macOS or Windows and grant notification permissions.',
   },
   {
@@ -14,7 +16,7 @@ const STEPS = [
     title: 'Alerts execute as trades',
     description: 'When an alert arrives, AI parses it and your broker places the order if validation passes.',
   },
-] as const
+]
 
 export default function HowItWorks() {
   return (

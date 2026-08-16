@@ -15,7 +15,7 @@ const FAQ = [
   },
   {
     q: 'Can I automate Discord options alerts to Schwab?',
-    a: 'Yes, once Notification Watcher is signed in and Schwab is connected. Alerts still have to parse and pass chain validation.',
+    a: 'Yes, once Trade Desky Watcher is signed in and Schwab is connected. Alerts still have to parse and pass chain validation.',
   },
 ] as const
 
@@ -60,7 +60,7 @@ function SchwabIntegrationPage() {
           </li>
           <li>Approve access on Schwab’s site. Complete onboarding and a test order if offered.</li>
           <li>
-            Keep Notification Watcher running on the machine that sees Discord (or any other)
+            Keep Trade Desky Watcher running on the machine that sees Discord (or any other)
             banners.
           </li>
         </ol>

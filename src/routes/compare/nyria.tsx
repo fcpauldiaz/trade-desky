@@ -36,7 +36,7 @@ function CompareNyriaPage() {
       <SeoSection title="How alerts arrive">
         <p className="text-sm">
           Nyria documents inviting a Discord bot and pointing channels at a strategy. Trade Desky
-          reads OS notifications through Notification Watcher. If you need channel-level bot
+          reads OS notifications through Trade Desky Watcher. If you need channel-level bot
           monitoring without a desktop session, Nyria’s model fits better.
         </p>
       </SeoSection>

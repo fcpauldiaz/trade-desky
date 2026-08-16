@@ -30,7 +30,7 @@ function TermsPage() {
       summary="These terms are a contract between you and us for use of the Trade Desky website, API, and desktop app."
     >
       <p>
-        By creating an account, installing Notification Watcher, or paying for Pro, you agree to
+        By creating an account, installing Trade Desky Watcher, or paying for Pro, you agree to
         these Terms, the <Link to="/privacy">Privacy Policy</Link>, the{' '}
         <Link to="/refund">Refund Policy</Link>, and the <Link to="/risk">Risk Disclosure</Link>. If
         you do not agree, do not use the service.

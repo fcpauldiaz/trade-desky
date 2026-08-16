@@ -15,7 +15,7 @@ const FAQ = [
   },
   {
     q: 'Can I send Discord alerts to Tradier without a webhook?',
-    a: 'Yes. Install Notification Watcher, sign in, and keep the app running. Alerts are captured from desktop notifications, then routed to your connected Tradier account.',
+    a: 'Yes. Install Trade Desky Watcher, sign in, and keep the app running. Alerts are captured from desktop notifications, then routed to your connected Tradier account.',
   },
 ] as const
 
@@ -46,7 +46,7 @@ function TradierIntegrationPage() {
     >
       <SeoSection title="How this differs from a Discord bot">
         <p className="text-sm">
-          We do not join your server. Notification Watcher reads the same banners you see on macOS
+          We do not join your server. Trade Desky Watcher reads the same banners you see on macOS
           or Windows. If Discord is quiet or the machine is asleep, nothing is sent to Tradier.
         </p>
       </SeoSection>

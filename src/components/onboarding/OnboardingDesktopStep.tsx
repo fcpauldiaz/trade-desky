@@ -1,4 +1,4 @@
-import { DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
+import { DESKTOP_APP_NAME, DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
 
 type Props = {
   onContinue: () => void
@@ -9,7 +9,7 @@ export default function OnboardingDesktopStep({ onContinue }: Props) {
     <div className="island-shell space-y-5 rounded-2xl p-6">
       <div>
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 1 of 3</p>
-        <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Install Notification Watcher</h2>
+        <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Install {DESKTOP_APP_NAME}</h2>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
           Download the desktop app for macOS or Windows. It captures alert notifications and forwards them to your
           account — no webhook URL to copy.
