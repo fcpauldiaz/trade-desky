@@ -9,7 +9,7 @@ export const Route = createFileRoute('/compare/botifytrades')({
   head: () =>
     pageHead({
       title: 'BotifyTrades alternative — Trade Desky',
-      description: `BotifyTrades is a self-hosted multi-broker Discord bot. Trade Desky is hosted SaaS at ${PRO_PRICE_LABEL}/mo for Tradier and Schwab with a desktop notification watcher.`,
+      description: `BotifyTrades is a self-hosted multi-broker Discord bot. Trade Desky is hosted SaaS at ${PRO_PRICE_LABEL}/mo for Tradier and Schwab with Trade Desky Watcher.`,
       path: '/compare/botifytrades',
     }),
   component: CompareBotifyPage,

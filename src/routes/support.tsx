@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { pageHead } from '#/lib/seo'
-import { DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
+import { DESKTOP_APP_NAME, DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
 import { SUPPORT_EMAIL } from '#/lib/site'
 
 export const Route = createFileRoute('/support')({
@@ -31,7 +31,7 @@ function SupportPage() {
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            Desktop app — install Notification Watcher from the{' '}
+            Desktop app — install {DESKTOP_APP_NAME} from the{' '}
             <a className="underline" href={DESKTOP_APP_RELEASES_URL} rel="noreferrer" target="_blank">
               releases page
             </a>{' '}

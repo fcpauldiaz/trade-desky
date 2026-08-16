@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import SeoPage, { RelatedPages, SeoSection } from '#/components/marketing/SeoPage'
-import { DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
+import { DESKTOP_APP_NAME, DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
 import { breadcrumbJsonLd, faqPageJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
 
@@ -45,7 +45,7 @@ function DiscordIntegrationPage() {
         faqPageJsonLd(FAQ),
       ]}
     >
-      <SeoSection title="Notification Watcher, not a server bot">
+      <SeoSection title={`${DESKTOP_APP_NAME}, not a server bot`}>
         <p className="text-sm">
           Products that invite a Discord bot see every channel message in a guild. We only see what
           the OS shows you. That is slower to set up on a new machine and stricter about “computer
@@ -58,7 +58,7 @@ function DiscordIntegrationPage() {
             Create an account and subscribe on <Link to="/pricing">pricing</Link>.
           </li>
           <li>
-            Install Notification Watcher from the{' '}
+            Install {DESKTOP_APP_NAME} from the{' '}
             <a className="underline" href={DESKTOP_APP_RELEASES_URL} rel="noreferrer" target="_blank">
               desktop releases
             </a>{' '}

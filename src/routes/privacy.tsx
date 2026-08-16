@@ -27,7 +27,7 @@ function PrivacyPage() {
     >
       <p>
         {COMPANY_NAME} (“we”) provides {PRODUCT_NAME}. This policy covers the website, the
-        Notification Watcher desktop app, and the receiver API. It does not cover Tradier, Schwab,
+        Trade Desky Watcher desktop app, and the receiver API. It does not cover Tradier, Schwab,
         Discord, or Creem’s own sites. Creem’s privacy notice is at{' '}
         <a href={CREEM_PRIVACY_URL} rel="noreferrer" target="_blank">
           creem.io/privacy

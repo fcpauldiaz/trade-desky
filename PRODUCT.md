@@ -5,7 +5,7 @@ Active options traders who follow Discord alert channels and want automated exec
 
 ## Core jobs
 1. Subscribe and connect a broker
-2. Sign in to the Notification Watcher desktop app
+2. Sign in to the Trade Desky Watcher desktop app
 3. Monitor P&L and trade history on the dashboard
 
 ## Information hierarchy (dashboard)
