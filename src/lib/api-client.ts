@@ -61,6 +61,17 @@ export function clearReceiverTokenCache() {
   cachedTokenExpiresAt = 0
 }
 
+function apiErrorMessage(text: string, fallback: string): string {
+  if (!text) return fallback
+  try {
+    const body = JSON.parse(text) as { detail?: unknown }
+    if (typeof body.detail === 'string' && body.detail) return body.detail
+  } catch {
+    return text
+  }
+  return text
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await getReceiverToken()
   const headers: Record<string, string> = {
@@ -71,7 +82,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, { ...init, headers })
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(text || res.statusText)
+    throw new Error(apiErrorMessage(text, res.statusText))
   }
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
