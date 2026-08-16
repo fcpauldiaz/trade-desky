@@ -2,8 +2,12 @@ import { Link } from '@tanstack/react-router'
 
 import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
+import { showPricingForUser } from '#/lib/pricing-visibility'
+import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Hero() {
+  const { loggedIn, canProcessTrades } = useCanProcessTrades()
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades)
   return (
     <section className="marketing-hero">
       <div className="page-wrap px-4 sm:px-6 lg:px-8">
@@ -28,9 +32,11 @@ export default function Hero() {
               <Link to="/signup" className="btn-primary btn-primary-lg">
                 Get started — automate alerts
               </Link>
-              <Link to="/pricing" className="btn-secondary">
-                View pricing
-              </Link>
+              {showPricing ? (
+                <Link to="/pricing" className="btn-secondary">
+                  View pricing
+                </Link>
+              ) : null}
             </div>
             <SocialProof />
             <p className="marketing-hero-note">Set up in minutes. No webhook URLs to copy.</p>

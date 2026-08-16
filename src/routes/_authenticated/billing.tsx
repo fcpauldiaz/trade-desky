@@ -138,9 +138,11 @@ function BillingPage() {
             {loadingAction === 'portal' ? 'Opening…' : 'Manage subscription'}
           </button>
         )}
-        <Link to="/pricing" className="btn-secondary">
-          View pricing
-        </Link>
+        {!billing?.can_process_trades ? (
+          <Link to="/pricing" className="btn-secondary">
+            View pricing
+          </Link>
+        ) : null}
       </div>
       {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
       <p className="text-sm text-[var(--muted-foreground)]">
