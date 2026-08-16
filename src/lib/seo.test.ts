@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { INDEXABLE_PATHS, pageHead, pageTitle, sitemapXml } from '#/lib/seo'
+import { INDEXABLE_PATHS, LLMS_SECTIONS, llmsTxt, pageHead, pageTitle, sitemapXml } from '#/lib/seo'
 import { SITE_URL, canonicalUrl } from '#/lib/site'
 
 describe('seo helpers', () => {
@@ -45,5 +45,16 @@ describe('seo helpers', () => {
       expect(xml).toContain(`<loc>${canonicalUrl(path)}</loc>`)
     }
     expect(xml.match(/<url>/g)?.length).toBe(INDEXABLE_PATHS.length)
+  })
+
+  it('lists every indexable path in llms.txt', () => {
+    const listed = LLMS_SECTIONS.flatMap((section) => section.links.map((link) => link.path))
+    expect([...listed].sort()).toEqual([...INDEXABLE_PATHS].sort())
+
+    const body = llmsTxt()
+    expect(body.startsWith('# Trade Desky\n')).toBe(true)
+    for (const path of INDEXABLE_PATHS) {
+      expect(body).toContain(canonicalUrl(path))
+    }
   })
 })

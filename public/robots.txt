@@ -10,3 +10,5 @@ Disallow: /settings
 Disallow: /onboarding
 
 Sitemap: https://tradedesky.chapilabs.com/sitemap.xml
+# LLM context: https://tradedesky.chapilabs.com/llms.txt
+
