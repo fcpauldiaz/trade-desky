@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api, type CheckoutPlan } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { SUPPORT_EMAIL } from '#/lib/site'
@@ -23,6 +23,7 @@ function BillingPage() {
   const [actionError, setActionError] = useState('')
   const [loadingAction, setLoadingAction] = useState<'monthly' | 'yearly' | 'portal' | null>(null)
   const [confirming, setConfirming] = useState(Boolean(checkoutId))
+  const skipBillingFetchRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -35,7 +36,12 @@ function BillingPage() {
           const confirmed = await api.confirmCheckout(checkoutId)
           if (cancelled) return
           setBilling(confirmed)
+          skipBillingFetchRef.current = true
           void navigate({ to: '/billing', search: {}, replace: true })
+          return
+        }
+        if (skipBillingFetchRef.current) {
+          skipBillingFetchRef.current = false
           return
         }
         const data = await api.billing()
@@ -48,7 +54,6 @@ function BillingPage() {
             const data = await api.billing()
             if (!cancelled) setBilling(data)
           } catch {
-            setError('Could not load billing')
           }
         } else {
           setError('Could not load billing')
