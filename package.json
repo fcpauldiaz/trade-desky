@@ -29,6 +29,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "better-auth": "^1.6.18",
     "drizzle-orm": "^0.45.2",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^0.545.0",
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.0",

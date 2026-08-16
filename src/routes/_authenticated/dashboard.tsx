@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import KpiStrip from '#/components/dashboard/KpiStrip'
 import MonthlyPnLCalendar from '#/components/dashboard/MonthlyPnLCalendar'
 import TradeTable from '#/components/dashboard/TradeTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
+import { currentMonthKey, shiftMonth } from '#/lib/pnl-calendar'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({ component: DashboardPage })
 
@@ -15,12 +16,10 @@ function DashboardPage() {
   const [daily, setDaily] = useState<Record<string, number>>({})
   const [trades, setTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [error, setError] = useState('')
-  const month = useMemo(() => {
-    const now = new Date()
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  }, [])
+  const [month, setMonth] = useState(() => currentMonthKey())
 
   useEffect(() => {
+    setDaily({})
     api.billing()
       .then(setBilling)
       .catch(() => {
@@ -48,7 +47,18 @@ function DashboardPage() {
         mode={mode}
         onModeChange={setMode}
       />
-      <MonthlyPnLCalendar dailyPnl={daily} month={month} trades={trades} />
+      <MonthlyPnLCalendar
+        dailyPnl={daily}
+        month={month}
+        trades={trades}
+        onPrevMonth={() => setMonth((current) => shiftMonth(current, -1))}
+        onNextMonth={() => {
+          setMonth((current) => {
+            const next = shiftMonth(current, 1)
+            return next > currentMonthKey() ? current : next
+          })
+        }}
+      />
       <section>
         <h2 className="mb-3 text-lg font-semibold">Recent trades</h2>
         <TradeTable trades={trades} />
