@@ -1,22 +1,43 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
-import { checkoutUrl } from '#/lib/creem'
 import UpgradeBanner from '#/components/UpgradeBanner'
 
 export const Route = createFileRoute('/_authenticated/billing')({ component: BillingPage })
 
 function BillingPage() {
   const [billing, setBilling] = useState<Awaited<ReturnType<typeof api.billing>> | null>(null)
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null)
   const [error, setError] = useState('')
+  const [actionError, setActionError] = useState('')
+  const [loadingAction, setLoadingAction] = useState<'checkout' | 'portal' | null>(null)
 
   useEffect(() => {
     api.billing().then(setBilling).catch(() => setError('Could not load billing'))
-    api.me().then((u) => setUser({ id: u.id, email: u.email })).catch(() => {})
   }, [])
 
-  const manageUrl = billing?.customer_portal_url || (user ? checkoutUrl(user.id, user.email) : '#')
+  async function startCheckout() {
+    setActionError('')
+    setLoadingAction('checkout')
+    try {
+      const { checkout_url } = await api.createCheckout()
+      window.location.assign(checkout_url)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not start checkout')
+      setLoadingAction(null)
+    }
+  }
+
+  async function openPortal() {
+    setActionError('')
+    setLoadingAction('portal')
+    try {
+      const { url } = await api.createBillingPortal()
+      window.location.assign(url)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not open billing portal')
+      setLoadingAction(null)
+    }
+  }
 
   return (
     <main className="page-wrap max-w-2xl space-y-6 px-4 py-10">
@@ -32,11 +53,31 @@ function BillingPage() {
           <p><strong>Can process trades:</strong> {billing.can_process_trades ? 'Yes' : 'No'}</p>
         </div>
       )}
-      {user && (
-        <a href={manageUrl} target="_blank" rel="noreferrer" className="inline-block rounded-full bg-[var(--lagoon-deep)] px-5 py-2 text-white no-underline">
-          Manage subscription
-        </a>
-      )}
+      <div className="flex flex-wrap gap-3">
+        {!billing?.can_process_trades ? (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={startCheckout}
+            disabled={loadingAction !== null}
+          >
+            {loadingAction === 'checkout' ? 'Starting checkout…' : 'Subscribe'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={openPortal}
+            disabled={loadingAction !== null}
+          >
+            {loadingAction === 'portal' ? 'Opening…' : 'Manage subscription'}
+          </button>
+        )}
+        <Link to="/pricing" className="btn-secondary">
+          View pricing
+        </Link>
+      </div>
+      {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
     </main>
   )
 }

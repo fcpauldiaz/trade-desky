@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
-import { checkoutUrl } from '#/lib/creem'
 import { useSession } from '#/lib/auth-client'
 import { api } from '#/lib/api-client'
 
@@ -55,30 +54,36 @@ const ADVANTAGE_FEATURES = [
 
 function PricingPage() {
   const { data: session } = useSession()
-  const [userId, setUserId] = useState('')
-  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!session?.user) return
-    api
-      .me()
-      .then((u) => {
-        setUserId(u.id)
-        setEmail(u.email)
-      })
-      .catch(() => {})
-  }, [session?.user])
+  async function startCheckout() {
+    setError('')
+    setLoading(true)
+    try {
+      const { checkout_url } = await api.createCheckout()
+      window.location.assign(checkout_url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not start checkout')
+      setLoading(false)
+    }
+  }
 
   function renderCta() {
-    if (session?.user && userId) {
+    if (session?.user) {
       return (
-        <a href={checkoutUrl(userId, email)} className="btn-primary btn-primary-lg pricing-cta">
-          Get Started
-        </a>
+        <button
+          type="button"
+          className="btn-primary btn-primary-lg pricing-cta"
+          onClick={startCheckout}
+          disabled={loading}
+        >
+          {loading ? 'Starting checkout…' : 'Get Started'}
+        </button>
       )
     }
     return (
-      <Link to="/login" className="btn-primary btn-primary-lg pricing-cta">
+      <Link to="/signup" className="btn-primary btn-primary-lg pricing-cta">
         Get Started
       </Link>
     )
@@ -124,6 +129,7 @@ function PricingPage() {
 
           <div className="pricing-cta-block">
             {renderCta()}
+            {error ? <p className="pricing-cta-error">{error}</p> : null}
             <ul className="pricing-trust-list">
               <li>Cancel anytime</li>
               <li>Paper and live trading</li>

@@ -41,7 +41,7 @@ Auth migrations run automatically on server startup. To apply them manually: `np
 |-------|-------------|
 | `/` | Marketing landing |
 | `/reviews` | Public customer reviews + submit form for paid subscribers |
-| `/pricing` | Creem checkout |
+| `/pricing` | Pro plan + Creem checkout |
 | `/login`, `/signup` | Email + password (Better Auth) |
 | `/dashboard` | P&L calendar + trade table |
 | `/connections` | Tradier + Schwab connect + test connection |
@@ -64,7 +64,6 @@ Use the repo **Dockerfile** — do not use Nixpacks (it pins Node 22.11, which i
 | Variable | Example |
 |----------|---------|
 | `VITE_RECEIVER_API_URL` | `https://api.yourdomain.com` |
-| `VITE_CREEM_CHECKOUT_URL` | your Creem payment link URL |
 
 **Runtime variables:**
 

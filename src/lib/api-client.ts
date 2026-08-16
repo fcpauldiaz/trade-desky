@@ -86,6 +86,11 @@ export const api = {
       onboarding_completed: boolean
     }>('/v1/me'),
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
+  createCheckout: () =>
+    apiFetch<{ checkout_url: string; checkout_id: string | null }>('/v1/me/billing/checkout', {
+      method: 'POST',
+    }),
+  createBillingPortal: () => apiFetch<{ url: string }>('/v1/me/billing/portal', { method: 'POST' }),
   brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),
   tradierAuthorize: (environment: TradierEnvironment = 'sandbox') =>
     apiFetch<{ url: string }>(`/v1/me/brokers/tradier/authorize?environment=${environment}`),
