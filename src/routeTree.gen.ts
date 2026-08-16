@@ -11,13 +11,26 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as RiskRouteImport } from './routes/risk'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as IntegrationsIndexRouteImport } from './routes/integrations/index'
+import { Route as CompareIndexRouteImport } from './routes/compare/index'
+import { Route as IntegrationsTradierRouteImport } from './routes/integrations/tradier'
+import { Route as IntegrationsSchwabRouteImport } from './routes/integrations/schwab'
+import { Route as IntegrationsDiscordRouteImport } from './routes/integrations/discord'
+import { Route as ForDiscordOptionsTradersRouteImport } from './routes/for/discord-options-traders'
+import { Route as CompareTradelabsRouteImport } from './routes/compare/tradelabs'
+import { Route as CompareNyriaRouteImport } from './routes/compare/nyria'
+import { Route as CompareManualCopyRouteImport } from './routes/compare/manual-copy'
+import { Route as CompareBotifytradesRouteImport } from './routes/compare/botifytrades'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -36,14 +49,29 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RiskRoute = RiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -68,6 +96,57 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsIndexRoute = IntegrationsIndexRouteImport.update({
+  id: '/integrations/',
+  path: '/integrations/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsTradierRoute = IntegrationsTradierRouteImport.update({
+  id: '/integrations/tradier',
+  path: '/integrations/tradier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsSchwabRoute = IntegrationsSchwabRouteImport.update({
+  id: '/integrations/schwab',
+  path: '/integrations/schwab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsDiscordRoute = IntegrationsDiscordRouteImport.update({
+  id: '/integrations/discord',
+  path: '/integrations/discord',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForDiscordOptionsTradersRoute =
+  ForDiscordOptionsTradersRouteImport.update({
+    id: '/for/discord-options-traders',
+    path: '/for/discord-options-traders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CompareTradelabsRoute = CompareTradelabsRouteImport.update({
+  id: '/compare/tradelabs',
+  path: '/compare/tradelabs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareNyriaRoute = CompareNyriaRouteImport.update({
+  id: '/compare/nyria',
+  path: '/compare/nyria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareManualCopyRoute = CompareManualCopyRouteImport.update({
+  id: '/compare/manual-copy',
+  path: '/compare/manual-copy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareBotifytradesRoute = CompareBotifytradesRouteImport.update({
+  id: '/compare/botifytrades',
+  path: '/compare/botifytrades',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -112,8 +191,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reviews': typeof ReviewsRoute
+  '/risk': typeof RiskRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/billing': typeof AuthenticatedBillingRoute
@@ -121,6 +203,16 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/compare/botifytrades': typeof CompareBotifytradesRoute
+  '/compare/manual-copy': typeof CompareManualCopyRoute
+  '/compare/nyria': typeof CompareNyriaRoute
+  '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/integrations/discord': typeof IntegrationsDiscordRoute
+  '/integrations/schwab': typeof IntegrationsSchwabRoute
+  '/integrations/tradier': typeof IntegrationsTradierRoute
+  '/compare/': typeof CompareIndexRoute
+  '/integrations/': typeof IntegrationsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/desktop/auth': typeof ApiDesktopAuthRoute
 }
@@ -129,8 +221,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reviews': typeof ReviewsRoute
+  '/risk': typeof RiskRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/billing': typeof AuthenticatedBillingRoute
@@ -138,6 +233,16 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/compare/botifytrades': typeof CompareBotifytradesRoute
+  '/compare/manual-copy': typeof CompareManualCopyRoute
+  '/compare/nyria': typeof CompareNyriaRoute
+  '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/integrations/discord': typeof IntegrationsDiscordRoute
+  '/integrations/schwab': typeof IntegrationsSchwabRoute
+  '/integrations/tradier': typeof IntegrationsTradierRoute
+  '/compare': typeof CompareIndexRoute
+  '/integrations': typeof IntegrationsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/desktop/auth': typeof ApiDesktopAuthRoute
 }
@@ -148,8 +253,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reviews': typeof ReviewsRoute
+  '/risk': typeof RiskRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
@@ -157,6 +265,16 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/compare/botifytrades': typeof CompareBotifytradesRoute
+  '/compare/manual-copy': typeof CompareManualCopyRoute
+  '/compare/nyria': typeof CompareNyriaRoute
+  '/compare/tradelabs': typeof CompareTradelabsRoute
+  '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/integrations/discord': typeof IntegrationsDiscordRoute
+  '/integrations/schwab': typeof IntegrationsSchwabRoute
+  '/integrations/tradier': typeof IntegrationsTradierRoute
+  '/compare/': typeof CompareIndexRoute
+  '/integrations/': typeof IntegrationsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/desktop/auth': typeof ApiDesktopAuthRoute
 }
@@ -167,8 +285,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/reviews'
+    | '/risk'
     | '/signup'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/billing'
@@ -176,6 +297,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/settings'
+    | '/compare/botifytrades'
+    | '/compare/manual-copy'
+    | '/compare/nyria'
+    | '/compare/tradelabs'
+    | '/for/discord-options-traders'
+    | '/integrations/discord'
+    | '/integrations/schwab'
+    | '/integrations/tradier'
+    | '/compare/'
+    | '/integrations/'
     | '/api/auth/$'
     | '/api/desktop/auth'
   fileRoutesByTo: FileRoutesByTo
@@ -184,8 +315,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/reviews'
+    | '/risk'
     | '/signup'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/billing'
@@ -193,6 +327,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/settings'
+    | '/compare/botifytrades'
+    | '/compare/manual-copy'
+    | '/compare/nyria'
+    | '/compare/tradelabs'
+    | '/for/discord-options-traders'
+    | '/integrations/discord'
+    | '/integrations/schwab'
+    | '/integrations/tradier'
+    | '/compare'
+    | '/integrations'
     | '/api/auth/$'
     | '/api/desktop/auth'
   id:
@@ -202,8 +346,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/privacy'
+    | '/refund'
     | '/reviews'
+    | '/risk'
     | '/signup'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/_authenticated/billing'
@@ -211,6 +358,16 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
+    | '/compare/botifytrades'
+    | '/compare/manual-copy'
+    | '/compare/nyria'
+    | '/compare/tradelabs'
+    | '/for/discord-options-traders'
+    | '/integrations/discord'
+    | '/integrations/schwab'
+    | '/integrations/tradier'
+    | '/compare/'
+    | '/integrations/'
     | '/api/auth/$'
     | '/api/desktop/auth'
   fileRoutesById: FileRoutesById
@@ -221,10 +378,23 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  RefundRoute: typeof RefundRoute
   ReviewsRoute: typeof ReviewsRoute
+  RiskRoute: typeof RiskRoute
   SignupRoute: typeof SignupRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  CompareBotifytradesRoute: typeof CompareBotifytradesRoute
+  CompareManualCopyRoute: typeof CompareManualCopyRoute
+  CompareNyriaRoute: typeof CompareNyriaRoute
+  CompareTradelabsRoute: typeof CompareTradelabsRoute
+  ForDiscordOptionsTradersRoute: typeof ForDiscordOptionsTradersRoute
+  IntegrationsDiscordRoute: typeof IntegrationsDiscordRoute
+  IntegrationsSchwabRoute: typeof IntegrationsSchwabRoute
+  IntegrationsTradierRoute: typeof IntegrationsTradierRoute
+  CompareIndexRoute: typeof CompareIndexRoute
+  IntegrationsIndexRoute: typeof IntegrationsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDesktopAuthRoute: typeof ApiDesktopAuthRoute
 }
@@ -245,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -252,11 +429,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/risk': {
+      id: '/risk'
+      path: '/risk'
+      fullPath: '/risk'
+      preLoaderRoute: typeof RiskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reviews': {
       id: '/reviews'
       path: '/reviews'
       fullPath: '/reviews'
       preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -292,6 +483,76 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations/': {
+      id: '/integrations/'
+      path: '/integrations'
+      fullPath: '/integrations/'
+      preLoaderRoute: typeof IntegrationsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations/tradier': {
+      id: '/integrations/tradier'
+      path: '/integrations/tradier'
+      fullPath: '/integrations/tradier'
+      preLoaderRoute: typeof IntegrationsTradierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations/schwab': {
+      id: '/integrations/schwab'
+      path: '/integrations/schwab'
+      fullPath: '/integrations/schwab'
+      preLoaderRoute: typeof IntegrationsSchwabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations/discord': {
+      id: '/integrations/discord'
+      path: '/integrations/discord'
+      fullPath: '/integrations/discord'
+      preLoaderRoute: typeof IntegrationsDiscordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/discord-options-traders': {
+      id: '/for/discord-options-traders'
+      path: '/for/discord-options-traders'
+      fullPath: '/for/discord-options-traders'
+      preLoaderRoute: typeof ForDiscordOptionsTradersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/tradelabs': {
+      id: '/compare/tradelabs'
+      path: '/compare/tradelabs'
+      fullPath: '/compare/tradelabs'
+      preLoaderRoute: typeof CompareTradelabsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/nyria': {
+      id: '/compare/nyria'
+      path: '/compare/nyria'
+      fullPath: '/compare/nyria'
+      preLoaderRoute: typeof CompareNyriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/manual-copy': {
+      id: '/compare/manual-copy'
+      path: '/compare/manual-copy'
+      fullPath: '/compare/manual-copy'
+      preLoaderRoute: typeof CompareManualCopyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/botifytrades': {
+      id: '/compare/botifytrades'
+      path: '/compare/botifytrades'
+      fullPath: '/compare/botifytrades'
+      preLoaderRoute: typeof CompareBotifytradesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
@@ -372,10 +633,23 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  RefundRoute: RefundRoute,
   ReviewsRoute: ReviewsRoute,
+  RiskRoute: RiskRoute,
   SignupRoute: SignupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  CompareBotifytradesRoute: CompareBotifytradesRoute,
+  CompareManualCopyRoute: CompareManualCopyRoute,
+  CompareNyriaRoute: CompareNyriaRoute,
+  CompareTradelabsRoute: CompareTradelabsRoute,
+  ForDiscordOptionsTradersRoute: ForDiscordOptionsTradersRoute,
+  IntegrationsDiscordRoute: IntegrationsDiscordRoute,
+  IntegrationsSchwabRoute: IntegrationsSchwabRoute,
+  IntegrationsTradierRoute: IntegrationsTradierRoute,
+  CompareIndexRoute: CompareIndexRoute,
+  IntegrationsIndexRoute: IntegrationsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDesktopAuthRoute: ApiDesktopAuthRoute,
 }

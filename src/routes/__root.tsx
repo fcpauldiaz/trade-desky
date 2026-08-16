@@ -21,6 +21,11 @@ export const Route = createRootRoute({
       {
         title: 'Trade Desky',
       },
+      {
+        name: 'description',
+        content:
+          'Turn Discord-style notification alerts into Tradier or Schwab option orders. Desktop capture, AI parsing, paper or live.',
+      },
     ],
     links: [
       {

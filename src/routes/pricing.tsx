@@ -4,10 +4,22 @@ import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
+import JsonLd from '#/components/JsonLd'
 import { useSession } from '#/lib/auth-client'
 import { api } from '#/lib/api-client'
+import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-ld'
+import { pageHead } from '#/lib/seo'
+import { PRO_PRICE_LABEL } from '#/lib/site'
 
-export const Route = createFileRoute('/pricing')({ component: PricingPage })
+export const Route = createFileRoute('/pricing')({
+  head: () =>
+    pageHead({
+      title: `Trade Desky pricing — ${PRO_PRICE_LABEL}/mo`,
+      description: `Pro is ${PRO_PRICE_LABEL} per month for desktop alert capture, AI parsing, and Tradier or Schwab execution. Cancel anytime in the billing portal.`,
+      path: '/pricing',
+    }),
+  component: PricingPage,
+})
 
 const PRO_FEATURES = [
   'AI trade parsing + execution',
@@ -91,6 +103,7 @@ function PricingPage() {
 
   return (
     <main className="marketing-page">
+      <JsonLd data={[softwareApplicationJsonLd(), faqPageJsonLd(HOME_FAQ)]} />
       <section className="marketing-section marketing-section-white pricing-hero">
         <div className="page-wrap px-4 sm:px-6 lg:px-8">
           <div className="pricing-hero-head">
@@ -98,13 +111,14 @@ function PricingPage() {
               Simple, <HeroHighlight variant="yellow">Transparent</HeroHighlight> Pricing
             </h1>
             <p className="marketing-section-subtitle pricing-hero-sub">
-              One plan for automated alert capture and broker execution. Cancel anytime.
+              One plan at {PRO_PRICE_LABEL} per month for automated alert capture and broker
+              execution. Cancel anytime.
             </p>
           </div>
 
           <div className="pricing-plan-grid pricing-plan-grid-single">
             <article className="pricing-plan-card is-featured is-selected">
-              <span className="pricing-plan-badge">Most Popular</span>
+              <span className="pricing-plan-badge">Pro</span>
               <div className="pricing-plan-top">
                 <div>
                   <h2 className="pricing-plan-name">Pro</h2>
@@ -115,8 +129,8 @@ function PricingPage() {
                 </span>
               </div>
               <p className="pricing-plan-price">
-                <span className="pricing-plan-price-main">Pro</span>
-                <span className="pricing-plan-price-period"> plan</span>
+                <span className="pricing-plan-price-main">{PRO_PRICE_LABEL}</span>
+                <span className="pricing-plan-price-period">/mo</span>
               </p>
               <span className="pricing-plan-offer">Full automation</span>
               <ul className="pricing-plan-features">

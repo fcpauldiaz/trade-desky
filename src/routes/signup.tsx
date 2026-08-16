@@ -1,8 +1,13 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signUp } from '#/lib/auth-client'
+import { noindexHead } from '#/lib/seo'
 
-export const Route = createFileRoute('/signup')({ component: SignupPage })
+export const Route = createFileRoute('/signup')({
+  head: () =>
+    noindexHead('Sign up', 'Create a Trade Desky account to automate Discord-style option alerts.'),
+  component: SignupPage,
+})
 
 function SignupPage() {
   const navigate = useNavigate()
@@ -66,6 +71,10 @@ function SignupPage() {
           />
         </label>
         {error && <p className="text-sm text-red-600">{error}</p>}
+        <p className="text-xs text-[var(--ja-gray-600)]">
+          By creating an account you agree to the <Link to="/terms">Terms</Link>,{' '}
+          <Link to="/privacy">Privacy Policy</Link>, and <Link to="/risk">Risk Disclosure</Link>.
+        </p>
         <button type="submit" className="btn-primary w-full">
           Create account
         </button>

@@ -1,8 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signIn } from '#/lib/auth-client'
+import { noindexHead } from '#/lib/seo'
 
-export const Route = createFileRoute('/login')({ component: LoginPage })
+export const Route = createFileRoute('/login')({
+  head: () => noindexHead('Log in', 'Sign in to your Trade Desky account.'),
+  component: LoginPage,
+})
 
 function LoginPage() {
   const navigate = useNavigate()

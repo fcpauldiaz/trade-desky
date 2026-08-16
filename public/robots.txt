@@ -1,3 +1,12 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /dashboard
+Disallow: /connections
+Disallow: /billing
+Disallow: /settings
+Disallow: /onboarding
+
+Sitemap: https://tradedesky.chapilabs.com/sitemap.xml

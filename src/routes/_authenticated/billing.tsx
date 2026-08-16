@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
+import { SUPPORT_EMAIL } from '#/lib/site'
 
 export const Route = createFileRoute('/_authenticated/billing')({ component: BillingPage })
 
@@ -78,6 +79,12 @@ function BillingPage() {
         </Link>
       </div>
       {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
+      <p className="text-sm text-[var(--muted-foreground)]">
+        Billing help:{' '}
+        <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>
+          {SUPPORT_EMAIL}
+        </a>
+      </p>
     </main>
   )
 }

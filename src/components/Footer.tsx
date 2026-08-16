@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
+import { SUPPORT_EMAIL } from '#/lib/site'
+
 export default function Footer() {
   const year = new Date().getFullYear()
 
@@ -9,12 +11,21 @@ export default function Footer() {
         <div className="site-footer-brand">
           <h2>Trade Desky</h2>
           <p>Notification alerts → AI parsing → broker execution. Not financial advice.</p>
+          <p>
+            <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+          </p>
         </div>
         <div className="site-footer-col">
           <h3>Product</h3>
           <ul>
             <li>
               <Link to="/pricing">Pricing</Link>
+            </li>
+            <li>
+              <Link to="/integrations">Integrations</Link>
+            </li>
+            <li>
+              <Link to="/compare">Compare</Link>
             </li>
             <li>
               <Link to="/reviews">Reviews</Link>
@@ -32,6 +43,12 @@ export default function Footer() {
             </li>
             <li>
               <Link to="/privacy">Privacy</Link>
+            </li>
+            <li>
+              <Link to="/refund">Refunds</Link>
+            </li>
+            <li>
+              <Link to="/risk">Risk</Link>
             </li>
           </ul>
         </div>

@@ -19,7 +19,7 @@ export default function Header() {
         <Link to="/" className="site-brand">
           <img
             src="/logo192.png"
-            alt=""
+            alt="Trade Desky"
             width={40}
             height={40}
             className="site-logo-mark"
@@ -32,6 +32,9 @@ export default function Header() {
           </Link>
           <Link to="/pricing" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
             Pricing
+          </Link>
+          <Link to="/integrations" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
+            Integrations
           </Link>
           <Link to="/reviews" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
             Reviews

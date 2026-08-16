@@ -8,8 +8,20 @@ import FeaturesSection from '#/components/marketing/FeaturesSection'
 import HowItWorks from '#/components/marketing/HowItWorks'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
+import JsonLd from '#/components/JsonLd'
+import { faqPageJsonLd, HOME_FAQ, organizationJsonLd, softwareApplicationJsonLd } from '#/lib/json-ld'
+import { pageHead } from '#/lib/seo'
 
-export const Route = createFileRoute('/')({ component: HomePage })
+export const Route = createFileRoute('/')({
+  head: () =>
+    pageHead({
+      title: 'Trade Desky — automate Discord alerts to Tradier and Schwab',
+      description:
+        'Capture Discord-style notification alerts on your desktop, parse them with AI, and send option orders to Tradier or Schwab. No webhook URL to copy.',
+      path: '/',
+    }),
+  component: HomePage,
+})
 
 function HomePage() {
   const [reviews, setReviews] = useState<Review[]>([])
@@ -20,6 +32,7 @@ function HomePage() {
 
   return (
     <main className="marketing-page">
+      <JsonLd data={[organizationJsonLd(), softwareApplicationJsonLd(), faqPageJsonLd(HOME_FAQ)]} />
       <Hero />
       <FeaturesSection />
       <HowItWorks />
