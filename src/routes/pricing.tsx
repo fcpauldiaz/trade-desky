@@ -6,16 +6,16 @@ import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
 import JsonLd from '#/components/JsonLd'
 import { useSession } from '#/lib/auth-client'
-import { api } from '#/lib/api-client'
+import { api, type CheckoutPlan } from '#/lib/api-client'
 import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
-import { PRO_PRICE_LABEL } from '#/lib/site'
+import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL } from '#/lib/site'
 
 export const Route = createFileRoute('/pricing')({
   head: () =>
     pageHead({
-      title: `Trade Desky pricing — ${PRO_PRICE_LABEL}/mo`,
-      description: `Pro is ${PRO_PRICE_LABEL} per month for desktop alert capture, AI parsing, and Tradier or Schwab execution. Cancel anytime in the billing portal.`,
+      title: `Trade Desky pricing — ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr`,
+      description: `Pro is ${PRO_PRICE_LABEL} per month or ${PRO_YEARLY_PRICE_LABEL} per year for desktop alert capture, AI parsing, and Tradier or Schwab execution. Cancel anytime in the billing portal.`,
       path: '/pricing',
     }),
   component: PricingPage,
@@ -66,6 +66,7 @@ const ADVANTAGE_FEATURES = [
 
 function PricingPage() {
   const { data: session } = useSession()
+  const [plan, setPlan] = useState<CheckoutPlan>('yearly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -73,7 +74,7 @@ function PricingPage() {
     setError('')
     setLoading(true)
     try {
-      const { checkout_url } = await api.createCheckout()
+      const { checkout_url } = await api.createCheckout(plan)
       window.location.assign(checkout_url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start checkout')
@@ -111,21 +112,24 @@ function PricingPage() {
               Simple, <HeroHighlight variant="yellow">Transparent</HeroHighlight> Pricing
             </h1>
             <p className="marketing-section-subtitle pricing-hero-sub">
-              One plan at {PRO_PRICE_LABEL} per month for automated alert capture and broker
-              execution. Cancel anytime.
+              Pro at {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year for automated
+              alert capture and broker execution. Cancel anytime.
             </p>
           </div>
 
-          <div className="pricing-plan-grid pricing-plan-grid-single">
-            <article className="pricing-plan-card is-featured is-selected">
-              <span className="pricing-plan-badge">Pro</span>
+          <div className="pricing-plan-grid">
+            <button
+              type="button"
+              className={`pricing-plan-card${plan === 'monthly' ? ' is-selected' : ''}`}
+              onClick={() => setPlan('monthly')}
+            >
               <div className="pricing-plan-top">
                 <div>
-                  <h2 className="pricing-plan-name">Pro</h2>
+                  <h2 className="pricing-plan-name">Monthly</h2>
                   <p className="pricing-plan-billing">Billed monthly via Creem</p>
                 </div>
                 <span className="pricing-plan-radio" aria-hidden="true">
-                  ✓
+                  {plan === 'monthly' ? '✓' : ''}
                 </span>
               </div>
               <p className="pricing-plan-price">
@@ -138,7 +142,33 @@ function PricingPage() {
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-            </article>
+            </button>
+            <button
+              type="button"
+              className={`pricing-plan-card is-featured${plan === 'yearly' ? ' is-selected' : ''}`}
+              onClick={() => setPlan('yearly')}
+            >
+              <span className="pricing-plan-badge">Save vs monthly</span>
+              <div className="pricing-plan-top">
+                <div>
+                  <h2 className="pricing-plan-name">Yearly</h2>
+                  <p className="pricing-plan-billing">Billed yearly via Creem</p>
+                </div>
+                <span className="pricing-plan-radio" aria-hidden="true">
+                  {plan === 'yearly' ? '✓' : ''}
+                </span>
+              </div>
+              <p className="pricing-plan-price">
+                <span className="pricing-plan-price-main">{PRO_YEARLY_PRICE_LABEL}</span>
+                <span className="pricing-plan-price-period">/yr</span>
+              </p>
+              <span className="pricing-plan-offer">Same Pro features, one yearly charge</span>
+              <ul className="pricing-plan-features">
+                {PRO_FEATURES.map((feature) => (
+                  <li key={`year-${feature}`}>{feature}</li>
+                ))}
+              </ul>
+            </button>
           </div>
 
           <div className="pricing-cta-block">

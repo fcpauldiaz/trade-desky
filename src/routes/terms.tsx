@@ -8,6 +8,7 @@ import {
   LEGAL_REGION,
   PRODUCT_NAME,
   PRO_PRICE_LABEL,
+  PRO_YEARLY_PRICE_LABEL,
   SITE_URL,
   SUPPORT_EMAIL,
 } from '#/lib/site'
@@ -116,7 +117,8 @@ function TermsPage() {
 
       <h2>7. Billing</h2>
       <p>
-        Pro is {PRO_PRICE_LABEL} per month unless we post a different price before you pay. Creem
+        Pro is {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year unless we post a
+        different price before you pay. Creem
         charges your payment method, collects applicable tax, and issues receipts. Manage or cancel
         in the billing portal from <Link to="/billing">Billing</Link>. Cancellation stops the next
         renewal; access to automated execution lasts until the paid period ends unless we or Creem
