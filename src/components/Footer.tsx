@@ -19,6 +19,9 @@ export default function Footer() {
           <h3>Product</h3>
           <ul>
             <li>
+              <Link to="/download">Download</Link>
+            </li>
+            <li>
               <Link to="/pricing">Pricing</Link>
             </li>
             <li>

@@ -12,6 +12,7 @@ import {
 export const INDEXABLE_PATHS = [
   '/',
   '/pricing',
+  '/download',
   '/reviews',
   '/support',
   '/privacy',
@@ -57,6 +58,11 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
         path: '/pricing',
         title: 'Pricing',
         summary: `Pro is ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr. Cancel anytime via Creem.`,
+      },
+      {
+        path: '/download',
+        title: 'Download',
+        summary: 'Install Trade Desky Watcher for macOS or Windows from this site.',
       },
       {
         path: '/reviews',

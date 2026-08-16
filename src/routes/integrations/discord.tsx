@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import SeoPage, { RelatedPages, SeoSection } from '#/components/marketing/SeoPage'
-import { DESKTOP_APP_NAME, DESKTOP_APP_RELEASES_URL } from '#/lib/desktop-app'
+import { DESKTOP_APP_NAME } from '#/lib/desktop-app'
 import { breadcrumbJsonLd, faqPageJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
 
@@ -59,9 +59,9 @@ function DiscordIntegrationPage() {
           </li>
           <li>
             Install {DESKTOP_APP_NAME} from the{' '}
-            <a className="underline" href={DESKTOP_APP_RELEASES_URL} rel="noreferrer" target="_blank">
-              desktop releases
-            </a>{' '}
+            <Link className="underline" to="/download">
+              download page
+            </Link>{' '}
             and sign in with the same email.
           </li>
           <li>Allow notification access when the OS asks.</li>
