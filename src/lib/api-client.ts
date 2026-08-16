@@ -94,6 +94,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ plan }),
     }),
+  confirmCheckout: (checkoutId: string) =>
+    apiFetch<BillingStatus>('/v1/me/billing/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ checkout_id: checkoutId }),
+    }),
   createBillingPortal: () => apiFetch<{ url: string }>('/v1/me/billing/portal', { method: 'POST' }),
   brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),
   tradierAuthorize: (environment: TradierEnvironment = 'sandbox') =>
