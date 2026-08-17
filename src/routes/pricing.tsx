@@ -74,6 +74,9 @@ function PricingPage() {
   if (loggedIn && isPending) {
     return null
   }
+  if (loggedIn && !canProcessTrades) {
+    return <Navigate to="/onboarding" />
+  }
   if (!showPricingForUser(loggedIn, canProcessTrades)) {
     return <Navigate to="/billing" />
   }

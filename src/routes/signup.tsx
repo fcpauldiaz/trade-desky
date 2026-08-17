@@ -24,14 +24,14 @@ function SignupPage() {
       setError(result.error.message || 'Signup failed')
       return
     }
-    navigate({ to: '/pricing' })
+    navigate({ to: '/onboarding' })
   }
 
   return (
     <main className="marketing-page page-wrap px-4 py-12">
       <header className="marketing-page-header">
         <h1>Sign up</h1>
-        <p>Create your account and connect your broker when you are ready.</p>
+        <p>Create your account, set up alert capture, then subscribe.</p>
       </header>
       <form onSubmit={onSubmit} className="feature-item mx-auto max-w-md space-y-4">
         <label className="block text-sm">
