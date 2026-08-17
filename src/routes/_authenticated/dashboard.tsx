@@ -7,9 +7,19 @@ import TradeTable from '#/components/dashboard/TradeTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { currentMonthKey, shiftMonth, tradeInMonth } from '#/lib/pnl-calendar'
 
-export const Route = createFileRoute('/_authenticated/dashboard')({ component: DashboardPage })
+type DashboardSearch = {
+  trade?: string
+}
+
+export const Route = createFileRoute('/_authenticated/dashboard')({
+  validateSearch: (search: Record<string, unknown>): DashboardSearch => ({
+    trade: typeof search.trade === 'string' ? search.trade : undefined,
+  }),
+  component: DashboardPage,
+})
 
 function DashboardPage() {
+  const { trade: highlightTradeId } = Route.useSearch()
   const [mode, setMode] = useState('')
   const [billing, setBilling] = useState<{ can_process_trades: boolean } | null>(null)
   const [summary, setSummary] = useState({ total_trades: 0, total_pnl: 0, mtd_pnl: 0, win_rate: 0 })
@@ -109,7 +119,7 @@ function DashboardPage() {
       />
       <section>
         <h2 className="mb-3 text-lg font-semibold">Recent trades</h2>
-        <TradeTable trades={trades} />
+        <TradeTable trades={trades} highlightTradeId={highlightTradeId} />
       </section>
     </main>
   )

@@ -29,6 +29,21 @@ export type Trade = {
   created_at: string
 }
 
+export type AlertOutcome = 'executed' | 'skipped' | 'pending'
+
+export type AlertAudit = {
+  id: string
+  created_at: string
+  source_app: string
+  platform: string
+  title: string
+  text: string
+  outcome: AlertOutcome
+  skip_reason: string | null
+  trade_id: string | null
+  trade_status: string | null
+}
+
 export type CheckoutPlan = 'monthly' | 'yearly'
 
 export type TradierEnvironment = 'sandbox' | 'live'
@@ -125,6 +140,7 @@ export const api = {
     const qs = params.toString()
     return apiFetch<Trade[]>(`/v1/me/trades${qs ? `?${qs}` : ''}`)
   },
+  alerts: (limit = 100) => apiFetch<AlertAudit[]>(`/v1/me/alerts?limit=${limit}`),
   dailyPnl: (month: string) => apiFetch<Record<string, number>>(`/v1/me/performance/daily?month=${month}`),
   summary: () =>
     apiFetch<{ total_trades: number; total_pnl: number; mtd_pnl: number; win_rate: number }>(
