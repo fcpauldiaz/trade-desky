@@ -9,6 +9,7 @@ export type UserSettings = {
   fixed_contracts: number
   risk_percent: number
   default_broker: string | null
+  trade_filter_prompt: string | null
 }
 
 export type TestOrderResult = {

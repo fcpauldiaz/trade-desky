@@ -29,6 +29,8 @@ function OnboardingPage() {
     sizing_mode: 'alert_inferred',
     fixed_contracts: 1,
     risk_percent: 1,
+    default_broker: null,
+    trade_filter_prompt: null,
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
