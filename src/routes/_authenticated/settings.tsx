@@ -4,7 +4,12 @@ import { api } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import type { SizingMode, UserSettings } from '#/lib/sizing-types'
 
-type SettingsForm = Omit<UserSettings, 'allowed_tickers'> & { allowed_tickers: string }
+type SettingsForm = Omit<UserSettings, 'allowed_tickers' | 'trade_filter_prompt'> & {
+  allowed_tickers: string
+  trade_filter_prompt: string
+}
+
+const TRADE_FILTER_MAX = 4000
 
 export const Route = createFileRoute('/_authenticated/settings')({ component: SettingsPage })
 
@@ -19,6 +24,7 @@ function SettingsPage() {
     fixed_contracts: 1,
     risk_percent: 1,
     default_broker: null,
+    trade_filter_prompt: '',
   })
   const [saved, setSaved] = useState(false)
 
@@ -27,6 +33,7 @@ function SettingsPage() {
       setSettings({
         ...s,
         allowed_tickers: s.allowed_tickers || '',
+        trade_filter_prompt: s.trade_filter_prompt || '',
       }),
     )
     api.billing().then((b) => setCanTrade(b.can_process_trades)).catch(() => {})
@@ -37,6 +44,7 @@ function SettingsPage() {
     await api.updateSettings({
       ...settings,
       allowed_tickers: settings.allowed_tickers || null,
+      trade_filter_prompt: settings.trade_filter_prompt.trim() || null,
     })
     setSaved(true)
   }
@@ -116,10 +124,25 @@ function SettingsPage() {
         <label className="block text-sm">
           Allowed tickers (comma-separated)
           <input
-            className="mt-1 w-full rounded-lg border px-2 py-1"
+            className="demo-input mt-1 w-full"
             value={settings.allowed_tickers}
             onChange={(e) => setSettings({ ...settings, allowed_tickers: e.target.value })}
           />
+        </label>
+        <label className="block text-sm">
+          Trade filter prompt
+          <textarea
+            className="demo-textarea mt-1 w-full"
+            rows={5}
+            maxLength={TRADE_FILTER_MAX}
+            placeholder="Only take 0DTE SPX/SPY. Skip calls. Skip if I already said no to similar setups."
+            value={settings.trade_filter_prompt}
+            onChange={(e) => setSettings({ ...settings, trade_filter_prompt: e.target.value })}
+          />
+          <span className="mt-1 block text-xs text-[var(--sea-ink-soft)]">
+            Empty means take every Discord/text alert that already passes tickers and confidence.
+            Eterminal signals are not filtered. {settings.trade_filter_prompt.length}/{TRADE_FILTER_MAX}
+          </span>
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -130,7 +153,7 @@ function SettingsPage() {
           />
           Enable live trading
         </label>
-        <button type="submit" disabled={!canTrade} className="rounded-full bg-[var(--lagoon-deep)] px-4 py-2 text-white disabled:opacity-50">
+        <button type="submit" disabled={!canTrade} className="btn-primary disabled:opacity-50">
           Save
         </button>
         {saved && <p className="text-sm text-[var(--sea-ink-soft)]">Saved.</p>}
