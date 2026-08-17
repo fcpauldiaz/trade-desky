@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import KpiStrip from '#/components/dashboard/KpiStrip'
 import MonthlyPnLCalendar from '#/components/dashboard/MonthlyPnLCalendar'
 import TradeTable from '#/components/dashboard/TradeTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
+import { currentMonthKey, shiftMonth, tradeInMonth } from '#/lib/pnl-calendar'
 
 type DashboardSearch = {
   trade?: string
@@ -23,12 +24,12 @@ function DashboardPage() {
   const [billing, setBilling] = useState<{ can_process_trades: boolean } | null>(null)
   const [summary, setSummary] = useState({ total_trades: 0, total_pnl: 0, mtd_pnl: 0, win_rate: 0 })
   const [daily, setDaily] = useState<Record<string, number>>({})
+  const [dailyLoading, setDailyLoading] = useState(true)
+  const [monthTrades, setMonthTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
+  const [monthTradesLoading, setMonthTradesLoading] = useState(true)
   const [trades, setTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [error, setError] = useState('')
-  const month = useMemo(() => {
-    const now = new Date()
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  }, [])
+  const [month, setMonth] = useState(() => currentMonthKey())
 
   useEffect(() => {
     api.billing()
@@ -38,11 +39,55 @@ function DashboardPage() {
         setError('Could not load billing status')
       })
     api.summary().then(setSummary).catch(() => setError('Could not load performance summary'))
+  }, [])
+
+  useEffect(() => {
+    api
+      .trades({ mode: mode || undefined })
+      .then(setTrades)
+      .catch(() => setError('Could not load trades'))
+  }, [mode])
+
+  useEffect(() => {
+    let cancelled = false
+    setDaily({})
+    setDailyLoading(true)
     api
       .dailyPnl(month)
-      .then(setDaily)
-      .catch(() => setError('Could not load daily P&L'))
-    api.trades(mode || undefined).then(setTrades).catch(() => setError('Could not load trades'))
+      .then((data) => {
+        if (!cancelled) setDaily(data)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load daily P&L')
+      })
+      .finally(() => {
+        if (!cancelled) setDailyLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [month])
+
+  useEffect(() => {
+    let cancelled = false
+    setMonthTrades([])
+    setMonthTradesLoading(true)
+    api
+      .trades({ mode: mode || undefined, month, limit: 500 })
+      .then((data) => {
+        if (!cancelled) {
+          setMonthTrades(data.filter((trade) => tradeInMonth(trade, month)))
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load trades')
+      })
+      .finally(() => {
+        if (!cancelled) setMonthTradesLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [mode, month])
 
   return (
@@ -58,7 +103,20 @@ function DashboardPage() {
         mode={mode}
         onModeChange={setMode}
       />
-      <MonthlyPnLCalendar dailyPnl={daily} month={month} trades={trades} />
+      <MonthlyPnLCalendar
+        dailyPnl={daily}
+        dailyLoading={dailyLoading}
+        monthTradesLoading={monthTradesLoading}
+        month={month}
+        monthTrades={monthTrades}
+        onPrevMonth={() => setMonth((current) => shiftMonth(current, -1))}
+        onNextMonth={() => {
+          setMonth((current) => {
+            const next = shiftMonth(current, 1)
+            return next > currentMonthKey() ? current : next
+          })
+        }}
+      />
       <section>
         <h2 className="mb-3 text-lg font-semibold">Recent trades</h2>
         <TradeTable trades={trades} highlightTradeId={highlightTradeId} />

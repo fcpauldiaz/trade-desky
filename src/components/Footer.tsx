@@ -1,9 +1,13 @@
 import { Link } from '@tanstack/react-router'
 
+import { showPricingForUser } from '#/lib/pricing-visibility'
 import { SUPPORT_EMAIL } from '#/lib/site'
+import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const { loggedIn, canProcessTrades, isPending } = useCanProcessTrades()
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades, isPending)
 
   return (
     <footer className="site-footer">
@@ -21,9 +25,11 @@ export default function Footer() {
             <li>
               <Link to="/download">Download</Link>
             </li>
-            <li>
-              <Link to="/pricing">Pricing</Link>
-            </li>
+            {showPricing ? (
+              <li>
+                <Link to="/pricing">Pricing</Link>
+              </li>
+            ) : null}
             <li>
               <Link to="/integrations">Integrations</Link>
             </li>

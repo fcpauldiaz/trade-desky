@@ -1,11 +1,17 @@
 import { Link, useNavigate } from '@tanstack/react-router'
+import DownloadsMenu from '#/components/DownloadsMenu'
 import { clearReceiverTokenCache } from '#/lib/api-client'
 import { signOut, useSession } from '#/lib/auth-client'
+import { showDownloadsForUser, showPricingForUser } from '#/lib/pricing-visibility'
+import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Header() {
   const { data: session, isPending } = useSession()
+  const { canProcessTrades, isPending: subscriptionPending } = useCanProcessTrades()
   const navigate = useNavigate()
   const loggedIn = Boolean(session?.user)
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades, subscriptionPending)
+  const showDownloads = showDownloadsForUser(loggedIn, canProcessTrades, subscriptionPending)
 
   async function logout() {
     clearReceiverTokenCache()
@@ -30,9 +36,11 @@ export default function Header() {
           <Link to="/" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
             Home
           </Link>
-          <Link to="/pricing" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
-            Pricing
-          </Link>
+          {showPricing ? (
+            <Link to="/pricing" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
+              Pricing
+            </Link>
+          ) : null}
           <Link to="/integrations" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
             Integrations
           </Link>
@@ -69,6 +77,7 @@ export default function Header() {
           ) : null}
         </div>
         <div className="site-header-actions">
+          {showDownloads ? <DownloadsMenu /> : null}
           {!loggedIn && !isPending ? (
             <Link to="/signup" className="btn-primary btn-sm">
               Sign up

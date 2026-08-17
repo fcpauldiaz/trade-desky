@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api, type CheckoutPlan } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { SUPPORT_EMAIL } from '#/lib/site'
+import { invalidateCanProcessTradesCache } from '#/lib/use-can-process-trades'
 
 type BillingSearch = {
   checkout_id?: string
@@ -36,6 +37,7 @@ function BillingPage() {
           const confirmed = await api.confirmCheckout(checkoutId)
           if (cancelled) return
           setBilling(confirmed)
+          invalidateCanProcessTradesCache()
           skipBillingFetchRef.current = true
           void navigate({ to: '/billing', search: {}, replace: true })
           return
@@ -52,7 +54,10 @@ function BillingPage() {
           setError(err instanceof Error ? err.message : 'Could not confirm checkout')
           try {
             const data = await api.billing()
-            if (!cancelled) setBilling(data)
+            if (!cancelled) {
+              setBilling(data)
+              invalidateCanProcessTradesCache()
+            }
           } catch {
           }
         } else {
@@ -138,9 +143,11 @@ function BillingPage() {
             {loadingAction === 'portal' ? 'Opening…' : 'Manage subscription'}
           </button>
         )}
-        <Link to="/pricing" className="btn-secondary">
-          View pricing
-        </Link>
+        {!billing?.can_process_trades ? (
+          <Link to="/pricing" className="btn-secondary">
+            View pricing
+          </Link>
+        ) : null}
       </div>
       {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
       <p className="text-sm text-[var(--muted-foreground)]">

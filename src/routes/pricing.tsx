@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Navigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
 import JsonLd from '#/components/JsonLd'
-import { useSession } from '#/lib/auth-client'
 import { api, type CheckoutPlan } from '#/lib/api-client'
+import { showPricingForUser } from '#/lib/pricing-visibility'
+import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
 import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL, PRO_YEARLY_SAVINGS_PILL } from '#/lib/site'
@@ -65,10 +66,17 @@ const ADVANTAGE_FEATURES = [
 ] as const
 
 function PricingPage() {
-  const { data: session } = useSession()
+  const { loggedIn, canProcessTrades, isPending } = useCanProcessTrades()
   const [plan, setPlan] = useState<CheckoutPlan>('yearly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  if (loggedIn && isPending) {
+    return null
+  }
+  if (!showPricingForUser(loggedIn, canProcessTrades)) {
+    return <Navigate to="/billing" />
+  }
 
   async function startCheckout() {
     setError('')
@@ -83,7 +91,7 @@ function PricingPage() {
   }
 
   function renderCta() {
-    if (session?.user) {
+    if (loggedIn) {
       return (
         <button
           type="button"

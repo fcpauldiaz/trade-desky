@@ -132,7 +132,14 @@ export const api = {
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
-  trades: (mode?: string) => apiFetch<Trade[]>(`/v1/me/trades${mode ? `?mode=${mode}` : ''}`),
+  trades: (options?: { mode?: string; month?: string; limit?: number }) => {
+    const params = new URLSearchParams()
+    if (options?.mode) params.set('mode', options.mode)
+    if (options?.month) params.set('month', options.month)
+    if (options?.limit != null) params.set('limit', String(options.limit))
+    const qs = params.toString()
+    return apiFetch<Trade[]>(`/v1/me/trades${qs ? `?${qs}` : ''}`)
+  },
   alerts: (limit = 100) => apiFetch<AlertAudit[]>(`/v1/me/alerts?limit=${limit}`),
   dailyPnl: (month: string) => apiFetch<Record<string, number>>(`/v1/me/performance/daily?month=${month}`),
   summary: () =>
