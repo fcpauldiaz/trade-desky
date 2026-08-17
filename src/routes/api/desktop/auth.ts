@@ -30,16 +30,24 @@ export const Route = createFileRoute('/api/desktop/auth')({
             body: { email, password },
           })
           const user = result.user
-          if (!user) {
+          if (!user?.id || !user.email) {
             return Response.json({ error: 'Invalid credentials' }, { status: 401 })
           }
 
-          const token = await issueDeviceToken(user.id, user.email)
-          return Response.json({
-            api_key: token.api_key,
-            ingest_url: token.ingest_url,
-            email: user.email,
-          })
+          try {
+            const token = await issueDeviceToken(user.id, user.email)
+            return Response.json({
+              api_key: token.api_key,
+              ingest_url: token.ingest_url,
+              email: user.email,
+            })
+          } catch (tokenError) {
+            console.error('desktop auth device token failed', tokenError)
+            return Response.json(
+              { error: 'Signed in, but could not create a desktop device token. Try again.' },
+              { status: 502 },
+            )
+          }
         } catch {
           return Response.json({ error: 'Invalid credentials' }, { status: 401 })
         }
