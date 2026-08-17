@@ -10,9 +10,13 @@ const listeners = new Set<() => void>()
 
 function loadCanProcessTrades(): Promise<boolean> {
   if (!inflight) {
+    const epochAtStart = cacheEpoch
     inflight = api.me().then((me) => {
-      lastKnown = me.can_process_trades
-      return lastKnown
+      const subscribed = me.can_process_trades
+      if (epochAtStart === cacheEpoch) {
+        lastKnown = subscribed
+      }
+      return subscribed
     })
   }
   return inflight
@@ -63,8 +67,8 @@ export function useCanProcessTrades() {
       })
       .catch(() => {
         inflight = null
-        if (!cancelled && lastKnown !== null) {
-          setCanProcessTrades(lastKnown)
+        if (!cancelled) {
+          setCanProcessTrades(lastKnown ?? false)
           setResolved(true)
         }
       })
