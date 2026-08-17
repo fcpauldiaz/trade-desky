@@ -28,7 +28,7 @@ function LoginPage() {
       const me = await api.me()
       navigate({ to: postLoginPath(me.can_process_trades) })
     } catch {
-      navigate({ to: '/dashboard' })
+      navigate({ to: postLoginPath(false) })
     }
   }
 

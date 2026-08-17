@@ -140,6 +140,7 @@ export const api = {
     const qs = params.toString()
     return apiFetch<Trade[]>(`/v1/me/trades${qs ? `?${qs}` : ''}`)
   },
+  trade: (id: string) => apiFetch<Trade>(`/v1/me/trades/${encodeURIComponent(id)}`),
   alerts: (limit = 100) => apiFetch<AlertAudit[]>(`/v1/me/alerts?limit=${limit}`),
   dailyPnl: (month: string) => apiFetch<Record<string, number>>(`/v1/me/performance/daily?month=${month}`),
   summary: () =>

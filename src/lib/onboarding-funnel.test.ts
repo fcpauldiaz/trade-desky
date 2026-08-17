@@ -30,6 +30,14 @@ describe('unpaidAuthenticatedRedirect', () => {
     )
   })
 
+  it('treats a failed profile fetch like unpaid except on onboarding and billing', () => {
+    expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/alerts' })).toBe(
+      '/onboarding',
+    )
+    expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/onboarding' })).toBeNull()
+    expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/billing' })).toBeNull()
+  })
+
   it('sends subscribed users away from onboarding to connections', () => {
     expect(unpaidAuthenticatedRedirect({ canProcessTrades: true, pathname: '/onboarding' })).toBe(
       '/connections',

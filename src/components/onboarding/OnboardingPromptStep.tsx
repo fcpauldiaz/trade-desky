@@ -24,8 +24,8 @@ export default function OnboardingPromptStep({
         <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Tell AI which trades to take</h2>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
           Write personal rules for Discord and text alerts. After ticker and confidence checks, the model takes or
-          skips each trade. Leave this empty to take every alert that already passes those filters. Eterminal
-          signals are not filtered. You can change this later in Settings.
+          skips each trade. Leave this empty to take every alert that already passes those filters.
+          You can change this later in Settings.
         </p>
       </div>
 

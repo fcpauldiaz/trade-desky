@@ -42,7 +42,16 @@ function AuthenticatedLayout() {
         setReady(true)
       })
       .catch(() => {
-        if (!cancelled) setReady(true)
+        if (cancelled) return
+        const to = unpaidAuthenticatedRedirect({
+          canProcessTrades: false,
+          pathname,
+        })
+        if (to) {
+          void navigate({ to })
+          return
+        }
+        setReady(true)
       })
     return () => {
       cancelled = true
