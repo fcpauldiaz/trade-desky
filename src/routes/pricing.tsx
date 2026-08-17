@@ -71,7 +71,10 @@ function PricingPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  if (!isPending && !showPricingForUser(loggedIn, canProcessTrades)) {
+  if (loggedIn && isPending) {
+    return null
+  }
+  if (!showPricingForUser(loggedIn, canProcessTrades)) {
     return <Navigate to="/billing" />
   }
 

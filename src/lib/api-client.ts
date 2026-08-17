@@ -2,7 +2,6 @@ import type { Review } from '#/lib/review-types'
 import type { TestOrderResult, UserSettings } from '#/lib/sizing-types'
 import { authClient } from '#/lib/auth-client'
 import { apiErrorMessage } from '#/lib/api-error'
-import { monthIsoBounds } from '#/lib/pnl-calendar'
 
 const API_BASE = import.meta.env.VITE_RECEIVER_API_URL || 'http://localhost:8000'
 
@@ -121,12 +120,7 @@ export const api = {
   trades: (options?: { mode?: string; month?: string; limit?: number }) => {
     const params = new URLSearchParams()
     if (options?.mode) params.set('mode', options.mode)
-    if (options?.month) {
-      params.set('month', options.month)
-      const { from, to } = monthIsoBounds(options.month)
-      params.set('from', from)
-      params.set('to', to)
-    }
+    if (options?.month) params.set('month', options.month)
     if (options?.limit != null) params.set('limit', String(options.limit))
     const qs = params.toString()
     return apiFetch<Trade[]>(`/v1/me/trades${qs ? `?${qs}` : ''}`)

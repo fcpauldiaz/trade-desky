@@ -11,6 +11,8 @@ import {
   realizedPnlStats,
   shiftMonth,
   sumDailyPnl,
+  tradeInMonth,
+  tradeUtcDayKey,
 } from '#/lib/pnl-calendar'
 
 describe('currentMonthKey', () => {
@@ -57,11 +59,19 @@ describe('dayKeyFor', () => {
 })
 
 describe('monthIsoBounds', () => {
-  it('returns an inclusive start and exclusive end for the month', () => {
+  it('returns UTC start inclusive and next month exclusive', () => {
     expect(monthIsoBounds('2026-08')).toEqual({
-      from: new Date(2026, 7, 1).toISOString(),
-      to: new Date(2026, 8, 1).toISOString(),
+      from: '2026-08-01T00:00:00.000Z',
+      to: '2026-09-01T00:00:00.000Z',
     })
+  })
+})
+
+describe('tradeUtcDayKey', () => {
+  it('matches heatmap UTC calendar days', () => {
+    expect(tradeUtcDayKey('2026-08-01T02:00:00.000Z')).toBe('2026-08-01')
+    expect(tradeInMonth({ created_at: '2026-08-01T02:00:00.000Z' }, '2026-08')).toBe(true)
+    expect(tradeInMonth({ created_at: '2026-09-01T00:00:00.000Z' }, '2026-08')).toBe(false)
   })
 })
 

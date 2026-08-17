@@ -16,8 +16,9 @@ export function parseMonth(month: string): { year: number; month: number } {
 
 export function monthIsoBounds(month: string): { from: string; to: string } {
   const { year, month: monthIndex } = parseMonth(month)
-  const from = new Date(year, monthIndex - 1, 1)
-  const to = monthIndex === 12 ? new Date(year + 1, 0, 1) : new Date(year, monthIndex, 1)
+  const from = new Date(Date.UTC(year, monthIndex - 1, 1))
+  const to =
+    monthIndex === 12 ? new Date(Date.UTC(year + 1, 0, 1)) : new Date(Date.UTC(year, monthIndex, 1))
   return { from: from.toISOString(), to: to.toISOString() }
 }
 
@@ -61,13 +62,13 @@ export function dayKeyFor(month: string, day: number): string {
   return `${year}-${String(monthIndex).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-export function tradeLocalDayKey(createdAt: string): string {
+export function tradeUtcDayKey(createdAt: string): string {
   const date = new Date(createdAt)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
 }
 
 export function tradeInMonth(trade: { created_at: string }, month: string): boolean {
-  return tradeLocalDayKey(trade.created_at).slice(0, 7) === month
+  return tradeUtcDayKey(trade.created_at).slice(0, 7) === month
 }
 
 export function heatmapMaxAbs(dailyPnl: Record<string, number>): number {

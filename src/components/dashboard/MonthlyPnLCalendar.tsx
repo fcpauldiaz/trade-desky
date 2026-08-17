@@ -10,7 +10,7 @@ import {
   pnlHeatColor,
   realizedPnlStats,
   sumDailyPnl,
-  tradeLocalDayKey,
+  tradeUtcDayKey,
 } from '#/lib/pnl-calendar'
 import { capturePng, pnlCaption, pnlShareFilename, shareOrDownload } from '#/lib/share-pnl'
 
@@ -44,7 +44,7 @@ export default function MonthlyPnLCalendar({
   const monthStats = realizedPnlStats(monthTrades)
   const monthPnl = sumDailyPnl(dailyPnl)
   const dayTrades = selectedDay
-    ? monthTrades.filter((trade) => tradeLocalDayKey(trade.created_at) === selectedDay)
+    ? monthTrades.filter((trade) => tradeUtcDayKey(trade.created_at) === selectedDay)
     : []
   const dayStats = realizedPnlStats(dayTrades)
   const dayPnl = selectedDay ? (dailyPnl[selectedDay] ?? 0) : 0
