@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import type { SizingMode, UserSettings } from '#/lib/sizing-types'
+import { TRADE_FILTER_PROMPT_MAX } from '#/lib/sizing-types'
 
 type SettingsForm = Omit<UserSettings, 'allowed_tickers' | 'trade_filter_prompt'> & {
   allowed_tickers: string
   trade_filter_prompt: string
 }
 
-const TRADE_FILTER_MAX = 4000
+const TRADE_FILTER_MAX = TRADE_FILTER_PROMPT_MAX
 
 export const Route = createFileRoute('/_authenticated/settings')({ component: SettingsPage })
 

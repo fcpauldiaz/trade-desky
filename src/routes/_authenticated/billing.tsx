@@ -38,6 +38,11 @@ function BillingPage() {
           if (cancelled) return
           setBilling(confirmed)
           invalidateCanProcessTradesCache()
+          if (confirmed.can_process_trades) {
+            await api.completeOnboarding().catch(() => {})
+            void navigate({ to: '/connections' })
+            return
+          }
           skipBillingFetchRef.current = true
           void navigate({ to: '/billing', search: {}, replace: true })
           return

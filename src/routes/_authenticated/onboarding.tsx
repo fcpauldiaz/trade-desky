@@ -1,25 +1,16 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '#/lib/api-client'
 import type { UserSettings } from '#/lib/sizing-types'
 import OnboardingDesktopStep from '#/components/onboarding/OnboardingDesktopStep'
-import OnboardingSizingStep from '#/components/onboarding/OnboardingSizingStep'
-import OnboardingTestStep from '#/components/onboarding/OnboardingTestStep'
-
-type OnboardingSearch = {
-  broker?: string
-}
+import OnboardingPayStep from '#/components/onboarding/OnboardingPayStep'
+import OnboardingPromptStep from '#/components/onboarding/OnboardingPromptStep'
 
 export const Route = createFileRoute('/_authenticated/onboarding')({
-  validateSearch: (search: Record<string, unknown>): OnboardingSearch => ({
-    broker: typeof search.broker === 'string' ? search.broker : undefined,
-  }),
   component: OnboardingPage,
 })
 
 function OnboardingPage() {
-  const navigate = useNavigate()
-  const { broker } = Route.useSearch()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [settings, setSettings] = useState<UserSettings>({
     default_mode: 'paper',
@@ -32,60 +23,61 @@ function OnboardingPage() {
     default_broker: null,
     trade_filter_prompt: null,
   })
+  const [prompt, setPrompt] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    api.settings().then(setSettings).catch(() => {})
+    api
+      .settings()
+      .then((loaded) => {
+        setSettings(loaded)
+        setPrompt(loaded.trade_filter_prompt || '')
+      })
+      .catch(() => {})
   }, [])
 
-  async function saveSizingAndContinue() {
+  async function savePromptAndContinue(nextPrompt: string) {
     setSaving(true)
     setError('')
     try {
-      await api.updateSettings(settings)
+      const updated = await api.updateSettings({
+        ...settings,
+        trade_filter_prompt: nextPrompt.trim() || null,
+      })
+      setSettings(updated)
+      setPrompt(updated.trade_filter_prompt || '')
       setStep(3)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save settings')
+      setError(err instanceof Error ? err.message : 'Failed to save prompt')
     } finally {
       setSaving(false)
     }
   }
 
-  async function finishOnboarding() {
-    await api.completeOnboarding().catch(() => {})
-    navigate({ to: '/dashboard' })
-  }
-
   return (
     <main className="page-wrap max-w-xl space-y-6 px-4 py-10">
       <header>
-        <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Set up trading</h1>
+        <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Get set up</h1>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
-          {broker ? `${broker} connected — ` : ''}install the desktop app, configure sizing, and verify your broker.
+          Install desktop capture, optionally add an AI trade filter, then subscribe.
         </p>
       </header>
 
       {step === 1 && <OnboardingDesktopStep onContinue={() => setStep(2)} />}
 
       {step === 2 && (
-        <OnboardingSizingStep
-          settings={settings}
-          onChange={setSettings}
-          onContinue={saveSizingAndContinue}
+        <OnboardingPromptStep
+          prompt={prompt}
+          onChange={setPrompt}
+          onContinue={() => savePromptAndContinue(prompt)}
+          onSkip={() => setStep(3)}
           saving={saving}
           error={error}
         />
       )}
 
-      {step === 3 && (
-        <OnboardingTestStep
-          broker={broker || 'broker'}
-          defaultMode={settings.default_mode}
-          onSkip={finishOnboarding}
-          onComplete={finishOnboarding}
-        />
-      )}
+      {step === 3 && <OnboardingPayStep />}
     </main>
   )
 }

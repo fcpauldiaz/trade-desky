@@ -11,8 +11,8 @@ export default function OnboardingDesktopStep({ onContinue }: Props) {
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--sea-ink-soft)]">Step 1 of 3</p>
         <h2 className="text-xl font-semibold text-[var(--sea-ink)]">Install {DESKTOP_APP_NAME}</h2>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
-          Download the desktop app for macOS or Windows. It captures alert notifications and forwards them to your
-          account — no webhook URL to copy.
+          The desktop app captures Discord-style alert notifications and forwards them to your account — no webhook
+          URL to copy. You can install it now or after you subscribe.
         </p>
       </div>
 
@@ -23,25 +23,15 @@ export default function OnboardingDesktopStep({ onContinue }: Props) {
       </ol>
 
       <div className="flex flex-wrap gap-3">
-        <a
-          href={DESKTOP_MAC_ASSET_PATH}
-          className="rounded-full bg-[var(--lagoon-deep)] px-5 py-2.5 text-sm font-semibold text-white"
-        >
+        <a href={DESKTOP_MAC_ASSET_PATH} className="btn-primary">
           Download for macOS
         </a>
-        <a
-          href={DESKTOP_WIN_ASSET_PATH}
-          className="rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold"
-        >
+        <a href={DESKTOP_WIN_ASSET_PATH} className="btn-secondary">
           Download for Windows
         </a>
       </div>
 
-      <button
-        type="button"
-        onClick={onContinue}
-        className="rounded-full bg-[var(--lagoon-deep)] px-5 py-2.5 text-sm font-semibold text-white"
-      >
+      <button type="button" onClick={onContinue} className="btn-primary">
         Continue
       </button>
     </div>
