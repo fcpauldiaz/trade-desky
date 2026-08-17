@@ -7,8 +7,8 @@ export default function UpgradeBanner() {
       <p className="mb-4 text-sm text-[var(--ja-gray-600)]">
         An active Pro subscription is required for this feature.
       </p>
-      <Link to="/pricing" className="btn-primary btn-sm">
-        View pricing
+      <Link to="/onboarding" className="btn-primary btn-sm">
+        Continue setup
       </Link>
     </div>
   )

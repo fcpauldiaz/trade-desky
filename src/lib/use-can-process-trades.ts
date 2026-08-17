@@ -4,12 +4,20 @@ import { api } from '#/lib/api-client'
 import { useSession } from '#/lib/auth-client'
 
 let inflight: Promise<boolean> | null = null
+let lastKnown: boolean | null = null
 let cacheEpoch = 0
 const listeners = new Set<() => void>()
 
 function loadCanProcessTrades(): Promise<boolean> {
   if (!inflight) {
-    inflight = api.me().then((me) => me.can_process_trades)
+    const epochAtStart = cacheEpoch
+    inflight = api.me().then((me) => {
+      const subscribed = me.can_process_trades
+      if (epochAtStart === cacheEpoch) {
+        lastKnown = subscribed
+      }
+      return subscribed
+    })
   }
   return inflight
 }
@@ -25,7 +33,8 @@ export function invalidateCanProcessTradesCache() {
 export function useCanProcessTrades() {
   const { data: session, isPending: sessionPending } = useSession()
   const loggedIn = Boolean(session?.user)
-  const [canProcessTrades, setCanProcessTrades] = useState(false)
+  const [canProcessTrades, setCanProcessTrades] = useState(lastKnown === true)
+  const [resolved, setResolved] = useState(lastKnown !== null)
   const [billingPending, setBillingPending] = useState(false)
   const [epoch, setEpoch] = useState(cacheEpoch)
 
@@ -40,7 +49,9 @@ export function useCanProcessTrades() {
   useEffect(() => {
     if (!loggedIn) {
       inflight = null
+      lastKnown = null
       setCanProcessTrades(false)
+      setResolved(false)
       setBillingPending(false)
       return
     }
@@ -49,11 +60,17 @@ export function useCanProcessTrades() {
     setBillingPending(true)
     loadCanProcessTrades()
       .then((subscribed) => {
-        if (!cancelled) setCanProcessTrades(subscribed)
+        if (!cancelled) {
+          setCanProcessTrades(subscribed)
+          setResolved(true)
+        }
       })
       .catch(() => {
         inflight = null
-        if (!cancelled) setCanProcessTrades(false)
+        if (!cancelled) {
+          setCanProcessTrades(lastKnown ?? false)
+          setResolved(true)
+        }
       })
       .finally(() => {
         if (!cancelled) setBillingPending(false)
@@ -67,6 +84,6 @@ export function useCanProcessTrades() {
   return {
     loggedIn,
     canProcessTrades,
-    isPending: sessionPending || (loggedIn && billingPending),
+    isPending: sessionPending || (loggedIn && (billingPending || !resolved)),
   }
 }

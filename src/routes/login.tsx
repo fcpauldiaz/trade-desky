@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import { api } from '#/lib/api-client'
 import { signIn } from '#/lib/auth-client'
+import { postLoginPath } from '#/lib/onboarding-funnel'
 import { noindexHead } from '#/lib/seo'
 
 export const Route = createFileRoute('/login')({
@@ -22,7 +24,12 @@ function LoginPage() {
       setError(result.error.message || 'Invalid email or password')
       return
     }
-    navigate({ to: '/dashboard' })
+    try {
+      const me = await api.me()
+      navigate({ to: postLoginPath(me.can_process_trades) })
+    } catch {
+      navigate({ to: postLoginPath(false) })
+    }
   }
 
   return (

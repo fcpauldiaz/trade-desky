@@ -1,5 +1,7 @@
 export type SizingMode = 'alert_inferred' | 'fixed' | 'risk_percent'
 
+export const TRADE_FILTER_PROMPT_MAX = 4000
+
 export type UserSettings = {
   default_mode: string
   max_contracts: number

@@ -6,6 +6,7 @@ import MonthlyPnLCalendar from '#/components/dashboard/MonthlyPnLCalendar'
 import TradeTable from '#/components/dashboard/TradeTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { currentMonthKey, shiftMonth, tradeInMonth } from '#/lib/pnl-calendar'
+import { mergeHighlightedTrade } from '#/lib/merge-highlighted-trade'
 
 type DashboardSearch = {
   trade?: string
@@ -42,11 +43,29 @@ function DashboardPage() {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
     api
       .trades({ mode: mode || undefined })
-      .then(setTrades)
-      .catch(() => setError('Could not load trades'))
-  }, [mode])
+      .then(async (list) => {
+        if (cancelled) return
+        if (!highlightTradeId || list.some((trade) => trade.id === highlightTradeId)) {
+          setTrades(list)
+          return
+        }
+        try {
+          const extra = await api.trade(highlightTradeId)
+          if (!cancelled) setTrades(mergeHighlightedTrade(list, extra))
+        } catch {
+          if (!cancelled) setTrades(list)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load trades')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [mode, highlightTradeId])
 
   useEffect(() => {
     let cancelled = false

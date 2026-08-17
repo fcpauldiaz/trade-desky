@@ -39,7 +39,7 @@ function ConnectionsPage() {
     const connected = params.get('connected')
     if (connected) {
       window.history.replaceState({}, '', '/connections')
-      navigate({ to: '/onboarding', search: { broker: connected } })
+      navigate({ to: '/dashboard' })
     }
   }, [navigate])
 
@@ -66,7 +66,7 @@ function ConnectionsPage() {
       setTradierAccountId('')
       await refreshBrokers()
       if (!tradierConnected) {
-        navigate({ to: '/onboarding', search: { broker: 'tradier' } })
+        navigate({ to: '/dashboard' })
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Tradier token connect failed')
