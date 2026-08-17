@@ -63,7 +63,11 @@ function AlertsPage() {
         })}
       </div>
       <section className="island-shell rounded-2xl p-5">
-        {loading ? <p className="text-sm text-[var(--sea-ink-soft)]">Loading alerts…</p> : <AlertAuditTable alerts={visible} />}
+        {loading ? (
+          <p className="text-sm text-[var(--sea-ink-soft)]">Loading alerts…</p>
+        ) : (
+          <AlertAuditTable alerts={visible} totalCount={alerts.length} loadFailed={!!error} />
+        )}
       </section>
     </main>
   )

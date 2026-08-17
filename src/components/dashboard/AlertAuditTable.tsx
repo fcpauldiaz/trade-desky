@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import type { AlertAudit, AlertOutcome } from '#/lib/api-client'
 import {
@@ -12,7 +13,17 @@ function outcomeClass(outcome: AlertOutcome): string {
   return 'bg-[var(--ja-gray-100)]'
 }
 
-export default function AlertAuditTable({ alerts }: { alerts: AlertAudit[] }) {
+type AlertAuditTableProps = {
+  alerts: AlertAudit[]
+  totalCount?: number
+  loadFailed?: boolean
+}
+
+export default function AlertAuditTable({
+  alerts,
+  totalCount = alerts.length,
+  loadFailed = false,
+}: AlertAuditTableProps) {
   const [sortAsc, setSortAsc] = useState(false)
   const [openId, setOpenId] = useState<string | null>(null)
 
@@ -27,6 +38,10 @@ export default function AlertAuditTable({ alerts }: { alerts: AlertAudit[] }) {
   }, [alerts, sortAsc])
 
   if (!alerts.length) {
+    if (loadFailed) return null
+    if (totalCount > 0) {
+      return <p className="text-sm text-[var(--sea-ink-soft)]">No alerts match this filter.</p>
+    }
     return (
       <p className="text-sm text-[var(--sea-ink-soft)]">
         No captured alerts yet. When the desktop watcher is running, banners show up here.
@@ -80,6 +95,15 @@ export default function AlertAuditTable({ alerts }: { alerts: AlertAudit[] }) {
                   </span>
                   {alert.trade_status ? (
                     <div className="mt-1 text-xs text-[var(--sea-ink-soft)]">{alert.trade_status}</div>
+                  ) : null}
+                  {alert.trade_id ? (
+                    <Link
+                      to="/dashboard"
+                      search={{ trade: alert.trade_id }}
+                      className="mt-1 inline-block text-xs font-semibold text-[var(--ja-black)] underline"
+                    >
+                      View trade
+                    </Link>
                   ) : null}
                 </td>
                 <td className="px-3 py-2 text-[var(--sea-ink-soft)]">{alert.skip_reason ?? '—'}</td>
