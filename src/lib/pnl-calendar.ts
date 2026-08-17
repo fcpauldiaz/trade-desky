@@ -61,6 +61,15 @@ export function dayKeyFor(month: string, day: number): string {
   return `${year}-${String(monthIndex).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
+export function tradeLocalDayKey(createdAt: string): string {
+  const date = new Date(createdAt)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+export function tradeInMonth(trade: { created_at: string }, month: string): boolean {
+  return tradeLocalDayKey(trade.created_at).slice(0, 7) === month
+}
+
 export function heatmapMaxAbs(dailyPnl: Record<string, number>): number {
   const values = Object.values(dailyPnl)
   if (values.length === 0) return 1

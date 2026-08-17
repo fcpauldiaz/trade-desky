@@ -5,7 +5,7 @@ import KpiStrip from '#/components/dashboard/KpiStrip'
 import MonthlyPnLCalendar from '#/components/dashboard/MonthlyPnLCalendar'
 import TradeTable from '#/components/dashboard/TradeTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
-import { currentMonthKey, shiftMonth } from '#/lib/pnl-calendar'
+import { currentMonthKey, shiftMonth, tradeInMonth } from '#/lib/pnl-calendar'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({ component: DashboardPage })
 
@@ -16,6 +16,7 @@ function DashboardPage() {
   const [daily, setDaily] = useState<Record<string, number>>({})
   const [dailyLoading, setDailyLoading] = useState(true)
   const [monthTrades, setMonthTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
+  const [monthTradesLoading, setMonthTradesLoading] = useState(true)
   const [trades, setTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [error, setError] = useState('')
   const [month, setMonth] = useState(() => currentMonthKey())
@@ -60,15 +61,19 @@ function DashboardPage() {
   useEffect(() => {
     let cancelled = false
     setMonthTrades([])
+    setMonthTradesLoading(true)
     api
       .trades({ mode: mode || undefined, month, limit: 500 })
       .then((data) => {
         if (!cancelled) {
-          setMonthTrades(data.filter((trade) => trade.created_at.slice(0, 7) === month))
+          setMonthTrades(data.filter((trade) => tradeInMonth(trade, month)))
         }
       })
       .catch(() => {
         if (!cancelled) setError('Could not load trades')
+      })
+      .finally(() => {
+        if (!cancelled) setMonthTradesLoading(false)
       })
     return () => {
       cancelled = true
@@ -91,6 +96,7 @@ function DashboardPage() {
       <MonthlyPnLCalendar
         dailyPnl={daily}
         dailyLoading={dailyLoading}
+        monthTradesLoading={monthTradesLoading}
         month={month}
         monthTrades={monthTrades}
         onPrevMonth={() => setMonth((current) => shiftMonth(current, -1))}

@@ -10,12 +10,14 @@ import {
   pnlHeatColor,
   realizedPnlStats,
   sumDailyPnl,
+  tradeLocalDayKey,
 } from '#/lib/pnl-calendar'
 import { capturePng, pnlCaption, pnlShareFilename, shareOrDownload } from '#/lib/share-pnl'
 
 type Props = {
   dailyPnl: Record<string, number>
   dailyLoading?: boolean
+  monthTradesLoading?: boolean
   month: string
   monthTrades?: Trade[]
   onPrevMonth: () => void
@@ -25,6 +27,7 @@ type Props = {
 export default function MonthlyPnLCalendar({
   dailyPnl,
   dailyLoading = false,
+  monthTradesLoading = false,
   month,
   monthTrades = [],
   onPrevMonth,
@@ -41,11 +44,11 @@ export default function MonthlyPnLCalendar({
   const monthStats = realizedPnlStats(monthTrades)
   const monthPnl = sumDailyPnl(dailyPnl)
   const dayTrades = selectedDay
-    ? monthTrades.filter((trade) => trade.created_at.slice(0, 10) === selectedDay)
+    ? monthTrades.filter((trade) => tradeLocalDayKey(trade.created_at) === selectedDay)
     : []
   const dayStats = realizedPnlStats(dayTrades)
   const dayPnl = selectedDay ? (dailyPnl[selectedDay] ?? 0) : 0
-  const shareDisabled = dailyLoading || sharing !== null
+  const shareDisabled = dailyLoading || monthTradesLoading || sharing !== null
 
   useEffect(() => {
     setSelectedDay(null)

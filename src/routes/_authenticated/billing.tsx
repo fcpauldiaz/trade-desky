@@ -47,10 +47,7 @@ function BillingPage() {
           return
         }
         const data = await api.billing()
-        if (!cancelled) {
-          setBilling(data)
-          invalidateCanProcessTradesCache()
-        }
+        if (!cancelled) setBilling(data)
       } catch (err) {
         if (cancelled) return
         if (checkoutId) {
