@@ -14,12 +14,13 @@ function DashboardPage() {
   const [billing, setBilling] = useState<{ can_process_trades: boolean } | null>(null)
   const [summary, setSummary] = useState({ total_trades: 0, total_pnl: 0, mtd_pnl: 0, win_rate: 0 })
   const [daily, setDaily] = useState<Record<string, number>>({})
+  const [dailyLoading, setDailyLoading] = useState(true)
+  const [monthTrades, setMonthTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [trades, setTrades] = useState<Awaited<ReturnType<typeof api.trades>>>([])
   const [error, setError] = useState('')
   const [month, setMonth] = useState(() => currentMonthKey())
 
   useEffect(() => {
-    setDaily({})
     api.billing()
       .then(setBilling)
       .catch(() => {
@@ -27,11 +28,51 @@ function DashboardPage() {
         setError('Could not load billing status')
       })
     api.summary().then(setSummary).catch(() => setError('Could not load performance summary'))
+  }, [])
+
+  useEffect(() => {
+    api
+      .trades({ mode: mode || undefined })
+      .then(setTrades)
+      .catch(() => setError('Could not load trades'))
+  }, [mode])
+
+  useEffect(() => {
+    let cancelled = false
+    setDaily({})
+    setDailyLoading(true)
     api
       .dailyPnl(month)
-      .then(setDaily)
-      .catch(() => setError('Could not load daily P&L'))
-    api.trades(mode || undefined).then(setTrades).catch(() => setError('Could not load trades'))
+      .then((data) => {
+        if (!cancelled) setDaily(data)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load daily P&L')
+      })
+      .finally(() => {
+        if (!cancelled) setDailyLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [month])
+
+  useEffect(() => {
+    let cancelled = false
+    setMonthTrades([])
+    api
+      .trades({ mode: mode || undefined, month, limit: 500 })
+      .then((data) => {
+        if (!cancelled) {
+          setMonthTrades(data.filter((trade) => trade.created_at.slice(0, 7) === month))
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load trades')
+      })
+    return () => {
+      cancelled = true
+    }
   }, [mode, month])
 
   return (
@@ -49,8 +90,9 @@ function DashboardPage() {
       />
       <MonthlyPnLCalendar
         dailyPnl={daily}
+        dailyLoading={dailyLoading}
         month={month}
-        trades={trades}
+        monthTrades={monthTrades}
         onPrevMonth={() => setMonth((current) => shiftMonth(current, -1))}
         onNextMonth={() => {
           setMonth((current) => {

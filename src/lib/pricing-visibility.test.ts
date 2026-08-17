@@ -14,6 +14,10 @@ describe('showPricingForUser', () => {
   it('hides pricing for logged-in subscribers', () => {
     expect(showPricingForUser(true, true)).toBe(false)
   })
+
+  it('hides pricing while subscription status is pending', () => {
+    expect(showPricingForUser(true, false, true)).toBe(false)
+  })
 })
 
 describe('showDownloadsForUser', () => {
@@ -27,5 +31,9 @@ describe('showDownloadsForUser', () => {
 
   it('shows downloads for logged-in subscribers', () => {
     expect(showDownloadsForUser(true, true)).toBe(true)
+  })
+
+  it('hides downloads while subscription status is pending', () => {
+    expect(showDownloadsForUser(true, false, true)).toBe(false)
   })
 })

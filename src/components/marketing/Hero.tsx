@@ -6,8 +6,8 @@ import { showPricingForUser } from '#/lib/pricing-visibility'
 import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Hero() {
-  const { loggedIn, canProcessTrades } = useCanProcessTrades()
-  const showPricing = showPricingForUser(loggedIn, canProcessTrades)
+  const { loggedIn, canProcessTrades, isPending } = useCanProcessTrades()
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades, isPending)
   return (
     <section className="marketing-hero">
       <div className="page-wrap px-4 sm:px-6 lg:px-8">

@@ -2,6 +2,7 @@ import type { Review } from '#/lib/review-types'
 import type { TestOrderResult, UserSettings } from '#/lib/sizing-types'
 import { authClient } from '#/lib/auth-client'
 import { apiErrorMessage } from '#/lib/api-error'
+import { monthIsoBounds } from '#/lib/pnl-calendar'
 
 const API_BASE = import.meta.env.VITE_RECEIVER_API_URL || 'http://localhost:8000'
 
@@ -117,7 +118,19 @@ export const api = {
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
-  trades: (mode?: string) => apiFetch<Trade[]>(`/v1/me/trades${mode ? `?mode=${mode}` : ''}`),
+  trades: (options?: { mode?: string; month?: string; limit?: number }) => {
+    const params = new URLSearchParams()
+    if (options?.mode) params.set('mode', options.mode)
+    if (options?.month) {
+      params.set('month', options.month)
+      const { from, to } = monthIsoBounds(options.month)
+      params.set('from', from)
+      params.set('to', to)
+    }
+    if (options?.limit != null) params.set('limit', String(options.limit))
+    const qs = params.toString()
+    return apiFetch<Trade[]>(`/v1/me/trades${qs ? `?${qs}` : ''}`)
+  },
   dailyPnl: (month: string) => apiFetch<Record<string, number>>(`/v1/me/performance/daily?month=${month}`),
   summary: () =>
     apiFetch<{ total_trades: number; total_pnl: number; mtd_pnl: number; win_rate: number }>(

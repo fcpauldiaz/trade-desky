@@ -15,16 +15,18 @@ import { capturePng, pnlCaption, pnlShareFilename, shareOrDownload } from '#/lib
 
 type Props = {
   dailyPnl: Record<string, number>
+  dailyLoading?: boolean
   month: string
-  trades?: Trade[]
+  monthTrades?: Trade[]
   onPrevMonth: () => void
   onNextMonth: () => void
 }
 
 export default function MonthlyPnLCalendar({
   dailyPnl,
+  dailyLoading = false,
   month,
-  trades = [],
+  monthTrades = [],
   onPrevMonth,
   onNextMonth,
 }: Props) {
@@ -36,14 +38,14 @@ export default function MonthlyPnLCalendar({
   const cells = monthGrid(month)
   const maxAbs = heatmapMaxAbs(dailyPnl)
   const canGoNext = month < currentMonthKey()
-  const monthTrades = trades.filter((trade) => trade.created_at.slice(0, 7) === month)
   const monthStats = realizedPnlStats(monthTrades)
   const monthPnl = sumDailyPnl(dailyPnl)
   const dayTrades = selectedDay
-    ? trades.filter((trade) => trade.created_at.slice(0, 10) === selectedDay)
+    ? monthTrades.filter((trade) => trade.created_at.slice(0, 10) === selectedDay)
     : []
   const dayStats = realizedPnlStats(dayTrades)
   const dayPnl = selectedDay ? (dailyPnl[selectedDay] ?? 0) : 0
+  const shareDisabled = dailyLoading || sharing !== null
 
   useEffect(() => {
     setSelectedDay(null)
@@ -93,7 +95,7 @@ export default function MonthlyPnLCalendar({
           type="button"
           className="btn-primary px-4 py-2 text-sm"
           onClick={() => void share('month')}
-          disabled={sharing !== null}
+          disabled={shareDisabled}
         >
           {sharing === 'month' ? 'Sharing…' : 'Share month'}
         </button>
@@ -129,7 +131,7 @@ export default function MonthlyPnLCalendar({
               type="button"
               className="btn-secondary px-4 py-2 text-sm"
               onClick={() => void share('day')}
-              disabled={sharing !== null}
+              disabled={shareDisabled}
             >
               {sharing === 'day' ? 'Sharing…' : 'Share day'}
             </button>

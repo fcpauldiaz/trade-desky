@@ -7,6 +7,7 @@ import {
   formatMonthLabel,
   heatmapMaxAbs,
   monthGrid,
+  monthIsoBounds,
   realizedPnlStats,
   shiftMonth,
   sumDailyPnl,
@@ -52,6 +53,15 @@ describe('monthGrid', () => {
 describe('dayKeyFor', () => {
   it('zero-pads month and day', () => {
     expect(dayKeyFor('2026-08', 5)).toBe('2026-08-05')
+  })
+})
+
+describe('monthIsoBounds', () => {
+  it('returns an inclusive start and exclusive end for the month', () => {
+    expect(monthIsoBounds('2026-08')).toEqual({
+      from: new Date(2026, 7, 1).toISOString(),
+      to: new Date(2026, 8, 1).toISOString(),
+    })
   })
 })
 

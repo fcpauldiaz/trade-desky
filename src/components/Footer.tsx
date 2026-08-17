@@ -6,8 +6,8 @@ import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Footer() {
   const year = new Date().getFullYear()
-  const { loggedIn, canProcessTrades } = useCanProcessTrades()
-  const showPricing = showPricingForUser(loggedIn, canProcessTrades)
+  const { loggedIn, canProcessTrades, isPending } = useCanProcessTrades()
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades, isPending)
 
   return (
     <footer className="site-footer">

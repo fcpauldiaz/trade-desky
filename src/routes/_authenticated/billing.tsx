@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api, type CheckoutPlan } from '#/lib/api-client'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { SUPPORT_EMAIL } from '#/lib/site'
+import { invalidateCanProcessTradesCache } from '#/lib/use-can-process-trades'
 
 type BillingSearch = {
   checkout_id?: string
@@ -36,6 +37,7 @@ function BillingPage() {
           const confirmed = await api.confirmCheckout(checkoutId)
           if (cancelled) return
           setBilling(confirmed)
+          invalidateCanProcessTradesCache()
           skipBillingFetchRef.current = true
           void navigate({ to: '/billing', search: {}, replace: true })
           return
@@ -45,14 +47,20 @@ function BillingPage() {
           return
         }
         const data = await api.billing()
-        if (!cancelled) setBilling(data)
+        if (!cancelled) {
+          setBilling(data)
+          invalidateCanProcessTradesCache()
+        }
       } catch (err) {
         if (cancelled) return
         if (checkoutId) {
           setError(err instanceof Error ? err.message : 'Could not confirm checkout')
           try {
             const data = await api.billing()
-            if (!cancelled) setBilling(data)
+            if (!cancelled) {
+              setBilling(data)
+              invalidateCanProcessTradesCache()
+            }
           } catch {
           }
         } else {

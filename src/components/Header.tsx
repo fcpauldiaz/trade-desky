@@ -7,11 +7,11 @@ import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 
 export default function Header() {
   const { data: session, isPending } = useSession()
-  const { canProcessTrades } = useCanProcessTrades()
+  const { canProcessTrades, isPending: subscriptionPending } = useCanProcessTrades()
   const navigate = useNavigate()
   const loggedIn = Boolean(session?.user)
-  const showPricing = showPricingForUser(loggedIn, canProcessTrades)
-  const showDownloads = showDownloadsForUser(loggedIn, canProcessTrades)
+  const showPricing = showPricingForUser(loggedIn, canProcessTrades, subscriptionPending)
+  const showDownloads = showDownloadsForUser(loggedIn, canProcessTrades, subscriptionPending)
 
   async function logout() {
     clearReceiverTokenCache()

@@ -14,6 +14,13 @@ export function parseMonth(month: string): { year: number; month: number } {
   return { year, month: monthIndex }
 }
 
+export function monthIsoBounds(month: string): { from: string; to: string } {
+  const { year, month: monthIndex } = parseMonth(month)
+  const from = new Date(year, monthIndex - 1, 1)
+  const to = monthIndex === 12 ? new Date(year + 1, 0, 1) : new Date(year, monthIndex, 1)
+  return { from: from.toISOString(), to: to.toISOString() }
+}
+
 export function shiftMonth(month: string, delta: number): string {
   const { year, month: monthIndex } = parseMonth(month)
   const shifted = new Date(year, monthIndex - 1 + delta, 1)
