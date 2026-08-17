@@ -141,7 +141,7 @@ function SettingsPage() {
           />
           <span className="mt-1 block text-xs text-[var(--sea-ink-soft)]">
             Empty means take every Discord/text alert that already passes tickers and confidence.
-            Eterminal signals are not filtered. {settings.trade_filter_prompt.length}/{TRADE_FILTER_MAX}
+            {settings.trade_filter_prompt.length}/{TRADE_FILTER_MAX}
           </span>
         </label>
         <label className="flex items-center gap-2 text-sm">
