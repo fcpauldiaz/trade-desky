@@ -1,11 +1,23 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Trade } from '#/lib/api-client'
 
 type SortKey = keyof Pick<Trade, 'created_at' | 'underlying' | 'strike' | 'mode' | 'status' | 'pnl'>
 
-export default function TradeTable({ trades }: { trades: Trade[] }) {
+type TradeTableProps = {
+  trades: Trade[]
+  highlightTradeId?: string
+}
+
+export default function TradeTable({ trades, highlightTradeId }: TradeTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('created_at')
   const [asc, setAsc] = useState(false)
+  const highlightRef = useRef<HTMLTableRowElement>(null)
+
+  useEffect(() => {
+    if (highlightTradeId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+  }, [highlightTradeId, trades])
 
   const sorted = useMemo(() => {
     const copy = [...trades]
@@ -59,7 +71,11 @@ export default function TradeTable({ trades }: { trades: Trade[] }) {
         </thead>
         <tbody>
           {sorted.map((t) => (
-            <tr key={t.id} className="border-t border-[var(--line)]">
+            <tr
+              key={t.id}
+              ref={t.id === highlightTradeId ? highlightRef : undefined}
+              className={`border-t border-[var(--line)] ${t.id === highlightTradeId ? 'bg-[var(--ja-yellow)]' : ''}`}
+            >
               <td className="px-3 py-2">{new Date(t.created_at).toLocaleString()}</td>
               <td className="px-3 py-2 font-medium text-[var(--sea-ink)]">{t.underlying}</td>
               <td className="px-3 py-2">{t.strike}</td>
