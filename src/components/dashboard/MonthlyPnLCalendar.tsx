@@ -3,6 +3,7 @@ import type { Trade } from '#/lib/api-client'
 import PnlShareCard from '#/components/dashboard/PnlShareCard'
 import {
   currentMonthKey,
+  dailyPnlFromTrades,
   dayKeyFor,
   formatMonthLabel,
   heatmapMaxAbs,
@@ -19,6 +20,7 @@ type Props = {
   dailyLoading?: boolean
   monthTradesLoading?: boolean
   month: string
+  mode?: string
   monthTrades?: Trade[]
   onPrevMonth: () => void
   onNextMonth: () => void
@@ -29,6 +31,7 @@ export default function MonthlyPnLCalendar({
   dailyLoading = false,
   monthTradesLoading = false,
   month,
+  mode = '',
   monthTrades = [],
   onPrevMonth,
   onNextMonth,
@@ -42,12 +45,13 @@ export default function MonthlyPnLCalendar({
   const maxAbs = heatmapMaxAbs(dailyPnl)
   const canGoNext = month < currentMonthKey()
   const monthStats = realizedPnlStats(monthTrades)
-  const monthPnl = sumDailyPnl(dailyPnl)
+  const shareDailyPnl = mode ? dailyPnlFromTrades(monthTrades) : dailyPnl
+  const monthPnl = sumDailyPnl(shareDailyPnl)
   const dayTrades = selectedDay
     ? monthTrades.filter((trade) => tradeUtcDayKey(trade.created_at) === selectedDay)
     : []
   const dayStats = realizedPnlStats(dayTrades)
-  const dayPnl = selectedDay ? (dailyPnl[selectedDay] ?? 0) : 0
+  const dayPnl = selectedDay ? (shareDailyPnl[selectedDay] ?? 0) : 0
   const shareDisabled = dailyLoading || monthTradesLoading || sharing !== null
 
   useEffect(() => {
@@ -165,7 +169,7 @@ export default function MonthlyPnLCalendar({
           <PnlShareCard
             variant="month"
             month={month}
-            dailyPnl={dailyPnl}
+            dailyPnl={shareDailyPnl}
             monthPnl={monthPnl}
             winRate={monthStats.winRate}
             filledTrades={monthStats.filled}

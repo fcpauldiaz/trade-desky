@@ -108,6 +108,7 @@ function DashboardPage() {
         dailyLoading={dailyLoading}
         monthTradesLoading={monthTradesLoading}
         month={month}
+        mode={mode}
         monthTrades={monthTrades}
         onPrevMonth={() => setMonth((current) => shiftMonth(current, -1))}
         onNextMonth={() => {

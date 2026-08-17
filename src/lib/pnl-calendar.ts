@@ -88,6 +88,18 @@ export function sumDailyPnl(dailyPnl: Record<string, number>): number {
   return Object.values(dailyPnl).reduce((sum, value) => sum + value, 0)
 }
 
+export function dailyPnlFromTrades(
+  trades: Array<{ pnl: number | null; created_at: string }>,
+): Record<string, number> {
+  const daily: Record<string, number> = {}
+  for (const trade of trades) {
+    if (trade.pnl == null) continue
+    const key = tradeUtcDayKey(trade.created_at)
+    daily[key] = (daily[key] ?? 0) + trade.pnl
+  }
+  return daily
+}
+
 export function realizedPnlStats(trades: Array<{ pnl: number | null }>): RealizedPnlStats {
   const realized = trades.filter((trade) => trade.pnl != null)
   const wins = realized.filter((trade) => (trade.pnl ?? 0) > 0).length

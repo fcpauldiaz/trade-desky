@@ -26,7 +26,7 @@ export function useCanProcessTrades() {
   const { data: session, isPending: sessionPending } = useSession()
   const loggedIn = Boolean(session?.user)
   const [canProcessTrades, setCanProcessTrades] = useState(false)
-  const [billingPending, setBillingPending] = useState(false)
+  const [billingReady, setBillingReady] = useState(false)
   const [epoch, setEpoch] = useState(cacheEpoch)
 
   useEffect(() => {
@@ -41,12 +41,12 @@ export function useCanProcessTrades() {
     if (!loggedIn) {
       inflight = null
       setCanProcessTrades(false)
-      setBillingPending(false)
+      setBillingReady(false)
       return
     }
 
     let cancelled = false
-    setBillingPending(true)
+    setBillingReady(false)
     loadCanProcessTrades()
       .then((subscribed) => {
         if (!cancelled) setCanProcessTrades(subscribed)
@@ -56,7 +56,7 @@ export function useCanProcessTrades() {
         if (!cancelled) setCanProcessTrades(false)
       })
       .finally(() => {
-        if (!cancelled) setBillingPending(false)
+        if (!cancelled) setBillingReady(true)
       })
 
     return () => {
@@ -67,6 +67,6 @@ export function useCanProcessTrades() {
   return {
     loggedIn,
     canProcessTrades,
-    isPending: sessionPending || (loggedIn && billingPending),
+    isPending: sessionPending || (loggedIn && !billingReady),
   }
 }
