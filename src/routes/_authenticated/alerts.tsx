@@ -3,7 +3,13 @@ import { useEffect, useMemo, useState } from 'react'
 import AlertAuditTable from '#/components/dashboard/AlertAuditTable'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { api, type AlertAudit } from '#/lib/api-client'
-import { alertCounts, filterAlerts, type AlertFilter } from '#/lib/alert-audit'
+import {
+  alertCounts,
+  currentDateKey,
+  filterAlerts,
+  filterAlertsByDateRange,
+  type AlertFilter,
+} from '#/lib/alert-audit'
 
 export const Route = createFileRoute('/_authenticated/alerts')({ component: AlertsPage })
 
@@ -17,6 +23,8 @@ const FILTERS: Array<{ id: AlertFilter; label: string }> = [
 function AlertsPage() {
   const [alerts, setAlerts] = useState<AlertAudit[]>([])
   const [filter, setFilter] = useState<AlertFilter>('all')
+  const [fromDate, setFromDate] = useState(() => currentDateKey())
+  const [toDate, setToDate] = useState(() => currentDateKey())
   const [canTrade, setCanTrade] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -33,8 +41,12 @@ function AlertsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const counts = useMemo(() => alertCounts(alerts), [alerts])
-  const visible = useMemo(() => filterAlerts(alerts, filter), [alerts, filter])
+  const dateFiltered = useMemo(
+    () => filterAlertsByDateRange(alerts, fromDate, toDate),
+    [alerts, fromDate, toDate],
+  )
+  const counts = useMemo(() => alertCounts(dateFiltered), [dateFiltered])
+  const visible = useMemo(() => filterAlerts(dateFiltered, filter), [dateFiltered, filter])
 
   return (
     <main className="page-wrap space-y-6 px-4 py-10">
@@ -47,6 +59,39 @@ function AlertsPage() {
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {!canTrade ? <UpgradeBanner /> : null}
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex flex-col gap-1 text-sm font-semibold text-[var(--ja-black)]">
+          From
+          <input
+            type="date"
+            className="demo-input w-auto"
+            value={fromDate}
+            max={toDate || undefined}
+            onChange={(event) => setFromDate(event.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-semibold text-[var(--ja-black)]">
+          To
+          <input
+            type="date"
+            className="demo-input w-auto"
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(event) => setToDate(event.target.value)}
+          />
+        </label>
+        <button
+          type="button"
+          className="btn-secondary btn-sm"
+          onClick={() => {
+            const today = currentDateKey()
+            setFromDate(today)
+            setToDate(today)
+          }}
+        >
+          Today
+        </button>
+      </div>
       <div className="flex flex-wrap gap-2">
         {FILTERS.map(({ id, label }) => {
           const active = filter === id
@@ -66,7 +111,7 @@ function AlertsPage() {
         {loading ? (
           <p className="text-sm text-[var(--sea-ink-soft)]">Loading alerts…</p>
         ) : (
-          <AlertAuditTable alerts={visible} totalCount={alerts.length} loadFailed={!!error} />
+          <AlertAuditTable alerts={visible} totalCount={dateFiltered.length} loadFailed={!!error} />
         )}
       </section>
     </main>

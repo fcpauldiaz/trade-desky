@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import type { AlertAudit } from '#/lib/api-client'
 import {
   alertCounts,
+  alertLocalDayKey,
+  currentDateKey,
   filterAlerts,
+  filterAlertsByDateRange,
   formatAlertOutcome,
   formatPlatform,
   formatSourceApp,
@@ -24,6 +27,41 @@ function alert(partial: Partial<AlertAudit>): AlertAudit {
     ...partial,
   }
 }
+
+function localIso(year: number, month: number, day: number, hour = 12): string {
+  return new Date(year, month - 1, day, hour).toISOString()
+}
+
+describe('filterAlertsByDateRange', () => {
+  const rows = [
+    alert({ id: 'a', created_at: localIso(2026, 8, 16) }),
+    alert({ id: 'b', created_at: localIso(2026, 8, 17) }),
+    alert({ id: 'c', created_at: localIso(2026, 8, 18) }),
+  ]
+
+  it('keeps alerts within the inclusive range', () => {
+    expect(filterAlertsByDateRange(rows, '2026-08-16', '2026-08-17').map((row) => row.id)).toEqual([
+      'a',
+      'b',
+    ])
+  })
+
+  it('filters to a single day', () => {
+    expect(filterAlertsByDateRange(rows, '2026-08-17', '2026-08-17').map((row) => row.id)).toEqual(['b'])
+  })
+})
+
+describe('currentDateKey', () => {
+  it('formats local calendar day', () => {
+    expect(currentDateKey(new Date(2026, 7, 16))).toBe('2026-08-16')
+  })
+})
+
+describe('alertLocalDayKey', () => {
+  it('uses the local calendar day', () => {
+    expect(alertLocalDayKey(localIso(2026, 8, 16, 15))).toBe('2026-08-16')
+  })
+})
 
 describe('filterAlerts', () => {
   const rows = [
