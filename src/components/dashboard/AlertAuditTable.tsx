@@ -40,7 +40,7 @@ export default function AlertAuditTable({
   if (!alerts.length) {
     if (loadFailed) return null
     if (totalCount > 0) {
-      return <p className="text-sm text-[var(--sea-ink-soft)]">No alerts match this filter.</p>
+      return <p className="text-sm text-[var(--sea-ink-soft)]">No alerts match the current filters.</p>
     }
     return (
       <p className="text-sm text-[var(--sea-ink-soft)]">
