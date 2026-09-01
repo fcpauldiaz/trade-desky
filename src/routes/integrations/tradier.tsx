@@ -89,6 +89,7 @@ function TradierIntegrationPage() {
       <RelatedPages
         links={[
           { to: '/integrations/schwab', label: 'Schwab OAuth' },
+          { to: '/integrations/ninjatrader', label: 'NinjaTrader futures' },
           { to: '/integrations/discord', label: 'Desktop alert capture' },
           { to: '/compare/nyria', label: 'Nyria vs Trade Desky' },
         ]}

@@ -462,6 +462,30 @@ a:hover {
   color: rgba(0, 0, 0, 0.6);
 }
 
+.broker-logos-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.broker-logo-item {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  background: var(--ja-white);
+  border: 2px solid var(--ja-black);
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 0 var(--ja-black);
+}
+
+.broker-logo-item img {
+  display: block;
+  height: 1.75rem;
+  width: auto;
+}
+
 .marketing-hero-visual {
   position: relative;
 }

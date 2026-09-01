@@ -44,10 +44,12 @@ Auth migrations run automatically on server startup. To apply them manually: `np
 | `/pricing` | Pro plan + Creem checkout |
 | `/login`, `/signup` | Email + password (Better Auth) |
 | `/dashboard` | P&L calendar + trade table |
-| `/connections` | Tradier + Schwab connect + test connection |
+| `/connections` | Tradier, Schwab, and NinjaTrader connect + inbound JSON webhook |
 | `/onboarding` | Post-connect sizing setup + SPY test order |
 | `/settings` | Paper/live, sizing mode, caps, tickers |
 | `/billing` | Subscription status |
+| `/integrations` | Broker and alert-source overview |
+| `/integrations/ninjatrader` | NinjaTrader futures bridge + inbound webhook docs |
 
 ## Deploy on Coolify (Dockerfile)
 

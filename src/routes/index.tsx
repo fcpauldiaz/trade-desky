@@ -15,9 +15,9 @@ import { pageHead } from '#/lib/seo'
 export const Route = createFileRoute('/')({
   head: () =>
     pageHead({
-      title: 'Trade Desky — automate Discord alerts to Tradier and Schwab',
+      title: 'Trade Desky — automate Discord alerts to Tradier, Schwab, and NinjaTrader',
       description:
-        'Capture Discord-style notification alerts on your desktop, parse them with AI, and send option orders to Tradier or Schwab. No webhook URL to copy.',
+        'Capture Discord-style notification alerts on your desktop, parse them with AI, and send orders to Tradier, Schwab, or NinjaTrader futures via the local bridge.',
       path: '/',
     }),
   component: HomePage,

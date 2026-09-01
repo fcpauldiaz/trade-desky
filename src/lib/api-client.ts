@@ -53,6 +53,33 @@ export type BrokerConnection = {
   status: string
   account_id: string | null
   environment: string | null
+  forward_url?: string | null
+  account_note?: string | null
+}
+
+export type InboundWebhook = {
+  id: string
+  url: string
+  secret_hint: string
+  enabled: boolean
+  created_at: string
+}
+
+export type InboundWebhookCreated = InboundWebhook & {
+  secret: string
+}
+
+export type NinjaTraderConnectResult = {
+  broker: string
+  status: string
+  forward_url: string
+  account_id: string | null
+  account_note: string | null
+}
+
+export type NinjaTraderTestResult = {
+  success: boolean
+  message: string
 }
 
 let cachedToken: string | null = null
@@ -130,6 +157,19 @@ export const api = {
       environment: TradierEnvironment
     }>('/v1/me/brokers/tradier/token', { method: 'POST', body: JSON.stringify(body) }),
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
+  ninjatraderConnect: (body: { forward_url: string }) =>
+    apiFetch<NinjaTraderConnectResult>('/v1/me/brokers/ninjatrader/connect', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  ninjatraderTest: () =>
+    apiFetch<NinjaTraderTestResult>('/v1/me/brokers/ninjatrader/test', { method: 'POST' }),
+  webhooks: () => apiFetch<InboundWebhook | null>('/v1/me/webhooks'),
+  createWebhook: () =>
+    apiFetch<InboundWebhookCreated>('/v1/me/webhooks', { method: 'POST' }),
+  rotateWebhookSecret: () =>
+    apiFetch<InboundWebhookCreated>('/v1/me/webhooks/rotate', { method: 'POST' }),
+  deleteWebhook: () => apiFetch<void>('/v1/me/webhooks', { method: 'DELETE' }),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
   trades: (options?: { mode?: string; month?: string; limit?: number }) => {

@@ -8,9 +8,9 @@ import { PRO_PRICE_LABEL } from '#/lib/site'
 export const Route = createFileRoute('/integrations/')({
   head: () =>
     pageHead({
-      title: 'Trade Desky integrations — Tradier, Schwab, Discord alerts',
+      title: 'Trade Desky integrations — Tradier, Schwab, NinjaTrader, Discord alerts',
       description:
-        'Connect Tradier or Schwab and capture Discord-style desktop notifications. No webhook URL. Paper on Tradier sandbox; live on Tradier or Schwab.',
+        'Connect Tradier, Schwab, or NinjaTrader. Capture Discord-style desktop notifications or POST custom JSON webhooks. Paper on Tradier sandbox; live on Tradier, Schwab, or NT futures.',
       path: '/integrations',
     }),
   component: IntegrationsIndexPage,
@@ -47,12 +47,21 @@ function IntegrationsIndexPage() {
             </Link>{' '}
             via official OAuth. There is no Schwab paper toggle in the app.
           </li>
+          <li>
+            <Link className="font-semibold underline" to="/integrations/ninjatrader">
+              NinjaTrader
+            </Link>{' '}
+            via a local bridge URL (futures). Optional inbound JSON webhook for TradingView or
+            custom bots.
+          </li>
         </ul>
       </SeoSection>
       <SeoSection title="What is not live">
         <p className="text-sm">
-          Webull, tastytrade, Interactive Brokers, TradingView webhooks, and Telegram are not
-          connected. If a competitor page lists them, that is their product, not ours. Pro is{' '}
+          Webull, tastytrade, Interactive Brokers, and Telegram are not connected. TradingView can
+          reach Trade Desky through your inbound JSON webhook when enabled on Connections — not a
+          native TradingView broker link. If a competitor page lists them, that is their product,
+          not ours. Pro is{' '}
           {PRO_PRICE_LABEL}/mo on <Link to="/pricing">pricing</Link>.
         </p>
       </SeoSection>
@@ -60,6 +69,7 @@ function IntegrationsIndexPage() {
         links={[
           { to: '/integrations/tradier', label: 'Tradier setup' },
           { to: '/integrations/schwab', label: 'Schwab setup' },
+          { to: '/integrations/ninjatrader', label: 'NinjaTrader setup' },
           { to: '/integrations/discord', label: 'Desktop Discord alerts' },
           { to: '/compare', label: 'Compare alternatives' },
         ]}

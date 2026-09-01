@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import HeroHighlight from '#/components/marketing/HeroHighlight'
+import BrokerLogos from '#/components/marketing/BrokerLogos'
 import SocialProof from '#/components/marketing/SocialProof'
 import { showPricingForUser } from '#/lib/pricing-visibility'
 import { useCanProcessTrades } from '#/lib/use-can-process-trades'
@@ -25,8 +26,8 @@ export default function Hero() {
               the rest.
             </p>
             <p className="marketing-hero-sub">
-              Parse Discord-style alerts, validate option chains, and route orders to Schwab or
-              Tradier — paper or live.
+              Parse Discord-style alerts, validate option chains, and route orders to Schwab,
+              Tradier, or NinjaTrader — paper or live.
             </p>
             <div className="marketing-hero-actions">
               <Link to="/signup" className="btn-primary btn-primary-lg">
@@ -39,7 +40,11 @@ export default function Hero() {
               ) : null}
             </div>
             <SocialProof />
-            <p className="marketing-hero-note">Set up in minutes. No webhook URLs to copy.</p>
+            <BrokerLogos />
+            <p className="marketing-hero-note">
+              Discord alerts use the desktop watcher — no webhook URL to copy. Custom JSON webhooks
+              and NinjaTrader are advanced options on Connections.
+            </p>
           </div>
           <div className="marketing-hero-visual">
             <div className="marketing-hero-card-shadow" aria-hidden="true" />
