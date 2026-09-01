@@ -7,9 +7,6 @@ import {
   NINJATRADER_BRIDGE_ZIP_URL,
 } from '#/lib/ninjatrader-bridge'
 import {
-  NINJATRADER_BRIDGE_DOCS_URL,
-} from '#/lib/brokers'
-import {
   NINJATRADER_GUIDE_IMAGES,
   NINJATRADER_GUIDE_PATH,
 } from '#/lib/guides'
@@ -65,19 +62,14 @@ function NinjaTraderGuidePage() {
         <li className="feature-item space-y-3 p-5">
           <h3 className="text-lg font-black">Install the local bridge (Sim101 first)</h3>
           <p className="text-sm">
-            Download the bridge as a{' '}
-            <a className="underline" href={NINJATRADER_BRIDGE_ZIP_URL} rel="noreferrer" target="_blank">
-              ZIP from GitHub
-            </a>{' '}
-            or clone{' '}
-            <a className="underline" href={NINJATRADER_BRIDGE_DOCS_URL} rel="noreferrer" target="_blank">
-              trade-desky-ninjatrader
-            </a>
-            . You can also use the{' '}
+            Download the bridge from the{' '}
             <Link className="underline" to={`${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`}>
               download page
-            </Link>
-            .
+            </Link>{' '}
+            or use the{' '}
+            <a className="underline" href={NINJATRADER_BRIDGE_ZIP_URL} rel="noreferrer" target="_blank">
+              bridge ZIP
+            </a>
             . Copy <code className="text-xs">NinjaTrader/*.cs</code> into{' '}
             <code className="text-xs">Documents\NinjaTrader 8\bin\Custom\AddOns\</code>, compile in
             NinjaTrader, then open <strong>Trade Desky — NinjaTrader</strong>.

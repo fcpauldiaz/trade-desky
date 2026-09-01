@@ -1,6 +1,3 @@
-export const NINJATRADER_BRIDGE_DOCS_URL =
-  'https://github.com/fcpauldiaz/trade-desky-ninjatrader#readme'
-
 export type BrokerLogo = {
   slug: 'tradier' | 'schwab' | 'ninjatrader'
   name: string
@@ -18,7 +15,7 @@ export const BROKER_LOGOS: readonly BrokerLogo[] = [
   {
     slug: 'schwab',
     name: 'Schwab',
-    src: '/brokers/schwab.jpg',
+    src: '/brokers/schwab.png',
     alt: 'Charles Schwab Corporation',
   },
   {

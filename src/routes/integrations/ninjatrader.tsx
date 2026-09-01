@@ -2,7 +2,6 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 
 import GuideFigure from '#/components/marketing/GuideFigure'
 import SeoPage, { RelatedPages, SeoSection } from '#/components/marketing/SeoPage'
-import { NINJATRADER_BRIDGE_DOCS_URL } from '#/lib/brokers'
 import { NINJATRADER_GUIDE_IMAGES, NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 import {
   NINJATRADER_BRIDGE_DOWNLOAD_PATH,
@@ -151,10 +150,6 @@ function NinjaTraderIntegrationPage() {
           <Link className="font-semibold underline" to={NINJATRADER_GUIDE_PATH}>
             NinjaTrader setup guide
           </Link>
-          . Repository docs:{' '}
-          <a className="underline" href={NINJATRADER_BRIDGE_DOCS_URL} rel="noreferrer" target="_blank">
-            trade-desky-ninjatrader
-          </a>
           .
         </p>
       </SeoSection>

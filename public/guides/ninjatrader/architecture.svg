@@ -34,6 +34,6 @@
   </defs>
   <rect x="24" y="200" width="852" height="72" rx="10" fill="#fff" stroke="#000" stroke-width="2"/>
   <text x="40" y="226" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#000">Same machine?</text>
-  <text x="40" y="248" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">If trade-receiver and NT run on one PC, you may use localhost  tunnel only when cloud must reach your bridge.</text>
+  <text x="40" y="248" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">If trade-receiver and NT run on one PC, you may use localhost → tunnel only when cloud must reach your bridge.</text>
   <text x="40" y="264" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">Start on Sim101 with dry_run enabled until fills look correct.</text>
 </svg>

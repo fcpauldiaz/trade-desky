@@ -7,9 +7,9 @@ import {
   type InboundWebhook,
   type TradierEnvironment,
 } from '#/lib/api-client'
-import { NINJATRADER_BRIDGE_DOCS_URL } from '#/lib/brokers'
-import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
+import FieldHelpDialog from '#/components/FieldHelpDialog'
 import UpgradeBanner from '#/components/UpgradeBanner'
+import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 
 export const Route = createFileRoute('/_authenticated/connections')({ component: ConnectionsPage })
 
@@ -389,9 +389,9 @@ function ConnectionsPage() {
                   Setup guide
                 </Link>
                 {' · '}
-                <a className="underline" href={NINJATRADER_BRIDGE_DOCS_URL} rel="noreferrer" target="_blank">
-                  GitHub
-                </a>
+                <Link className="underline" to="/download#ninjatrader">
+                  Download bridge
+                </Link>
                 . Pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
               </p>
             </div>
@@ -407,6 +407,17 @@ function ConnectionsPage() {
                   placeholder="https://….trycloudflare.com/webhook"
                   required
                 />
+                <FieldHelpDialog title="Forward URL">
+                  <p>
+                    Paste the public <strong>HTTPS</strong> URL of your local trade-desky-ninjatrader
+                    receiver — the address exposed by Cloudflare Tunnel, ngrok, or similar. It must end
+                    with <code>/webhook</code> and be reachable from Trade Desky cloud.
+                  </p>
+                  <p>
+                    This is <strong>not</strong> a download link or repository URL. Start on{' '}
+                    <strong>Sim101</strong> in NinjaTrader before testing live execution.
+                  </p>
+                </FieldHelpDialog>
               </label>
               <label className="block text-sm">
                 Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
@@ -468,6 +479,17 @@ function ConnectionsPage() {
                             Copy
                           </button>
                         </div>
+                        <FieldHelpDialog title="Inbound webhook URL" triggerLabel="What is this URL?">
+                          <p>
+                            This is Trade Desky&apos;s cloud endpoint for external systems (TradingView,
+                            Discord bots, custom scripts) to <strong>POST JSON</strong> alerts.
+                          </p>
+                          <p>
+                            Include your webhook secret in the{' '}
+                            <code>X-Webhook-Secret</code> request header. Trade Desky parses the payload
+                            with AI and routes futures to NinjaTrader when it is your default broker.
+                          </p>
+                        </FieldHelpDialog>
                       </label>
                       {revealedSecrets[hook.id] && (
                         <div className="space-y-2">
