@@ -22,7 +22,9 @@ export const INDEXABLE_PATHS = [
   '/integrations',
   '/integrations/tradier',
   '/integrations/schwab',
+  '/integrations/ninjatrader',
   '/integrations/discord',
+  '/guides/ninjatrader',
   '/compare',
   '/compare/nyria',
   '/compare/tradelabs',
@@ -52,7 +54,7 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
         path: '/',
         title: PRODUCT_NAME,
         summary:
-          'Desktop app that turns Discord-style notification alerts into Tradier or Schwab option orders.',
+          'Desktop app that turns Discord-style notification alerts into Tradier, Schwab, or NinjaTrader orders.',
       },
       {
         path: '/pricing',
@@ -62,7 +64,7 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
       {
         path: '/download',
         title: 'Download',
-        summary: 'Install Trade Desky Watcher for macOS or Windows from this site.',
+        summary: 'Trade Desky Watcher (macOS/Windows) and NinjaTrader bridge ZIP.',
       },
       {
         path: '/reviews',
@@ -77,7 +79,7 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
       {
         path: '/for/discord-options-traders',
         title: 'For Discord options traders',
-        summary: 'Capture Discord option-call alerts on the desktop and execute at Tradier or Schwab.',
+        summary: 'Capture Discord option-call alerts on the desktop and execute at Tradier, Schwab, or NinjaTrader.',
       },
     ],
   },
@@ -100,9 +102,19 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
         summary: 'Connect Charles Schwab for order execution.',
       },
       {
+        path: '/integrations/ninjatrader',
+        title: 'NinjaTrader',
+        summary: 'Connect NinjaTrader futures via a local bridge URL and optional inbound JSON webhook.',
+      },
+      {
         path: '/integrations/discord',
         title: 'Discord alerts',
         summary: 'Desktop notification capture from Discord — no webhook URL to paste.',
+      },
+      {
+        path: '/guides/ninjatrader',
+        title: 'NinjaTrader setup guide',
+        summary: 'Step-by-step Sim101 bridge install, tunnel, Connections, and inbound webhooks.',
       },
     ],
   },
@@ -218,7 +230,7 @@ export function llmsTxt(): string {
 
   return `# ${PRODUCT_NAME}
 
-> ${PRODUCT_NAME} is a ${COMPANY_NAME} desktop and web product that captures trading-alert notifications, parses option intent with AI, and can place Tradier or Schwab orders. Pro is ${PRO_PRICE_LABEL} per month or ${PRO_YEARLY_PRICE_LABEL} per year.
+> ${PRODUCT_NAME} is a ${COMPANY_NAME} desktop and web product that captures trading-alert notifications, parses option intent with AI, and can place Tradier, Schwab, or NinjaTrader orders. Pro is ${PRO_PRICE_LABEL} per month or ${PRO_YEARLY_PRICE_LABEL} per year.
 
 Do not treat this site as investment advice. Login, signup, and authenticated app routes are private.
 

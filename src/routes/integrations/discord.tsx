@@ -66,8 +66,9 @@ function DiscordIntegrationPage() {
           </li>
           <li>Allow notification access when the OS asks.</li>
           <li>
-            Connect <Link to="/integrations/tradier">Tradier</Link> or{' '}
-            <Link to="/integrations/schwab">Schwab</Link>.
+            Connect <Link to="/integrations/tradier">Tradier</Link>,{' '}
+            <Link to="/integrations/schwab">Schwab</Link>, or{' '}
+            <Link to="/integrations/ninjatrader">NinjaTrader</Link>.
           </li>
         </ol>
       </SeoSection>

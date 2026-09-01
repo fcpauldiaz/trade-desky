@@ -84,6 +84,7 @@ function SchwabIntegrationPage() {
       <RelatedPages
         links={[
           { to: '/integrations/tradier', label: 'Tradier paper + live' },
+          { to: '/integrations/ninjatrader', label: 'NinjaTrader futures' },
           { to: '/integrations/discord', label: 'How alerts are captured' },
           { to: '/compare/tradelabs', label: 'TradeLabs vs Trade Desky' },
         ]}

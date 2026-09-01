@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" role="img" aria-label="NinjaTrader Trade Desky Add-On panel with Sim101 selected">
+  <rect width="720" height="400" fill="#f3f4f6"/>
+  <rect x="40" y="30" width="640" height="340" rx="12" fill="#fff" stroke="#000" stroke-width="3"/>
+  <rect x="40" y="30" width="640" height="44" fill="#111827"/>
+  <text x="60" y="58" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="800" fill="#facc15">Trade Desky  NinjaTrader</text>
+  <text x="60" y="110" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#000">Account</text>
+  <rect x="60" y="122" width="280" height="36" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="76" y="145" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#000">Sim101</text>
+  <text x="300" y="145" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#000">¾</text>
+  <rect x="360" y="122" width="280" height="36" rx="6" fill="#facc15" stroke="#000" stroke-width="3"/>
+  <text x="500" y="145" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="800" fill="#000">Start Listener</text>
+  <rect x="60" y="190" width="18" height="18" rx="3" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="88" y="204" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#000">Live trading</text>
+  <text x="520" y="204" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#dc2626">OFF  use Sim101 first</text>
+  <rect x="60" y="230" width="580" height="110" rx="8" fill="#f9fafb" stroke="#000" stroke-width="2"/>
+  <text x="76" y="256" font-family="ui-monospace, monospace" font-size="11" fill="#166534">Listener ready on http://127.0.0.1:8787/webhook</text>
+  <text x="76" y="276" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">Waiting for Trade Desky orders&</text>
+  <text x="76" y="296" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">Account: Sim101 | Mode: simulation</text>
+  <rect x="60" y="360" width="200" height="4" fill="#facc15"/>
+  <text x="270" y="372" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">Compile Add-Ons after copying *.cs into Custom\AddOns</text>
+</svg>

@@ -17,7 +17,7 @@ const FEATURES = [
   {
     icon: '4',
     title: 'Multi-broker execution',
-    description: 'Connect Schwab or Tradier and trade in paper or live mode from one dashboard.',
+    description: 'Connect Schwab, Tradier, or NinjaTrader and trade in paper or live mode from one dashboard.',
   },
   {
     icon: '5',

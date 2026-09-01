@@ -13,11 +13,11 @@ export const HOME_FAQ: readonly FaqItem[] = [
   },
   {
     q: 'Do I need to configure a webhook URL?',
-    a: 'No. Sign in on macOS or Windows with the same account as the web app. The desktop client connects to our ingest endpoint automatically.',
+    a: 'Not for Discord alerts — sign in on macOS or Windows with the same account as the web app and the desktop client connects automatically. Custom JSON webhooks and NinjaTrader futures are optional advanced paths on Connections.',
   },
   {
     q: 'Which brokers are supported?',
-    a: 'Tradier and Schwab today. Connect from the Connections page, complete onboarding, then run paper or live trades from your dashboard.',
+    a: 'Tradier and Schwab for options (paper or live), plus NinjaTrader for futures via a local bridge. Connect from the Connections page, complete onboarding, then run trades from your dashboard.',
   },
   {
     q: 'Can I cancel anytime?',
@@ -63,7 +63,7 @@ export function softwareApplicationJsonLd() {
       },
     ],
     description:
-      'Desktop app that turns Discord-style notification alerts into Tradier or Schwab option orders.',
+      'Desktop app that turns Discord-style notification alerts into Tradier, Schwab, or NinjaTrader orders.',
   }
 }
 

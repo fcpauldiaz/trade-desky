@@ -31,6 +31,9 @@ export default function Footer() {
               </li>
             ) : null}
             <li>
+              <Link to="/guides/ninjatrader">NinjaTrader setup guide</Link>
+            </li>
+            <li>
               <Link to="/integrations">Integrations</Link>
             </li>
             <li>

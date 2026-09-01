@@ -462,6 +462,206 @@ a:hover {
   color: rgba(0, 0, 0, 0.6);
 }
 
+.broker-logos-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.broker-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background: var(--ja-gray-50);
+  border: 2px solid var(--ja-black);
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 0 var(--ja-black);
+}
+
+.broker-logo-item--ninjatrader {
+  padding: 18px;
+  background: var(--ja-white);
+}
+
+.broker-logo-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.broker-logo-image--tradier {
+  height: 2rem;
+}
+
+.broker-logo-image--schwab {
+  height: 3.25rem;
+}
+
+.broker-logo-image--ninjatrader {
+  height: 1.25rem;
+  max-width: 10rem;
+}
+
+.guide-figure {
+  margin: 1.25rem 0 0;
+  border: 3px solid var(--ja-black);
+  border-radius: 0.75rem;
+  box-shadow: 4px 4px 0 var(--ja-black);
+  overflow: hidden;
+  background: var(--ja-white);
+}
+
+.guide-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.guide-figure figcaption {
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--ja-gray-600);
+  border-top: 2px solid var(--ja-black);
+  background: var(--ja-gray-50);
+}
+
+.guide-step-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1.5rem;
+  counter-reset: guide-step;
+}
+
+.guide-step-list > li {
+  counter-increment: guide-step;
+}
+
+.guide-step-list h3::before {
+  content: counter(guide-step) '. ';
+  color: var(--ja-black);
+}
+
+.guide-callout {
+  margin-top: 1rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--ja-black);
+  border-radius: 0.5rem;
+  background: var(--ja-yellow-muted);
+  font-size: 0.875rem;
+}
+
+.guide-brand-mark {
+  display: block;
+  width: auto;
+  height: 1.5rem;
+  max-width: 12rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Download product cards — /download */
+.download-product-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+@media (min-width: 768px) {
+  .download-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+.download-product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--ja-white);
+  border: 3px solid var(--ja-black);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 4px 4px 0 var(--ja-yellow);
+}
+.download-product-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.download-product-platforms {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ja-gray-600);
+}
+.download-product-card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ja-black);
+  letter-spacing: -0.02em;
+}
+.download-product-card > p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ja-gray-600);
+}
+.download-product-logo-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 2rem;
+}
+.download-product-logo {
+  display: block;
+  height: 1.5rem;
+  width: auto;
+  max-width: 12rem;
+  object-fit: contain;
+}
+.download-product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+.download-product-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ja-gray-600);
+}
+.download-product-link {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--ja-black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.download-product-link:hover {
+  color: var(--ja-black);
+}
+.downloads-menu-heading {
+  margin: 0.35rem 0 0.15rem;
+  padding: 0.25rem 0.75rem 0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ja-gray-600);
+}
+.downloads-menu-heading:first-child {
+  margin-top: 0;
+}
+
 .marketing-hero-visual {
   position: relative;
 }
