@@ -7,6 +7,9 @@ import {
   type InboundWebhook,
   type TradierEnvironment,
 } from '#/lib/api-client'
+import CreateWebhookForm from '#/components/connections/CreateWebhookForm'
+import NinjatraderConnectForm from '#/components/connections/NinjatraderConnectForm'
+import TradierTokenForm from '#/components/connections/TradierTokenForm'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
@@ -33,17 +36,11 @@ function ConnectionsPage() {
   const [testMsg, setTestMsg] = useState<Record<string, string>>({})
   const [testing, setTesting] = useState<string | null>(null)
   const [error, setError] = useState('')
-  const [tradierToken, setTradierToken] = useState('')
-  const [tradierAccountId, setTradierAccountId] = useState('')
   const [tradierEnvironment, setTradierEnvironment] = useState<TradierEnvironment>('sandbox')
-  const [savingTradier, setSavingTradier] = useState(false)
-  const [forwardUrl, setForwardUrl] = useState('')
-  const [bridgeWebhookSecret, setBridgeWebhookSecret] = useState('')
-  const [accountLabel, setAccountLabel] = useState('')
-  const [savingNinjatrader, setSavingNinjatrader] = useState(false)
+  const [ninjatraderForwardUrl, setNinjatraderForwardUrl] = useState('')
+  const [ninjatraderAccountLabel, setNinjatraderAccountLabel] = useState('')
   const [webhooks, setWebhooks] = useState<InboundWebhook[]>([])
   const [revealedSecrets, setRevealedSecrets] = useState<Record<string, string>>({})
-  const [webhookName, setWebhookName] = useState('')
   const [webhookLoading, setWebhookLoading] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState('')
 
@@ -62,7 +59,7 @@ function ConnectionsPage() {
     }
     const connectedNt = list.find((b) => b.broker === 'ninjatrader' && b.status === 'connected')
     if (connectedNt?.account_id) {
-      setAccountLabel(connectedNt.account_id)
+      setNinjatraderAccountLabel(connectedNt.account_id)
     }
   }, [])
 
@@ -97,26 +94,25 @@ function ConnectionsPage() {
     }
   }
 
-  async function connectTradierToken(e: React.FormEvent) {
-    e.preventDefault()
+  async function connectTradierToken(values: {
+    environment: TradierEnvironment
+    accessToken: string
+    accountId: string
+  }) {
     setError('')
-    setSavingTradier(true)
     try {
       await api.tradierConnectToken({
-        access_token: tradierToken.trim(),
-        account_id: tradierAccountId.trim() || undefined,
-        environment: tradierEnvironment,
+        access_token: values.accessToken.trim(),
+        account_id: values.accountId.trim() || undefined,
+        environment: values.environment,
       })
-      setTradierToken('')
-      setTradierAccountId('')
       await refreshBrokers()
       if (!tradierConnected) {
         navigate({ to: '/dashboard' })
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Tradier token connect failed')
-    } finally {
-      setSavingTradier(false)
+      throw err
     }
   }
 
@@ -129,26 +125,27 @@ function ConnectionsPage() {
     }
   }
 
-  async function connectNinjatrader(e: React.FormEvent) {
-    e.preventDefault()
+  async function connectNinjatrader(values: {
+    forwardUrl: string
+    bridgeWebhookSecret: string
+    accountLabel: string
+  }) {
     setError('')
-    setSavingNinjatrader(true)
     try {
       const result = await api.ninjatraderConnect({
-        forward_url: forwardUrl.trim(),
-        webhook_secret: bridgeWebhookSecret.trim() || undefined,
-        account_label: accountLabel.trim() || undefined,
+        forward_url: values.forwardUrl.trim(),
+        webhook_secret: values.bridgeWebhookSecret.trim() || undefined,
+        account_label: values.accountLabel.trim() || undefined,
       })
-      setForwardUrl(result.forward_url)
-      setBridgeWebhookSecret('')
+      setNinjatraderForwardUrl(result.forward_url)
       await refreshBrokers()
       if (!ninjatraderConnected) {
         navigate({ to: '/dashboard' })
       }
+      return { forwardUrl: result.forward_url }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'NinjaTrader connect failed')
-    } finally {
-      setSavingNinjatrader(false)
+      throw err
     }
   }
 
@@ -175,23 +172,22 @@ function ConnectionsPage() {
   async function disconnect(broker: string) {
     await api.disconnectBroker(broker)
     if (broker === 'ninjatrader') {
-      setForwardUrl('')
-      setAccountLabel('')
-      setBridgeWebhookSecret('')
+      setNinjatraderForwardUrl('')
+      setNinjatraderAccountLabel('')
     }
     await refreshBrokers()
   }
 
-  async function createWebhook() {
+  async function createWebhook(values: { name: string }) {
     setError('')
     setWebhookLoading('create')
     try {
-      const created = await api.createWebhook({ name: webhookName.trim() })
-      setWebhookName('')
+      const created = await api.createWebhook({ name: values.name.trim() })
       setRevealedSecrets((prev) => ({ ...prev, [created.id]: created.secret }))
       await refreshWebhooks()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create webhook')
+      throw e
     } finally {
       setWebhookLoading(null)
     }
@@ -304,67 +300,12 @@ function ConnectionsPage() {
                 {!tradierConnected && '. Sandbox token for paper, production token for live.'}
               </p>
             </div>
-            <form onSubmit={connectTradierToken} className="space-y-3">
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Environment</legend>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="tradier-environment"
-                    checked={tradierEnvironment === 'sandbox'}
-                    onChange={() => setTradierEnvironment('sandbox')}
-                  />
-                  Paper (sandbox)
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="tradier-environment"
-                    checked={tradierEnvironment === 'live'}
-                    onChange={() => setTradierEnvironment('live')}
-                  />
-                  Live (production)
-                </label>
-              </fieldset>
-              <label className="block text-sm">
-                Access token
-                <input
-                  type="password"
-                  autoComplete="off"
-                  className="demo-input mt-1 w-full"
-                  value={tradierToken}
-                  onChange={(e) => setTradierToken(e.target.value)}
-                  placeholder={
-                    tradierEnvironment === 'sandbox'
-                      ? 'Paste sandbox API token'
-                      : 'Paste production API token'
-                  }
-                  required
-                />
-              </label>
-              <label className="block text-sm">
-                Account id <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-                <input
-                  type="text"
-                  autoComplete="off"
-                  className="demo-input mt-1 w-full"
-                  value={tradierAccountId}
-                  onChange={(e) => setTradierAccountId(e.target.value)}
-                  placeholder="Auto-detected from profile if empty"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={savingTradier || !tradierToken.trim()}
-                className="rounded-full bg-[var(--lagoon-deep)] px-4 py-2 text-sm text-white disabled:opacity-50"
-              >
-                {savingTradier
-                  ? 'Saving…'
-                  : tradierConnected
-                    ? `Switch to ${tradierEnvironment === 'sandbox' ? 'paper' : 'live'}`
-                    : 'Connect with API token'}
-              </button>
-            </form>
+            <TradierTokenForm
+              connected={tradierConnected}
+              environment={tradierEnvironment}
+              onEnvironmentChange={setTradierEnvironment}
+              onSubmit={connectTradierToken}
+            />
             <div className="border-t border-[var(--line)] pt-4">
               <p className="mb-2 text-xs text-[var(--sea-ink-soft)]">
                 Partner OAuth (requires TRADIER_CLIENT_ID / SECRET on the server):
@@ -395,64 +336,12 @@ function ConnectionsPage() {
                 . Pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
               </p>
             </div>
-            <form onSubmit={connectNinjatrader} className="space-y-3">
-              <label className="block text-sm">
-                Forward URL
-                <input
-                  type="url"
-                  autoComplete="off"
-                  className="demo-input mt-1 w-full"
-                  value={forwardUrl}
-                  onChange={(e) => setForwardUrl(e.target.value)}
-                  placeholder="https://….trycloudflare.com/webhook"
-                  required
-                />
-                <FieldHelpDialog title="Forward URL">
-                  <p>
-                    Paste the public <strong>HTTPS</strong> URL of your local trade-desky-ninjatrader
-                    receiver — the address exposed by Cloudflare Tunnel, ngrok, or similar. It must end
-                    with <code>/webhook</code> and be reachable from Trade Desky cloud.
-                  </p>
-                  <p>
-                    This is <strong>not</strong> a download link or repository URL. Start on{' '}
-                    <strong>Sim101</strong> in NinjaTrader before testing live execution.
-                  </p>
-                </FieldHelpDialog>
-              </label>
-              <label className="block text-sm">
-                Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-                <input
-                  type="password"
-                  autoComplete="off"
-                  className="demo-input mt-1 w-full"
-                  value={bridgeWebhookSecret}
-                  onChange={(e) => setBridgeWebhookSecret(e.target.value)}
-                  placeholder="Only if your local bridge requires it"
-                />
-              </label>
-              <label className="block text-sm">
-                Account label <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-                <input
-                  type="text"
-                  autoComplete="off"
-                  className="demo-input mt-1 w-full"
-                  value={accountLabel}
-                  onChange={(e) => setAccountLabel(e.target.value)}
-                  placeholder="Note shown in Connections — account is chosen in NT"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={savingNinjatrader || !forwardUrl.trim()}
-                className="btn-primary text-sm disabled:opacity-50"
-              >
-                {savingNinjatrader
-                  ? 'Saving…'
-                  : ninjatraderConnected
-                    ? 'Update NinjaTrader'
-                    : 'Connect NinjaTrader'}
-              </button>
-            </form>
+            <NinjatraderConnectForm
+              connected={ninjatraderConnected}
+              initialForwardUrl={ninjatraderForwardUrl}
+              initialAccountLabel={ninjatraderAccountLabel}
+              onSubmit={connectNinjatrader}
+            />
             <div className="border-t border-[var(--line)] pt-4 space-y-3">
               <h3 className="text-sm font-semibold">Inbound JSON webhooks</h3>
               <p className="text-xs text-[var(--sea-ink-soft)]">
@@ -535,26 +424,7 @@ function ConnectionsPage() {
                   ))}
                 </ul>
               )}
-              <div className="flex flex-wrap items-end gap-2">
-                <label className="block flex-1 text-sm">
-                  Name <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-                  <input
-                    type="text"
-                    className="demo-input mt-1 w-full"
-                    value={webhookName}
-                    onChange={(e) => setWebhookName(e.target.value)}
-                    placeholder="TradingView, Discord bot, etc."
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={webhookLoading === 'create'}
-                  onClick={createWebhook}
-                  className="btn-secondary text-sm"
-                >
-                  {webhookLoading === 'create' ? 'Creating…' : 'Create webhook'}
-                </button>
-              </div>
+              <CreateWebhookForm loading={webhookLoading === 'create'} onSubmit={createWebhook} />
               {copyFeedback && <p className="text-xs text-[var(--sea-ink-soft)]">{copyFeedback}</p>}
             </div>
           </div>
