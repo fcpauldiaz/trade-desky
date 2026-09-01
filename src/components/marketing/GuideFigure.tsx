@@ -1,3 +1,5 @@
+import { guideAssetUrl } from '#/lib/guides'
+
 type GuideFigureProps = {
   src: string
   alt: string
@@ -7,7 +9,7 @@ type GuideFigureProps = {
 export default function GuideFigure({ src, alt, caption }: GuideFigureProps) {
   return (
     <figure className="guide-figure">
-      <img src={src} alt={alt} loading="lazy" decoding="async" />
+      <img src={guideAssetUrl(src)} alt={alt} loading="lazy" decoding="async" />
       <figcaption>{caption}</figcaption>
     </figure>
   )
