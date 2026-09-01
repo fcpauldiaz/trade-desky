@@ -10,6 +10,6 @@ export const NINJATRADER_BRIDGE_ZIP_URL =
   'https://github.com/fcpauldiaz/trade-desky-ninjatrader/archive/refs/heads/main.zip'
 export const NINJATRADER_BRIDGE_README_URL =
   'https://github.com/fcpauldiaz/trade-desky-ninjatrader#readme'
-export const NINJATRADER_BRIDGE_GUIDE_PATH = '/integrations/ninjatrader' as const
+export const NINJATRADER_BRIDGE_GUIDE_PATH = '/guides/ninjatrader' as const
 export const NINJATRADER_BRIDGE_DOWNLOAD_PATH = '/download' as const
 export const NINJATRADER_BRIDGE_DOWNLOAD_URL = `${SITE_URL}${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`
