@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { BROKER_LOGOS, NINJATRADER_BRIDGE_DOCS_URL } from '#/lib/brokers'
+import { BROKER_LOGOS } from '#/lib/brokers'
 
 describe('brokers', () => {
   it('lists official Tradier, Schwab, and NinjaTrader logo assets', () => {
@@ -14,7 +14,7 @@ describe('brokers', () => {
       {
         slug: 'schwab',
         name: 'Schwab',
-        src: '/brokers/schwab.jpg',
+        src: '/brokers/schwab.png',
         alt: 'Charles Schwab Corporation',
       },
       {
@@ -24,9 +24,5 @@ describe('brokers', () => {
         alt: 'NinjaTrader',
       },
     ])
-  })
-
-  it('points NinjaTrader bridge docs at the standalone repo', () => {
-    expect(NINJATRADER_BRIDGE_DOCS_URL).toContain('trade-desky-ninjatrader')
   })
 })

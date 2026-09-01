@@ -8,7 +8,6 @@ import {
 } from '#/lib/desktop-app'
 import { breadcrumbJsonLd } from '#/lib/json-ld'
 import {
-  NINJATRADER_BRIDGE_GITHUB_URL,
   NINJATRADER_BRIDGE_GUIDE_PATH,
   NINJATRADER_BRIDGE_NAME,
   NINJATRADER_BRIDGE_ZIP_URL,
@@ -94,14 +93,9 @@ function DownloadPage() {
             >
               Download bridge ZIP
             </a>
-            <a
-              className="btn-secondary"
-              href={NINJATRADER_BRIDGE_GITHUB_URL}
-              rel="noreferrer"
-              target="_blank"
-            >
-              View on GitHub
-            </a>
+            <Link className="btn-secondary" to={NINJATRADER_BRIDGE_GUIDE_PATH}>
+              Setup guide
+            </Link>
           </div>
           <p className="download-product-note">
             Unzip and copy add-on files into{' '}
