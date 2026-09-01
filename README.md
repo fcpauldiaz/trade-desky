@@ -32,6 +32,7 @@ Desktop apps sign in via `POST /api/desktop/auth` and receive a device API key +
 | `TURSO_AUTH_TOKEN` | Required when `DATABASE_URL` is `libsql://…` |
 | `INTERNAL_API_SECRET` | Must match receiver — provisions users on signup |
 | `VITE_RECEIVER_API_URL` | trade-receiver API base |
+| `SENTRY_DSN` | Boop/Sentry DSN as `key@domain` — server runtime + Docker build arg for client (tunneled via same-origin route) |
 
 Auth migrations run automatically on server startup. To apply them manually: `npm run db:migrate`.
 
