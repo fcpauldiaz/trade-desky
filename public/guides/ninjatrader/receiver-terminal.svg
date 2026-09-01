@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-label="Python receiver terminal showing setup and webhook URL">
+  <rect width="720" height="360" fill="#111827"/>
+  <rect x="24" y="24" width="672" height="312" rx="10" fill="#0f172a" stroke="#000" stroke-width="3"/>
+  <circle cx="48" cy="48" r="6" fill="#ef4444"/><circle cx="68" cy="48" r="6" fill="#facc15"/><circle cx="88" cy="48" r="6" fill="#22c55e"/>
+  <text x="110" y="52" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#9ca3af">trade-desky-ninjatrader  python main.py</text>
+  <text x="40" y="90" font-family="ui-monospace, monospace" font-size="12" fill="#86efac">$ python main.py --setup</text>
+  <text x="40" y="112" font-family="ui-monospace, monospace" font-size="12" fill="#d1d5db">Wrote config.json (dry_run: true)</text>
+  <text x="40" y="144" font-family="ui-monospace, monospace" font-size="12" fill="#86efac">$ python main.py</text>
+  <text x="40" y="166" font-family="ui-monospace, monospace" font-size="12" fill="#facc15">Listening on http://127.0.0.1:8787/webhook</text>
+  <text x="40" y="188" font-family="ui-monospace, monospace" font-size="12" fill="#d1d5db">Webhook secret: whsec_""""""""""""</text>
+  <text x="40" y="210" font-family="ui-monospace, monospace" font-size="12" fill="#22c55e">Health OK  forward this URL to Trade Desky Connections</text>
+  <rect x="40" y="236" width="640" height="72" rx="6" fill="#1f2937" stroke="#facc15" stroke-width="2"/>
+  <text x="56" y="260" font-family="ui-monospace, monospace" font-size="11" fill="#f9fafb">Public URL (after tunnel): https://your-subdomain.trycloudflare.com/webhook</text>
+  <text x="56" y="280" font-family="ui-monospace, monospace" font-size="11" fill="#9ca3af">Keep dry_run: true until Sim101 test fills succeed</text>
+</svg>

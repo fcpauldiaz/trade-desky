@@ -29,6 +29,7 @@ import { Route as IntegrationsTradierRouteImport } from './routes/integrations/t
 import { Route as IntegrationsSchwabRouteImport } from './routes/integrations/schwab'
 import { Route as IntegrationsNinjatraderRouteImport } from './routes/integrations/ninjatrader'
 import { Route as IntegrationsDiscordRouteImport } from './routes/integrations/discord'
+import { Route as GuidesNinjatraderRouteImport } from './routes/guides/ninjatrader'
 import { Route as ForDiscordOptionsTradersRouteImport } from './routes/for/discord-options-traders'
 import { Route as DesktopFilenameRouteImport } from './routes/desktop/$filename'
 import { Route as CompareTradelabsRouteImport } from './routes/compare/tradelabs'
@@ -143,6 +144,11 @@ const IntegrationsDiscordRoute = IntegrationsDiscordRouteImport.update({
   path: '/integrations/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesNinjatraderRoute = GuidesNinjatraderRouteImport.update({
+  id: '/guides/ninjatrader',
+  path: '/guides/ninjatrader',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForDiscordOptionsTradersRoute =
   ForDiscordOptionsTradersRouteImport.update({
     id: '/for/discord-options-traders',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/compare/tradelabs': typeof CompareTradelabsRoute
   '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/guides/ninjatrader': typeof GuidesNinjatraderRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/ninjatrader': typeof IntegrationsNinjatraderRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -277,6 +284,7 @@ export interface FileRoutesByTo {
   '/compare/tradelabs': typeof CompareTradelabsRoute
   '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/guides/ninjatrader': typeof GuidesNinjatraderRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/ninjatrader': typeof IntegrationsNinjatraderRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/compare/tradelabs': typeof CompareTradelabsRoute
   '/desktop/$filename': typeof DesktopFilenameRoute
   '/for/discord-options-traders': typeof ForDiscordOptionsTradersRoute
+  '/guides/ninjatrader': typeof GuidesNinjatraderRoute
   '/integrations/discord': typeof IntegrationsDiscordRoute
   '/integrations/ninjatrader': typeof IntegrationsNinjatraderRoute
   '/integrations/schwab': typeof IntegrationsSchwabRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/compare/tradelabs'
     | '/desktop/$filename'
     | '/for/discord-options-traders'
+    | '/guides/ninjatrader'
     | '/integrations/discord'
     | '/integrations/ninjatrader'
     | '/integrations/schwab'
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/compare/tradelabs'
     | '/desktop/$filename'
     | '/for/discord-options-traders'
+    | '/guides/ninjatrader'
     | '/integrations/discord'
     | '/integrations/ninjatrader'
     | '/integrations/schwab'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/compare/tradelabs'
     | '/desktop/$filename'
     | '/for/discord-options-traders'
+    | '/guides/ninjatrader'
     | '/integrations/discord'
     | '/integrations/ninjatrader'
     | '/integrations/schwab'
@@ -453,6 +465,7 @@ export interface RootRouteChildren {
   CompareTradelabsRoute: typeof CompareTradelabsRoute
   DesktopFilenameRoute: typeof DesktopFilenameRoute
   ForDiscordOptionsTradersRoute: typeof ForDiscordOptionsTradersRoute
+  GuidesNinjatraderRoute: typeof GuidesNinjatraderRoute
   IntegrationsDiscordRoute: typeof IntegrationsDiscordRoute
   IntegrationsNinjatraderRoute: typeof IntegrationsNinjatraderRoute
   IntegrationsSchwabRoute: typeof IntegrationsSchwabRoute
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationsDiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/ninjatrader': {
+      id: '/guides/ninjatrader'
+      path: '/guides/ninjatrader'
+      fullPath: '/guides/ninjatrader'
+      preLoaderRoute: typeof GuidesNinjatraderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/for/discord-options-traders': {
       id: '/for/discord-options-traders'
       path: '/for/discord-options-traders'
@@ -749,6 +769,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareTradelabsRoute: CompareTradelabsRoute,
   DesktopFilenameRoute: DesktopFilenameRoute,
   ForDiscordOptionsTradersRoute: ForDiscordOptionsTradersRoute,
+  GuidesNinjatraderRoute: GuidesNinjatraderRoute,
   IntegrationsDiscordRoute: IntegrationsDiscordRoute,
   IntegrationsNinjatraderRoute: IntegrationsNinjatraderRoute,
   IntegrationsSchwabRoute: IntegrationsSchwabRoute,

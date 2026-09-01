@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-label="Trade Desky NinjaTrader architecture overview">
+  <rect width="900" height="300" fill="#f9fafb"/>
+  <text x="24" y="36" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="900" fill="#000">How alerts reach NinjaTrader 8</text>
+  <g font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700">
+    <rect x="24" y="70" width="130" height="88" rx="10" fill="#fff" stroke="#000" stroke-width="3"/>
+    <text x="89" y="100" text-anchor="middle" fill="#000">Desktop Watcher</text>
+    <text x="89" y="120" text-anchor="middle" fill="#4b5563" font-weight="500">or inbound</text>
+    <text x="89" y="136" text-anchor="middle" fill="#4b5563" font-weight="500">JSON webhook</text>
+    <rect x="190" y="70" width="150" height="88" rx="10" fill="#facc15" stroke="#000" stroke-width="3"/>
+    <text x="265" y="104" text-anchor="middle" fill="#000">Trade Desky cloud</text>
+    <text x="265" y="124" text-anchor="middle" fill="#000">trade-receiver</text>
+    <text x="265" y="144" text-anchor="middle" fill="#4b5563" font-weight="500">AI parse + route</text>
+    <rect x="376" y="70" width="120" height="88" rx="10" fill="#fff" stroke="#000" stroke-width="3"/>
+    <text x="436" y="104" text-anchor="middle" fill="#000">HTTPS tunnel</text>
+    <text x="436" y="124" text-anchor="middle" fill="#4b5563" font-weight="500">Cloudflare /</text>
+    <text x="436" y="140" text-anchor="middle" fill="#4b5563" font-weight="500">ngrok</text>
+    <rect x="532" y="70" width="150" height="88" rx="10" fill="#fff" stroke="#000" stroke-width="3"/>
+    <text x="607" y="104" text-anchor="middle" fill="#000">Local Python</text>
+    <text x="607" y="124" text-anchor="middle" fill="#000">receiver</text>
+    <text x="607" y="144" text-anchor="middle" fill="#4b5563" font-weight="500">/webhook</text>
+    <rect x="718" y="70" width="158" height="88" rx="10" fill="#111827" stroke="#000" stroke-width="3"/>
+    <text x="797" y="104" text-anchor="middle" fill="#facc15">NinjaTrader 8</text>
+    <text x="797" y="124" text-anchor="middle" fill="#fff" font-weight="500">Add-On listener</text>
+    <text x="797" y="144" text-anchor="middle" fill="#fff" font-weight="500">Sim101 first</text>
+  </g>
+  <path d="M154 114 H190" stroke="#000" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M340 114 H376" stroke="#000" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M496 114 H532" stroke="#000" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M682 114 H718" stroke="#000" stroke-width="3" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#000"/>
+    </marker>
+  </defs>
+  <rect x="24" y="200" width="852" height="72" rx="10" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="40" y="226" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#000">Same machine?</text>
+  <text x="40" y="248" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">If trade-receiver and NT run on one PC, you may use localhost  tunnel only when cloud must reach your bridge.</text>
+  <text x="40" y="264" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4b5563">Start on Sim101 with dry_run enabled until fills look correct.</text>
+</svg>

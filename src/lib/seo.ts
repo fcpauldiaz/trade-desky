@@ -24,6 +24,7 @@ export const INDEXABLE_PATHS = [
   '/integrations/schwab',
   '/integrations/ninjatrader',
   '/integrations/discord',
+  '/guides/ninjatrader',
   '/compare',
   '/compare/nyria',
   '/compare/tradelabs',
@@ -63,7 +64,7 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
       {
         path: '/download',
         title: 'Download',
-        summary: 'Install Trade Desky Watcher for macOS or Windows from this site.',
+        summary: 'Trade Desky Watcher (macOS/Windows) and NinjaTrader bridge ZIP.',
       },
       {
         path: '/reviews',
@@ -109,6 +110,11 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
         path: '/integrations/discord',
         title: 'Discord alerts',
         summary: 'Desktop notification capture from Discord — no webhook URL to paste.',
+      },
+      {
+        path: '/guides/ninjatrader',
+        title: 'NinjaTrader setup guide',
+        summary: 'Step-by-step Sim101 bridge install, tunnel, Connections, and inbound webhooks.',
       },
     ],
   },

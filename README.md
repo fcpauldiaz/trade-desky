@@ -50,6 +50,7 @@ Auth migrations run automatically on server startup. To apply them manually: `np
 | `/billing` | Subscription status |
 | `/integrations` | Broker and alert-source overview |
 | `/integrations/ninjatrader` | NinjaTrader futures bridge + inbound webhook docs |
+| `/guides/ninjatrader` | Step-by-step NinjaTrader bridge setup (Sim101 → live) |
 
 ## Deploy on Coolify (Dockerfile)
 

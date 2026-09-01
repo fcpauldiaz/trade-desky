@@ -8,6 +8,7 @@ import {
   type TradierEnvironment,
 } from '#/lib/api-client'
 import { NINJATRADER_BRIDGE_DOCS_URL } from '#/lib/brokers'
+import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 import UpgradeBanner from '#/components/UpgradeBanner'
 
 export const Route = createFileRoute('/_authenticated/connections')({ component: ConnectionsPage })
@@ -383,11 +384,15 @@ function ConnectionsPage() {
             <div>
               <h2 className="font-semibold">NinjaTrader</h2>
               <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                Futures execution via a local bridge. Install{' '}
+                Futures execution via a local bridge.{' '}
+                <Link className="underline" to={NINJATRADER_GUIDE_PATH}>
+                  Setup guide
+                </Link>
+                {' · '}
                 <a className="underline" href={NINJATRADER_BRIDGE_DOCS_URL} rel="noreferrer" target="_blank">
-                  trade-desky-ninjatrader
+                  GitHub
                 </a>
-                , pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
+                . Pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
               </p>
             </div>
             <form onSubmit={connectNinjatrader} className="space-y-3">
@@ -534,7 +539,7 @@ function ConnectionsPage() {
         </div>
       )}
       <p className="text-xs text-[var(--sea-ink-soft)]">
-        Need help? See <Link to="/integrations/ninjatrader">NinjaTrader setup</Link> or{' '}
+        Need help? See <Link to={NINJATRADER_GUIDE_PATH}>NinjaTrader setup guide</Link> or{' '}
         <Link to="/integrations">all integrations</Link>.
       </p>
     </main>
