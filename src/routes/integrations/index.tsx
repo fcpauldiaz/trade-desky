@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import SeoPage, { RelatedPages, SeoSection } from '#/components/marketing/SeoPage'
+import BrokerLogos from '#/components/marketing/BrokerLogos'
 import { breadcrumbJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
 import { PRO_PRICE_LABEL } from '#/lib/site'
@@ -26,6 +27,7 @@ function IntegrationsIndexPage() {
         { name: 'Integrations', path: '/integrations' },
       ])}
     >
+      <BrokerLogos />
       <SeoSection title="What is live">
         <ul className="list-disc space-y-2 pl-5 text-sm">
           <li>
