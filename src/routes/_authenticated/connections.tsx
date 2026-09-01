@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
 import {
   api,
+  DEFAULT_NINJATRADER_TEST_ORDER,
   type BrokerConnection,
   type InboundWebhook,
   type TradierEnvironment,
@@ -36,10 +37,13 @@ function ConnectionsPage() {
   const [tradierEnvironment, setTradierEnvironment] = useState<TradierEnvironment>('sandbox')
   const [savingTradier, setSavingTradier] = useState(false)
   const [forwardUrl, setForwardUrl] = useState('')
+  const [bridgeWebhookSecret, setBridgeWebhookSecret] = useState('')
+  const [accountLabel, setAccountLabel] = useState('')
   const [savingNinjatrader, setSavingNinjatrader] = useState(false)
-  const [webhook, setWebhook] = useState<InboundWebhook | null>(null)
-  const [webhookSecret, setWebhookSecret] = useState<string | null>(null)
-  const [webhookLoading, setWebhookLoading] = useState(false)
+  const [webhooks, setWebhooks] = useState<InboundWebhook[]>([])
+  const [revealedSecrets, setRevealedSecrets] = useState<Record<string, string>>({})
+  const [webhookName, setWebhookName] = useState('')
+  const [webhookLoading, setWebhookLoading] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState('')
 
   const tradier = brokers.find((b) => b.broker === 'tradier')
@@ -56,24 +60,24 @@ function ConnectionsPage() {
       setTradierEnvironment(connectedTradier.environment)
     }
     const connectedNt = list.find((b) => b.broker === 'ninjatrader' && b.status === 'connected')
-    if (connectedNt?.forward_url) {
-      setForwardUrl(connectedNt.forward_url)
+    if (connectedNt?.account_id) {
+      setAccountLabel(connectedNt.account_id)
     }
   }, [])
 
-  const refreshWebhook = useCallback(async () => {
+  const refreshWebhooks = useCallback(async () => {
     try {
       const data = await api.webhooks()
-      setWebhook(data)
+      setWebhooks(data)
     } catch {
-      setWebhook(null)
+      setWebhooks([])
     }
   }, [])
 
   useEffect(() => {
     api.billing().then((b) => setCanTrade(b.can_process_trades)).catch(() => setError('Could not load billing'))
     refreshBrokers().catch(() => setError('Could not load brokers'))
-    refreshWebhook().catch(() => {})
+    refreshWebhooks().catch(() => {})
 
     const params = new URLSearchParams(window.location.search)
     const connected = params.get('connected')
@@ -81,7 +85,7 @@ function ConnectionsPage() {
       window.history.replaceState({}, '', '/connections')
       navigate({ to: '/dashboard' })
     }
-  }, [navigate, refreshBrokers, refreshWebhook])
+  }, [navigate, refreshBrokers, refreshWebhooks])
 
   async function connectTradierOAuth() {
     try {
@@ -129,8 +133,13 @@ function ConnectionsPage() {
     setError('')
     setSavingNinjatrader(true)
     try {
-      const result = await api.ninjatraderConnect({ forward_url: forwardUrl.trim() })
+      const result = await api.ninjatraderConnect({
+        forward_url: forwardUrl.trim(),
+        webhook_secret: bridgeWebhookSecret.trim() || undefined,
+        account_label: accountLabel.trim() || undefined,
+      })
       setForwardUrl(result.forward_url)
+      setBridgeWebhookSecret('')
       await refreshBrokers()
       if (!ninjatraderConnected) {
         navigate({ to: '/dashboard' })
@@ -145,13 +154,11 @@ function ConnectionsPage() {
   async function testConnection(broker: string) {
     setTesting(broker)
     try {
-      if (broker === 'ninjatrader') {
-        const res = await api.ninjatraderTest()
-        setTestMsg((prev) => ({ ...prev, [broker]: res.message }))
-      } else {
-        const res = await api.testBrokerOrder(broker)
-        setTestMsg((prev) => ({ ...prev, [broker]: res.message }))
-      }
+      const res =
+        broker === 'ninjatrader'
+          ? await api.testBrokerOrder(broker, DEFAULT_NINJATRADER_TEST_ORDER)
+          : await api.testBrokerOrder(broker)
+      setTestMsg((prev) => ({ ...prev, [broker]: res.message }))
     } catch (e) {
       setTestMsg((prev) => ({ ...prev, [broker]: e instanceof Error ? e.message : 'Test failed' }))
     } finally {
@@ -168,49 +175,55 @@ function ConnectionsPage() {
     await api.disconnectBroker(broker)
     if (broker === 'ninjatrader') {
       setForwardUrl('')
+      setAccountLabel('')
+      setBridgeWebhookSecret('')
     }
     await refreshBrokers()
   }
 
   async function createWebhook() {
     setError('')
-    setWebhookLoading(true)
+    setWebhookLoading('create')
     try {
-      const created = await api.createWebhook()
-      setWebhook(created)
-      setWebhookSecret(created.secret)
+      const created = await api.createWebhook({ name: webhookName.trim() })
+      setWebhookName('')
+      setRevealedSecrets((prev) => ({ ...prev, [created.id]: created.secret }))
+      await refreshWebhooks()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create webhook')
     } finally {
-      setWebhookLoading(false)
+      setWebhookLoading(null)
     }
   }
 
-  async function rotateWebhook() {
+  async function rotateWebhook(id: string) {
     setError('')
-    setWebhookLoading(true)
+    setWebhookLoading(id)
     try {
-      const rotated = await api.rotateWebhookSecret()
-      setWebhook(rotated)
-      setWebhookSecret(rotated.secret)
+      const rotated = await api.rotateWebhookSecret(id)
+      setRevealedSecrets((prev) => ({ ...prev, [id]: rotated.secret }))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not rotate webhook secret')
     } finally {
-      setWebhookLoading(false)
+      setWebhookLoading(null)
     }
   }
 
-  async function removeWebhook() {
+  async function removeWebhook(id: string) {
     setError('')
-    setWebhookLoading(true)
+    setWebhookLoading(id)
     try {
-      await api.deleteWebhook()
-      setWebhook(null)
-      setWebhookSecret(null)
+      await api.deleteWebhook(id)
+      setRevealedSecrets((prev) => {
+        const next = { ...prev }
+        delete next[id]
+        return next
+      })
+      await refreshWebhooks()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not remove webhook')
     } finally {
-      setWebhookLoading(false)
+      setWebhookLoading(null)
     }
   }
 
@@ -231,6 +244,10 @@ function ConnectionsPage() {
     return broker
   }
 
+  function webhookTitle(webhook: InboundWebhook) {
+    return webhook.name.trim() || `Webhook ${webhook.id.slice(0, 8)}`
+  }
+
   return (
     <main className="page-wrap max-w-2xl space-y-6 px-4 py-10">
       <h1 className="text-3xl font-bold">Broker connections</h1>
@@ -243,10 +260,6 @@ function ConnectionsPage() {
               <span>
                 {brokerLabel(b.broker)}: {b.status}
                 {b.account_id && ` (${b.account_id})`}
-                {b.account_note && ` — ${b.account_note}`}
-                {b.forward_url && (
-                  <span className="block text-xs text-[var(--sea-ink-soft)]">{b.forward_url}</span>
-                )}
                 {environmentLabel(b.environment) && ` — ${environmentLabel(b.environment)}`}
                 {defaultBroker === b.broker && ' — default'}
               </span>
@@ -374,7 +387,7 @@ function ConnectionsPage() {
                 <a className="underline" href={NINJATRADER_BRIDGE_DOCS_URL} rel="noreferrer" target="_blank">
                   trade-desky-ninjatrader
                 </a>
-                , pick your account in the NinjaTrader panel, then paste the bridge webhook URL below.
+                , pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
               </p>
             </div>
             <form onSubmit={connectNinjatrader} className="space-y-3">
@@ -386,15 +399,32 @@ function ConnectionsPage() {
                   className="demo-input mt-1 w-full"
                   value={forwardUrl}
                   onChange={(e) => setForwardUrl(e.target.value)}
-                  placeholder="https://….trycloudflare.com/webhook or http://127.0.0.1:8787/webhook"
+                  placeholder="https://….trycloudflare.com/webhook"
                   required
                 />
               </label>
-              {ninjatrader?.account_note && (
-                <p className="text-xs text-[var(--sea-ink-soft)]">
-                  Account note from bridge: {ninjatrader.account_note}
-                </p>
-              )}
+              <label className="block text-sm">
+                Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  className="demo-input mt-1 w-full"
+                  value={bridgeWebhookSecret}
+                  onChange={(e) => setBridgeWebhookSecret(e.target.value)}
+                  placeholder="Only if your local bridge requires it"
+                />
+              </label>
+              <label className="block text-sm">
+                Account label <span className="text-[var(--sea-ink-soft)]">(optional)</span>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  className="demo-input mt-1 w-full"
+                  value={accountLabel}
+                  onChange={(e) => setAccountLabel(e.target.value)}
+                  placeholder="Note shown in Connections — account is chosen in NT"
+                />
+              </label>
               <button
                 type="submit"
                 disabled={savingNinjatrader || !forwardUrl.trim()}
@@ -403,59 +433,101 @@ function ConnectionsPage() {
                 {savingNinjatrader
                   ? 'Saving…'
                   : ninjatraderConnected
-                    ? 'Update forward URL'
+                    ? 'Update NinjaTrader'
                     : 'Connect NinjaTrader'}
               </button>
             </form>
             <div className="border-t border-[var(--line)] pt-4 space-y-3">
-              <h3 className="text-sm font-semibold">Inbound JSON webhook</h3>
+              <h3 className="text-sm font-semibold">Inbound JSON webhooks</h3>
               <p className="text-xs text-[var(--sea-ink-soft)]">
-                Discord bots, TradingView, or custom systems can POST JSON here. Trade Desky parses
-                with AI and routes futures to NinjaTrader when it is your default execution target.
-                Send the secret in the <code className="text-xs">X-Webhook-Secret</code> header.
+                Discord bots, TradingView, or custom systems can POST JSON to a Trade Desky webhook
+                URL. We parse with AI and route futures to NinjaTrader when it is your default
+                execution target. Send the secret in the{' '}
+                <code className="text-xs">X-Webhook-Secret</code> header.
               </p>
-              {webhook ? (
-                <div className="space-y-2 text-sm">
-                  <label className="block">
-                    Webhook URL
-                    <div className="mt-1 flex gap-2">
-                      <input type="text" readOnly className="demo-input flex-1" value={webhook.url} />
-                      <button type="button" className="rounded-full border px-3 py-1 text-xs" onClick={() => handleCopy(webhook.url)}>
-                        Copy
-                      </button>
-                    </div>
-                  </label>
-                  <p className="text-xs text-[var(--sea-ink-soft)]">
-                    Secret hint: {webhook.secret_hint}
-                    {webhook.enabled ? '' : ' (disabled)'}
-                  </p>
-                  {webhookSecret && (
-                    <div className="feature-item space-y-2 p-3">
-                      <p className="text-xs font-semibold text-amber-800">
-                        Save this secret now — it is only shown once.
-                      </p>
-                      <div className="flex gap-2">
-                        <input type="text" readOnly className="demo-input flex-1 font-mono text-xs" value={webhookSecret} />
-                        <button type="button" className="rounded-full border px-3 py-1 text-xs" onClick={() => handleCopy(webhookSecret)}>
-                          Copy
+              {webhooks.length > 0 && (
+                <ul className="space-y-3">
+                  {webhooks.map((hook) => (
+                    <li key={hook.id} className="feature-item space-y-2 p-3 text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold">{webhookTitle(hook)}</span>
+                        <span className="text-xs text-[var(--sea-ink-soft)]">
+                          {hook.enabled ? 'enabled' : 'disabled'}
+                        </span>
+                      </div>
+                      <label className="block">
+                        Webhook URL
+                        <div className="mt-1 flex gap-2">
+                          <input type="text" readOnly className="demo-input flex-1 text-xs" value={hook.url} />
+                          <button type="button" className="rounded-full border px-3 py-1 text-xs" onClick={() => handleCopy(hook.url)}>
+                            Copy
+                          </button>
+                        </div>
+                      </label>
+                      {revealedSecrets[hook.id] && (
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold text-amber-800">
+                            Save this secret now — it is only shown once.
+                          </p>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              readOnly
+                              className="demo-input flex-1 font-mono text-xs"
+                              value={revealedSecrets[hook.id]}
+                            />
+                            <button
+                              type="button"
+                              className="rounded-full border px-3 py-1 text-xs"
+                              onClick={() => handleCopy(revealedSecrets[hook.id])}
+                            >
+                              Copy
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={webhookLoading === hook.id}
+                          onClick={() => rotateWebhook(hook.id)}
+                          className="rounded-full border px-3 py-1 text-xs"
+                        >
+                          {webhookLoading === hook.id ? 'Working…' : 'Rotate secret'}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={webhookLoading === hook.id}
+                          onClick={() => removeWebhook(hook.id)}
+                          className="rounded-full border px-3 py-1 text-xs"
+                        >
+                          Delete
                         </button>
                       </div>
-                    </div>
-                  )}
-                  <div className="flex flex-wrap gap-2">
-                    <button type="button" disabled={webhookLoading} onClick={rotateWebhook} className="rounded-full border px-3 py-1 text-xs">
-                      {webhookLoading ? 'Working…' : 'Rotate secret'}
-                    </button>
-                    <button type="button" disabled={webhookLoading} onClick={removeWebhook} className="rounded-full border px-3 py-1 text-xs">
-                      Remove webhook
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button type="button" disabled={webhookLoading} onClick={createWebhook} className="btn-secondary text-sm">
-                  {webhookLoading ? 'Creating…' : 'Create inbound webhook'}
-                </button>
+                    </li>
+                  ))}
+                </ul>
               )}
+              <div className="flex flex-wrap items-end gap-2">
+                <label className="block flex-1 text-sm">
+                  Name <span className="text-[var(--sea-ink-soft)]">(optional)</span>
+                  <input
+                    type="text"
+                    className="demo-input mt-1 w-full"
+                    value={webhookName}
+                    onChange={(e) => setWebhookName(e.target.value)}
+                    placeholder="TradingView, Discord bot, etc."
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={webhookLoading === 'create'}
+                  onClick={createWebhook}
+                  className="btn-secondary text-sm"
+                >
+                  {webhookLoading === 'create' ? 'Creating…' : 'Create webhook'}
+                </button>
+              </div>
               {copyFeedback && <p className="text-xs text-[var(--sea-ink-soft)]">{copyFeedback}</p>}
             </div>
           </div>

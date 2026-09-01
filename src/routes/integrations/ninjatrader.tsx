@@ -50,8 +50,9 @@ function NinjaTraderIntegrationPage() {
           NinjaTrader does not offer a cloud OAuth flow like Schwab. Trade Desky stores your{' '}
           <code className="text-xs">forward_url</code> — the public URL of your{' '}
           <code className="text-xs">trade-desky-ninjatrader</code> receiver (for example a
-          Cloudflare tunnel or <code className="text-xs">127.0.0.1:8787/webhook</code>). Orders
-          ping that URL when futures are the target.
+          Cloudflare tunnel). The receiver requires HTTPS. Orders ping that URL when futures are the
+          target. Optionally pass your bridge webhook secret and an account label for display in
+          Connections.
         </p>
       </SeoSection>
       <SeoSection title="Connect NinjaTrader">

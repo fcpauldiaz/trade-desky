@@ -53,33 +53,50 @@ export type BrokerConnection = {
   status: string
   account_id: string | null
   environment: string | null
-  forward_url?: string | null
-  account_note?: string | null
 }
 
 export type InboundWebhook = {
   id: string
-  url: string
-  secret_hint: string
+  name: string
   enabled: boolean
+  url: string
   created_at: string
+  updated_at: string
 }
 
 export type InboundWebhookCreated = InboundWebhook & {
   secret: string
 }
 
+export type RotateWebhookSecretResult = {
+  secret: string
+}
+
+export type NinjaTraderConnectInput = {
+  forward_url: string
+  webhook_secret?: string
+  account_label?: string
+}
+
 export type NinjaTraderConnectResult = {
   broker: string
   status: string
   forward_url: string
-  account_id: string | null
-  account_note: string | null
 }
 
-export type NinjaTraderTestResult = {
-  success: boolean
-  message: string
+export type TestOrderRequest = {
+  symbol?: string
+  quantity?: number
+  side?: string
+  action?: string
+  dry_run?: boolean
+}
+
+export const DEFAULT_NINJATRADER_TEST_ORDER: TestOrderRequest = {
+  symbol: 'ES',
+  quantity: 1,
+  action: 'BUY',
+  dry_run: true,
 }
 
 let cachedToken: string | null = null
@@ -157,19 +174,26 @@ export const api = {
       environment: TradierEnvironment
     }>('/v1/me/brokers/tradier/token', { method: 'POST', body: JSON.stringify(body) }),
   schwabAuthorize: () => apiFetch<{ url: string }>('/v1/me/brokers/schwab/authorize'),
-  ninjatraderConnect: (body: { forward_url: string }) =>
+  ninjatraderConnect: (body: NinjaTraderConnectInput) =>
     apiFetch<NinjaTraderConnectResult>('/v1/me/brokers/ninjatrader/connect', {
       method: 'POST',
       body: JSON.stringify(body),
     }),
-  ninjatraderTest: () =>
-    apiFetch<NinjaTraderTestResult>('/v1/me/brokers/ninjatrader/test', { method: 'POST' }),
-  webhooks: () => apiFetch<InboundWebhook | null>('/v1/me/webhooks'),
-  createWebhook: () =>
-    apiFetch<InboundWebhookCreated>('/v1/me/webhooks', { method: 'POST' }),
-  rotateWebhookSecret: () =>
-    apiFetch<InboundWebhookCreated>('/v1/me/webhooks/rotate', { method: 'POST' }),
-  deleteWebhook: () => apiFetch<void>('/v1/me/webhooks', { method: 'DELETE' }),
+  webhooks: () => apiFetch<InboundWebhook[]>('/v1/me/webhooks'),
+  webhook: (id: string) =>
+    apiFetch<InboundWebhook>(`/v1/me/webhooks/${encodeURIComponent(id)}`),
+  createWebhook: (body: { name?: string } = {}) =>
+    apiFetch<InboundWebhookCreated>('/v1/me/webhooks', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  rotateWebhookSecret: (id: string) =>
+    apiFetch<RotateWebhookSecretResult>(
+      `/v1/me/webhooks/${encodeURIComponent(id)}/rotate-secret`,
+      { method: 'POST' },
+    ),
+  deleteWebhook: (id: string) =>
+    apiFetch<void>(`/v1/me/webhooks/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   disconnectBroker: (broker: string) =>
     apiFetch(`/v1/me/brokers/${broker}`, { method: 'DELETE' }),
   trades: (options?: { mode?: string; month?: string; limit?: number }) => {
@@ -190,10 +214,10 @@ export const api = {
   settings: () => apiFetch<UserSettings>('/v1/me/settings'),
   updateSettings: (body: UserSettings) =>
     apiFetch<UserSettings>('/v1/me/settings', { method: 'PUT', body: JSON.stringify(body) }),
-  testBrokerOrder: (broker: string) =>
+  testBrokerOrder: (broker: string, body: TestOrderRequest = { symbol: 'SPY', quantity: 1, side: 'buy' }) =>
     apiFetch<TestOrderResult>(`/v1/me/brokers/${broker}/test-order`, {
       method: 'POST',
-      body: JSON.stringify({ symbol: 'SPY', quantity: 1, side: 'buy' }),
+      body: JSON.stringify(body),
     }),
   completeOnboarding: () => apiFetch<{ status: string }>('/v1/me/onboarding/complete', { method: 'POST' }),
   regenerateApiKey: () =>
