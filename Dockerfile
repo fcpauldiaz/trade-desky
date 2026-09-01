@@ -8,7 +8,9 @@ RUN npm install
 COPY . .
 
 ARG VITE_RECEIVER_API_URL
+ARG SENTRY_DSN
 ENV VITE_RECEIVER_API_URL=$VITE_RECEIVER_API_URL
+ENV SENTRY_DSN=$SENTRY_DSN
 
 RUN npm run build
 
@@ -37,4 +39,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/" || exit 1
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "--import", "./.output/server/instrument.server.mjs", ".output/server/index.mjs"]

@@ -9,16 +9,18 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port 3000",
     "generate-routes": "tsr generate",
-    "build": "vite build",
-    "preview": "vite preview",
+    "build": "vite build && cp instrument.server.mjs .output/server",
+    "preview": "NODE_OPTIONS='--import ./instrument.server.mjs' vite preview",
+    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
+    "@sentry/tanstackstart-react": "^10.73.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "^1.33.5",
