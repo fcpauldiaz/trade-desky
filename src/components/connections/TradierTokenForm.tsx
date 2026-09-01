@@ -133,17 +133,19 @@ export default function TradierTokenForm({
         )}
       </form.Field>
 
-      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.values.environment]}>
-        {([canSubmit, isSubmitting, selectedEnvironment]) => (
+      <form.Subscribe
+        selector={(state) => [state.isSubmitting, state.values.accessToken, state.canSubmit] as const}
+      >
+        {([isSubmitting, accessToken, canSubmit]) => (
           <button
             type="submit"
-            disabled={!canSubmit || isSubmitting}
+            disabled={!accessToken.trim() || !canSubmit || isSubmitting}
             className="rounded-full bg-[var(--lagoon-deep)] px-4 py-2 text-sm text-white disabled:opacity-50"
           >
             {isSubmitting
               ? 'Saving…'
               : connected
-                ? `Switch to ${selectedEnvironment === 'sandbox' ? 'paper' : 'live'}`
+                ? `Switch to ${form.state.values.environment === 'sandbox' ? 'paper' : 'live'}`
                 : 'Connect with API token'}
           </button>
         )}

@@ -128,9 +128,15 @@ export default function NinjatraderConnectForm({
         )}
       </form.Field>
 
-      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-        {([canSubmit, isSubmitting]) => (
-          <button type="submit" disabled={!canSubmit || isSubmitting} className="btn-primary text-sm disabled:opacity-50">
+      <form.Subscribe
+        selector={(state) => [state.isSubmitting, state.values.forwardUrl, state.canSubmit] as const}
+      >
+        {([isSubmitting, forwardUrl, canSubmit]) => (
+          <button
+            type="submit"
+            disabled={!forwardUrl.trim() || !canSubmit || isSubmitting}
+            className="btn-primary text-sm disabled:opacity-50"
+          >
             {isSubmitting ? 'Saving…' : connected ? 'Update NinjaTrader' : 'Connect NinjaTrader'}
           </button>
         )}
