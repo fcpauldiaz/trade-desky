@@ -13,6 +13,14 @@ describe('DEFAULT_NINJATRADER_TEST_ORDER', () => {
   })
 })
 
+describe('receiver device paths', () => {
+  it('scopes revoke to device id', () => {
+    const id = 'dev_abc-123'
+    const encoded = encodeURIComponent(id)
+    expect(`/v1/me/devices/${encoded}`).toBe('/v1/me/devices/dev_abc-123')
+  })
+})
+
 describe('receiver webhook paths', () => {
   it('scopes rotate and delete to webhook id', () => {
     const id = 'wh_abc-123'
