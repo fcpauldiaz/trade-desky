@@ -22,12 +22,9 @@ describe('receiver device paths', () => {
 })
 
 describe('receiver webhook paths', () => {
-  it('scopes rotate and delete to webhook id', () => {
+  it('scopes delete to webhook id', () => {
     const id = 'wh_abc-123'
     const encoded = encodeURIComponent(id)
-    expect(`/v1/me/webhooks/${encoded}/rotate-secret`).toBe(
-      '/v1/me/webhooks/wh_abc-123/rotate-secret',
-    )
     expect(`/v1/me/webhooks/${encoded}`).toBe('/v1/me/webhooks/wh_abc-123')
   })
 })

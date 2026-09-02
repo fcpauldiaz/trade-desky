@@ -65,14 +65,6 @@ export type InboundWebhook = {
   updated_at: string
 }
 
-export type InboundWebhookCreated = InboundWebhook & {
-  secret: string
-}
-
-export type RotateWebhookSecretResult = {
-  secret: string
-}
-
 export type NinjaTraderConnectInput = {
   forward_url: string
   webhook_secret?: string
@@ -211,15 +203,10 @@ export const api = {
   webhook: (id: string) =>
     apiFetch<InboundWebhook>(`/v1/me/webhooks/${encodeURIComponent(id)}`),
   createWebhook: (body: { name?: string } = {}) =>
-    apiFetch<InboundWebhookCreated>('/v1/me/webhooks', {
+    apiFetch<InboundWebhook>('/v1/me/webhooks', {
       method: 'POST',
       body: JSON.stringify(body),
     }),
-  rotateWebhookSecret: (id: string) =>
-    apiFetch<RotateWebhookSecretResult>(
-      `/v1/me/webhooks/${encodeURIComponent(id)}/rotate-secret`,
-      { method: 'POST' },
-    ),
   deleteWebhook: (id: string) =>
     apiFetch<void>(`/v1/me/webhooks/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   disconnectBroker: (broker: string) =>
