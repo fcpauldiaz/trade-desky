@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form'
+import CopyButton from '#/components/CopyButton'
 import type { PairedDevice, UserDevice } from '#/lib/api-client'
 
 export type NinjatraderDevicePairingProps = {
@@ -8,7 +9,6 @@ export type NinjatraderDevicePairingProps = {
   revokingId: string | null
   onPair: (values: { name: string }) => Promise<void>
   onRevoke: (deviceId: string) => Promise<void>
-  onCopy: (value: string) => void
 }
 
 function deviceLabel(device: UserDevice) {
@@ -43,7 +43,6 @@ export default function NinjatraderDevicePairing({
   revokingId,
   onPair,
   onRevoke,
-  onCopy,
 }: NinjatraderDevicePairingProps) {
   const form = useForm({
     defaultValues: {
@@ -132,13 +131,7 @@ export default function NinjatraderDevicePairing({
                 className="demo-input flex-1 font-mono text-xs"
                 value={pairedDevice.device_token}
               />
-              <button
-                type="button"
-                className="rounded-full border px-3 py-1 text-xs"
-                onClick={() => onCopy(pairedDevice.device_token)}
-              >
-                Copy
-              </button>
+              <CopyButton value={pairedDevice.device_token} />
             </div>
           </label>
 
@@ -151,13 +144,7 @@ export default function NinjatraderDevicePairing({
                 className="demo-input flex-1 font-mono text-xs"
                 value={pairedDevice.ws_url}
               />
-              <button
-                type="button"
-                className="rounded-full border px-3 py-1 text-xs"
-                onClick={() => onCopy(pairedDevice.ws_url)}
-              >
-                Copy
-              </button>
+              <CopyButton value={pairedDevice.ws_url} />
             </div>
             <p className="mt-1 text-xs text-[var(--sea-ink-soft)]">
               Append <code>?token=</code> plus your device token when connecting.
@@ -173,13 +160,7 @@ export default function NinjatraderDevicePairing({
                 className="demo-input flex-1 font-mono text-xs"
                 value={pairedDevice.device_id}
               />
-              <button
-                type="button"
-                className="rounded-full border px-3 py-1 text-xs"
-                onClick={() => onCopy(pairedDevice.device_id)}
-              >
-                Copy
-              </button>
+              <CopyButton value={pairedDevice.device_id} />
             </div>
           </label>
 
@@ -192,13 +173,7 @@ export default function NinjatraderDevicePairing({
                 className="demo-input flex-1 font-mono text-xs"
                 value={agentConfigSnippet(pairedDevice)}
               />
-              <button
-                type="button"
-                className="rounded-full border px-3 py-1 text-xs"
-                onClick={() => onCopy(agentConfigSnippet(pairedDevice))}
-              >
-                Copy
-              </button>
+              <CopyButton value={agentConfigSnippet(pairedDevice)} />
             </div>
           </label>
         </div>

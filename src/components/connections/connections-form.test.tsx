@@ -343,7 +343,6 @@ describe('NinjatraderDevicePairing', () => {
         revokingId={null}
         onPair={onPair}
         onRevoke={vi.fn(async () => {})}
-        onCopy={vi.fn()}
       />,
     )
 
@@ -371,7 +370,6 @@ describe('NinjatraderDevicePairing', () => {
         revokingId={null}
         onPair={vi.fn(async () => {})}
         onRevoke={vi.fn(async () => {})}
-        onCopy={vi.fn()}
       />,
     )
 
@@ -402,7 +400,6 @@ describe('NinjatraderDevicePairing', () => {
         revokingId={null}
         onPair={vi.fn(async () => {})}
         onRevoke={onRevoke}
-        onCopy={vi.fn()}
       />,
     )
 
