@@ -145,7 +145,7 @@ function NinjaTraderIntegrationPage() {
             </p>
             <GuideFigure
               src={NINJATRADER_GUIDE_IMAGES.connections}
-              alt="Mock of Trade Desky Connections page with NinjaTrader forward URL and inbound webhook secret"
+              alt="Mock of Trade Desky Connections page with NinjaTrader forward URL and inbound webhook URL"
               caption="Forward URL is the bridge endpoint; inbound webhook is separate for TradingView or bots."
             />
           </li>
@@ -161,10 +161,10 @@ function NinjaTraderIntegrationPage() {
 
       <SeoSection title="Inbound JSON webhook">
         <p className="text-sm">
-          Separate from the NT bridge URL: Trade Desky can issue a cloud webhook URL + secret.
-          External systems POST JSON with the <code className="text-xs">X-Webhook-Secret</code>{' '}
-          header. Parsed futures route to NinjaTrader when it is connected and set as default.
-          Options still go to Tradier or Schwab when those are connected.
+          Separate from the NT bridge URL: Trade Desky can issue a cloud webhook URL. External
+          systems POST JSON to that endpoint. Parsed futures route to NinjaTrader when it is
+          connected and set as default. Options still go to Tradier or Schwab when those are
+          connected.
         </p>
       </SeoSection>
 

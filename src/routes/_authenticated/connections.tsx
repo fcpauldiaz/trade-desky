@@ -47,7 +47,6 @@ function ConnectionsPage() {
   const [pairedDevice, setPairedDevice] = useState<PairedDevice | null>(null)
   const [pairingDevice, setPairingDevice] = useState(false)
   const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null)
-  const [revealedSecrets, setRevealedSecrets] = useState<Record<string, string>>({})
   const [webhookLoading, setWebhookLoading] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState('')
 
@@ -246,25 +245,11 @@ function ConnectionsPage() {
     setError('')
     setWebhookLoading('create')
     try {
-      const created = await api.createWebhook({ name: values.name.trim() })
-      setRevealedSecrets((prev) => ({ ...prev, [created.id]: created.secret }))
+      await api.createWebhook({ name: values.name.trim() })
       await refreshWebhooks()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create webhook')
       throw e
-    } finally {
-      setWebhookLoading(null)
-    }
-  }
-
-  async function rotateWebhook(id: string) {
-    setError('')
-    setWebhookLoading(id)
-    try {
-      const rotated = await api.rotateWebhookSecret(id)
-      setRevealedSecrets((prev) => ({ ...prev, [id]: rotated.secret }))
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not rotate webhook secret')
     } finally {
       setWebhookLoading(null)
     }
@@ -275,11 +260,6 @@ function ConnectionsPage() {
     setWebhookLoading(id)
     try {
       await api.deleteWebhook(id)
-      setRevealedSecrets((prev) => {
-        const next = { ...prev }
-        delete next[id]
-        return next
-      })
       await refreshWebhooks()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not remove webhook')
@@ -434,8 +414,7 @@ function ConnectionsPage() {
               <p className="text-xs text-[var(--sea-ink-soft)]">
                 Discord bots, TradingView, or custom systems can POST JSON to a Trade Desky webhook
                 URL. We parse with AI and route futures to NinjaTrader when it is your default
-                execution target. Send the secret in the{' '}
-                <code className="text-xs">X-Webhook-Secret</code> header.
+                execution target.
               </p>
               {webhooks.length > 0 && (
                 <ul className="space-y-3">
@@ -461,43 +440,13 @@ function ConnectionsPage() {
                             Discord bots, custom scripts) to <strong>POST JSON</strong> alerts.
                           </p>
                           <p>
-                            Include your webhook secret in the{' '}
-                            <code>X-Webhook-Secret</code> request header. Trade Desky parses the payload
-                            with AI and routes futures to NinjaTrader when it is your default broker.
+                            POST JSON to this URL from TradingView, Discord bots, or custom scripts.
+                            Trade Desky parses the payload with AI and routes futures to NinjaTrader
+                            when it is your default broker.
                           </p>
                         </FieldHelpDialog>
                       </label>
-                      {revealedSecrets[hook.id] && (
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-amber-800">
-                            Save this secret now — it is only shown once.
-                          </p>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              readOnly
-                              className="demo-input flex-1 font-mono text-xs"
-                              value={revealedSecrets[hook.id]}
-                            />
-                            <button
-                              type="button"
-                              className="rounded-full border px-3 py-1 text-xs"
-                              onClick={() => handleCopy(revealedSecrets[hook.id])}
-                            >
-                              Copy
-                            </button>
-                          </div>
-                        </div>
-                      )}
                       <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          disabled={webhookLoading === hook.id}
-                          onClick={() => rotateWebhook(hook.id)}
-                          className="rounded-full border px-3 py-1 text-xs"
-                        >
-                          {webhookLoading === hook.id ? 'Working…' : 'Rotate secret'}
-                        </button>
                         <button
                           type="button"
                           disabled={webhookLoading === hook.id}

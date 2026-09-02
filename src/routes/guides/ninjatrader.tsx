@@ -157,7 +157,7 @@ python main.py`}
           </ol>
           <GuideFigure
             src={NINJATRADER_GUIDE_IMAGES.connections}
-            alt="Mock of Trade Desky Connections page with NinjaTrader forward URL and inbound webhook secret"
+            alt="Mock of Trade Desky Connections page with NinjaTrader forward URL and inbound webhook URL"
             caption="Forward URL is the bridge endpoint; inbound webhook is separate for TradingView or bots."
           />
         </li>
@@ -165,10 +165,9 @@ python main.py`}
         <li className="feature-item space-y-3 p-5">
           <h3 className="text-lg font-black">Optional: inbound JSON webhook</h3>
           <p className="text-sm">
-            On Connections, create an inbound webhook. Copy the URL and secret once (they are not
-            shown again). External systems POST JSON with the{' '}
-            <code className="text-xs">X-Webhook-Secret</code> header. Trade Desky parses with AI and
-            routes futures to NinjaTrader when it is your default broker.
+            On Connections, create an inbound webhook and copy the URL. External systems POST JSON to
+            that endpoint. Trade Desky parses with AI and routes futures to NinjaTrader when it is
+            your default broker.
           </p>
           <p className="text-sm">
             Discord-style desktop alerts still use Trade Desky Watcher — no inbound webhook required
