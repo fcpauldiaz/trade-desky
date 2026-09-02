@@ -1,13 +1,17 @@
 import { useForm } from '@tanstack/react-form'
-import { useEffect } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import { optionalHttpsUrl } from '#/lib/connection-form-validators'
+import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 
 export type NinjatraderConnectFormValues = {
   forwardUrl: string
   bridgeWebhookSecret: string
   accountLabel: string
 }
+
+type SaveOutcome = 'connected' | 'updated'
 
 type NinjatraderConnectFormProps = {
   connected: boolean
@@ -22,6 +26,9 @@ export default function NinjatraderConnectForm({
   initialAccountLabel,
   onSubmit,
 }: NinjatraderConnectFormProps) {
+  const [secretVisible, setSecretVisible] = useState(false)
+  const [saveOutcome, setSaveOutcome] = useState<SaveOutcome | null>(null)
+
   const form = useForm({
     defaultValues: {
       forwardUrl: initialForwardUrl,
@@ -29,22 +36,20 @@ export default function NinjatraderConnectForm({
       accountLabel: initialAccountLabel,
     },
     onSubmit: async ({ value }) => {
+      const wasConnected = connected
       const result = await onSubmit({
         forwardUrl: value.forwardUrl,
         bridgeWebhookSecret: value.bridgeWebhookSecret,
         accountLabel: value.accountLabel,
       })
       form.setFieldValue('forwardUrl', result.forwardUrl)
-      form.setFieldValue('bridgeWebhookSecret', '')
+      setSaveOutcome(wasConnected ? 'updated' : 'connected')
     },
   })
 
   useEffect(() => {
-    form.reset({
-      forwardUrl: initialForwardUrl,
-      bridgeWebhookSecret: '',
-      accountLabel: initialAccountLabel,
-    })
+    form.setFieldValue('forwardUrl', initialForwardUrl)
+    form.setFieldValue('accountLabel', initialAccountLabel)
   }, [form, initialAccountLabel, initialForwardUrl])
 
   return (
@@ -56,6 +61,33 @@ export default function NinjatraderConnectForm({
       }}
       className="space-y-3"
     >
+      {saveOutcome && (
+        <div className="feature-item space-y-2 p-3 text-sm">
+          <p className="font-semibold">
+            {saveOutcome === 'connected' ? 'NinjaTrader connected' : 'NinjaTrader settings saved'}
+          </p>
+          <p className="text-xs text-[var(--sea-ink-soft)]">Next steps:</p>
+          <ol className="list-decimal space-y-1 pl-4 text-xs text-[var(--sea-ink-soft)]">
+            <li>Confirm the local Trade Desky NinjaTrader Receiver EXE is running</li>
+            <li>
+              Confirm your ngrok/tunnel HTTPS URL ends with <code>/webhook</code> and matches Forward
+              URL above
+            </li>
+            <li>
+              In NinjaTrader 8, enable the Trade Desky add-on and start on <strong>Sim101</strong>
+            </li>
+            <li>
+              Use <strong>Test</strong> on the NinjaTrader card above to send a smoke order
+            </li>
+          </ol>
+          <p className="text-xs">
+            <a href={NINJATRADER_GUIDE_PATH} className="underline">
+              Full setup guide
+            </a>
+          </p>
+        </div>
+      )}
+
       <form.Field
         name="forwardUrl"
         validators={{
@@ -98,15 +130,25 @@ export default function NinjatraderConnectForm({
         {(field) => (
           <label className="block text-sm">
             Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-            <input
-              type="password"
-              autoComplete="off"
-              className="demo-input mt-1 w-full"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.value)}
-              placeholder="Only if your local bridge requires it"
-            />
+            <div className="relative mt-1">
+              <input
+                type={secretVisible ? 'text' : 'password'}
+                autoComplete="off"
+                className="demo-input w-full pr-10"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                placeholder="Only if your local bridge requires it"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-[var(--sea-ink-soft)] hover:text-[var(--ja-black)]"
+                aria-label={secretVisible ? 'Hide secret' : 'Show secret'}
+                onClick={() => setSecretVisible((visible) => !visible)}
+              >
+                {secretVisible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+              </button>
+            </div>
           </label>
         )}
       </form.Field>
