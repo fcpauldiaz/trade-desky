@@ -53,6 +53,7 @@ export type BrokerConnection = {
   status: string
   account_id: string | null
   environment: string | null
+  forward_url?: string | null
 }
 
 export type InboundWebhook = {

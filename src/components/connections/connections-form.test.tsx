@@ -97,6 +97,35 @@ describe('NinjatraderConnectForm', () => {
     expect(secretInput.value).toBe('my-bridge-secret')
   })
 
+  it('hydrates forward URL when initialForwardUrl arrives after mount', async () => {
+    const onSubmit = vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))
+
+    const { rerender } = render(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl=""
+        initialAccountLabel="Sim101"
+        onSubmit={onSubmit}
+      />,
+    )
+
+    const input = screen.getByPlaceholderText('https://….trycloudflare.com/webhook') as HTMLInputElement
+    expect(input.value).toBe('')
+
+    rerender(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl="https://tunnel.example.com/webhook"
+        initialAccountLabel="Sim101"
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(input.value).toBe('https://tunnel.example.com/webhook')
+    })
+  })
+
   it('shows updated messaging when already connected', async () => {
     const onSubmit = vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))
 
