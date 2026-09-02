@@ -11,10 +11,11 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port 3000",
     "generate-routes": "tsr generate",
-    "build": "vite build && cp instrument.server.mjs .output/server",
+    "build": "vite build && node scripts/prepare-server-output.mjs",
     "preview": "NODE_OPTIONS='--import ./instrument.server.mjs' vite preview",
     "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
     "test": "vitest run",
+    "test:server-runtime": "vitest run src/lib/server-runtime-deps.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
