@@ -139,9 +139,6 @@ function ConnectionsPage() {
       })
       setNinjatraderForwardUrl(result.forward_url)
       await refreshBrokers()
-      if (!ninjatraderConnected) {
-        navigate({ to: '/dashboard' })
-      }
       return { forwardUrl: result.forward_url }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'NinjaTrader connect failed')
