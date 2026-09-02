@@ -5,10 +5,13 @@ import {
   DEFAULT_NINJATRADER_TEST_ORDER,
   type BrokerConnection,
   type InboundWebhook,
+  type PairedDevice,
   type TradierEnvironment,
+  type UserDevice,
 } from '#/lib/api-client'
 import CreateWebhookForm from '#/components/connections/CreateWebhookForm'
 import NinjatraderConnectForm from '#/components/connections/NinjatraderConnectForm'
+import NinjatraderDevicePairing from '#/components/connections/NinjatraderDevicePairing'
 import TradierTokenForm from '#/components/connections/TradierTokenForm'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import UpgradeBanner from '#/components/UpgradeBanner'
@@ -40,6 +43,10 @@ function ConnectionsPage() {
   const [ninjatraderForwardUrl, setNinjatraderForwardUrl] = useState('')
   const [ninjatraderAccountLabel, setNinjatraderAccountLabel] = useState('')
   const [webhooks, setWebhooks] = useState<InboundWebhook[]>([])
+  const [devices, setDevices] = useState<UserDevice[]>([])
+  const [pairedDevice, setPairedDevice] = useState<PairedDevice | null>(null)
+  const [pairingDevice, setPairingDevice] = useState(false)
+  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null)
   const [revealedSecrets, setRevealedSecrets] = useState<Record<string, string>>({})
   const [webhookLoading, setWebhookLoading] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState('')
@@ -48,6 +55,7 @@ function ConnectionsPage() {
   const tradierConnected = tradier?.status === 'connected'
   const ninjatrader = brokers.find((b) => b.broker === 'ninjatrader')
   const ninjatraderConnected = ninjatrader?.status === 'connected'
+  const hasOnlineDevice = devices.some((device) => device.online && !device.revoked)
 
   const refreshBrokers = useCallback(async () => {
     const [list, settings] = await Promise.all([api.brokers(), api.settings()])
@@ -66,6 +74,15 @@ function ConnectionsPage() {
     }
   }, [])
 
+  const refreshDevices = useCallback(async () => {
+    try {
+      const data = await api.devices()
+      setDevices(data)
+    } catch {
+      setDevices([])
+    }
+  }, [])
+
   const refreshWebhooks = useCallback(async () => {
     try {
       const data = await api.webhooks()
@@ -79,6 +96,7 @@ function ConnectionsPage() {
     api.billing().then((b) => setCanTrade(b.can_process_trades)).catch(() => setError('Could not load billing'))
     refreshBrokers().catch(() => setError('Could not load brokers'))
     refreshWebhooks().catch(() => {})
+    refreshDevices().catch(() => {})
 
     const params = new URLSearchParams(window.location.search)
     const connected = params.get('connected')
@@ -86,7 +104,7 @@ function ConnectionsPage() {
       window.history.replaceState({}, '', '/connections')
       navigate({ to: '/dashboard' })
     }
-  }, [navigate, refreshBrokers, refreshWebhooks])
+  }, [navigate, refreshBrokers, refreshDevices, refreshWebhooks])
 
   async function connectTradierOAuth() {
     try {
@@ -125,6 +143,37 @@ function ConnectionsPage() {
       window.location.href = url
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Schwab connect failed')
+    }
+  }
+
+  async function pairWindowsReceiver(values: { name: string }) {
+    setError('')
+    setPairingDevice(true)
+    try {
+      const paired = await api.pairDevice({ name: values.name.trim() || undefined })
+      setPairedDevice(paired)
+      await refreshDevices()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not pair Windows receiver')
+      throw err
+    } finally {
+      setPairingDevice(false)
+    }
+  }
+
+  async function revokePairedDevice(deviceId: string) {
+    setError('')
+    setRevokingDeviceId(deviceId)
+    try {
+      await api.revokeDevice(deviceId)
+      if (pairedDevice?.device_id === deviceId) {
+        setPairedDevice(null)
+      }
+      await refreshDevices()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not revoke device')
+    } finally {
+      setRevokingDeviceId(null)
     }
   }
 
@@ -171,12 +220,13 @@ function ConnectionsPage() {
     }
   }
 
-  const ninjatraderTestDisabled = !ninjatraderConnected || !canTrade
+  const ninjatraderTestDisabled = !canTrade || (!ninjatraderConnected && !hasOnlineDevice)
   const ninjatraderTestDisabledReason = !canTrade
     ? 'An active subscription is required to test broker connections.'
-    : !ninjatraderConnected
-      ? 'Connect NinjaTrader before running a test order.'
+    : !ninjatraderConnected && !hasOnlineDevice
+      ? 'Pair a Windows receiver or connect NinjaTrader before running a test order.'
       : undefined
+  const ninjatraderTestVisible = ninjatraderConnected || hasOnlineDevice
 
   async function setDefault(broker: string) {
     await api.setDefaultBroker(broker)
@@ -345,21 +395,33 @@ function ConnectionsPage() {
             <div>
               <h2 className="font-semibold">NinjaTrader</h2>
               <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                Futures execution via a local bridge.{' '}
+                Futures execution via the Windows receiver. Pair your machine for outbound WebSocket
+                delivery (no ngrok), or use an HTTPS tunnel as a fallback.{' '}
                 <Link className="underline" to={NINJATRADER_GUIDE_PATH}>
                   Setup guide
                 </Link>
                 {' · '}
                 <Link className="underline" to="/download#ninjatrader">
-                  Download bridge
+                  Download receiver
                 </Link>
-                . Pick your account in the NinjaTrader panel, then paste the bridge HTTPS webhook URL below.
+                .
               </p>
             </div>
+            <NinjatraderDevicePairing
+              devices={devices}
+              pairedDevice={pairedDevice}
+              pairing={pairingDevice}
+              revokingId={revokingDeviceId}
+              onPair={pairWindowsReceiver}
+              onRevoke={revokePairedDevice}
+              onCopy={handleCopy}
+            />
             <NinjatraderConnectForm
               connected={ninjatraderConnected}
               initialForwardUrl={ninjatraderForwardUrl}
               initialAccountLabel={ninjatraderAccountLabel}
+              hasOnlineDevice={hasOnlineDevice}
+              showTestConnection={ninjatraderTestVisible}
               onSubmit={connectNinjatrader}
               onTestConnection={() => testConnection('ninjatrader')}
               testDisabled={ninjatraderTestDisabled}

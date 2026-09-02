@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CreateWebhookForm from '#/components/connections/CreateWebhookForm'
 import NinjatraderConnectForm from '#/components/connections/NinjatraderConnectForm'
+import NinjatraderDevicePairing from '#/components/connections/NinjatraderDevicePairing'
 import TradierTokenForm from '#/components/connections/TradierTokenForm'
 
 afterEach(() => {
@@ -89,7 +90,7 @@ describe('NinjatraderConnectForm', () => {
     })
 
     expect(await screen.findByText('NinjaTrader connected')).toBeTruthy()
-    expect(screen.getByText(/Confirm the local Trade Desky NinjaTrader Receiver EXE is running/)).toBeTruthy()
+    expect(screen.getByText(/Confirm the local Trade Desky NinjaTrader Receiver is running/)).toBeTruthy()
     expect(screen.getByText(/Test connection/)).toBeTruthy()
     expect(screen.getByText(/send a Sim101 smoke order/)).toBeTruthy()
 
@@ -259,7 +260,7 @@ describe('NinjatraderConnectForm', () => {
     expect(callOrder).toEqual(['submit', 'test'])
   })
 
-  it('disables Test connection when forward URL is empty', () => {
+  it('disables Test connection when forward URL is empty and no online device', () => {
     render(
       <NinjatraderConnectForm
         connected
@@ -267,12 +268,32 @@ describe('NinjatraderConnectForm', () => {
         initialAccountLabel=""
         onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
         onTestConnection={vi.fn(async () => ({ success: true, message: 'ok' }))}
+        showTestConnection
       />,
     )
 
     const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
     expect(testButton.disabled).toBe(true)
-    expect(screen.getByText('Enter a Forward URL to test your connection.')).toBeTruthy()
+    expect(
+      screen.getByText('Pair a Windows receiver or enter a Forward URL to test your connection.'),
+    ).toBeTruthy()
+  })
+
+  it('allows Test connection without forward URL when an online device is paired', () => {
+    render(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl=""
+        initialAccountLabel=""
+        hasOnlineDevice
+        onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+        onTestConnection={vi.fn(async () => ({ success: true, message: 'ok' }))}
+        showTestConnection
+      />,
+    )
+
+    const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
+    expect(testButton.disabled).toBe(false)
   })
 
   it('hides Test connection when not connected', () => {
@@ -307,6 +328,92 @@ describe('NinjatraderConnectForm', () => {
     const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
     expect(testButton.disabled).toBe(true)
     expect(screen.getByText('An active subscription is required to test broker connections.')).toBeTruthy()
+  })
+})
+
+describe('NinjatraderDevicePairing', () => {
+  it('submits optional device name when pairing', async () => {
+    const onPair = vi.fn(async () => {})
+
+    render(
+      <NinjatraderDevicePairing
+        devices={[]}
+        pairedDevice={null}
+        pairing={false}
+        revokingId={null}
+        onPair={onPair}
+        onRevoke={vi.fn(async () => {})}
+        onCopy={vi.fn()}
+      />,
+    )
+
+    fireEvent.change(screen.getByPlaceholderText('Office PC, Sim101 laptop, etc.'), {
+      target: { value: 'Sim101 laptop' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Pair Windows receiver' }))
+
+    await waitFor(() => {
+      expect(onPair).toHaveBeenCalledWith({ name: 'Sim101 laptop' })
+    })
+  })
+
+  it('shows one-time pairing credentials and config snippet', () => {
+    render(
+      <NinjatraderDevicePairing
+        devices={[]}
+        pairedDevice={{
+          device_id: 'dev_123',
+          device_token: 'ntd_secret_token',
+          ws_url: 'wss://api.example.com/v1/devices/ws',
+          name: 'Office PC',
+        }}
+        pairing={false}
+        revokingId={null}
+        onPair={vi.fn(async () => {})}
+        onRevoke={vi.fn(async () => {})}
+        onCopy={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText(/Save this device token now/)).toBeTruthy()
+    expect(screen.getByDisplayValue('ntd_secret_token')).toBeTruthy()
+    expect(screen.getByDisplayValue('wss://api.example.com/v1/devices/ws')).toBeTruthy()
+    expect(screen.getByDisplayValue('dev_123')).toBeTruthy()
+    expect(screen.getByDisplayValue(/"device_token": "ntd_secret_token"/)).toBeTruthy()
+  })
+
+  it('lists paired devices with online status and revoke action', async () => {
+    const onRevoke = vi.fn(async () => {})
+
+    render(
+      <NinjatraderDevicePairing
+        devices={[
+          {
+            id: 'dev_1',
+            name: 'Office PC',
+            online: true,
+            last_seen_at: '2026-09-02T12:00:00.000Z',
+            created_at: '2026-09-01T12:00:00.000Z',
+            revoked: false,
+          },
+        ]}
+        pairedDevice={null}
+        pairing={false}
+        revokingId={null}
+        onPair={vi.fn(async () => {})}
+        onRevoke={onRevoke}
+        onCopy={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Office PC')).toBeTruthy()
+    expect(screen.getByText('Online')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Revoke' }))
+
+    await waitFor(() => {
+      expect(onRevoke).toHaveBeenCalledWith('dev_1')
+    })
   })
 })
 

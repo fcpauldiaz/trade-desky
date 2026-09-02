@@ -22,6 +22,8 @@ type NinjatraderConnectFormProps = {
   connected: boolean
   initialForwardUrl: string
   initialAccountLabel: string
+  hasOnlineDevice?: boolean
+  showTestConnection?: boolean
   onSubmit: (values: NinjatraderConnectFormValues) => Promise<{ forwardUrl: string }>
   onTestConnection?: () => Promise<TestConnectionResult>
   testDisabled?: boolean
@@ -34,6 +36,8 @@ export default function NinjatraderConnectForm({
   connected,
   initialForwardUrl,
   initialAccountLabel,
+  hasOnlineDevice = false,
+  showTestConnection: showTestConnectionProp,
   onSubmit,
   onTestConnection,
   testDisabled = false,
@@ -69,7 +73,8 @@ export default function NinjatraderConnectForm({
     form.setFieldValue('accountLabel', initialAccountLabel)
   }, [form, initialAccountLabel, initialForwardUrl])
 
-  const showTestConnection = connected && onTestConnection
+  const showTestConnection = (showTestConnectionProp ?? connected) && onTestConnection
+  const canTestWithoutForwardUrl = hasOnlineDevice
 
   async function handleTestConnection() {
     if (
@@ -83,14 +88,16 @@ export default function NinjatraderConnectForm({
     }
 
     const forwardUrl = form.state.values.forwardUrl.trim()
-    if (!forwardUrl) {
+    if (!forwardUrl && !canTestWithoutForwardUrl) {
       return
     }
 
     testActionInFlight.current = true
     setTestSaving(true)
     try {
-      await form.handleSubmit()
+      if (forwardUrl) {
+        await form.handleSubmit()
+      }
       await onTestConnection()
     } catch {
       // Validation or save/test errors surface via form state or testResult
@@ -116,11 +123,15 @@ export default function NinjatraderConnectForm({
           </p>
           <p className="text-xs text-[var(--sea-ink-soft)]">Next steps:</p>
           <ol className="list-decimal space-y-1 pl-4 text-xs text-[var(--sea-ink-soft)]">
-            <li>Confirm the local Trade Desky NinjaTrader Receiver EXE is running</li>
-            <li>
-              Confirm your ngrok/tunnel HTTPS URL ends with <code>/webhook</code> and matches Forward
-              URL above
-            </li>
+            <li>Confirm the local Trade Desky NinjaTrader Receiver is running</li>
+            {hasOnlineDevice ? (
+              <li>Confirm your paired device shows online above</li>
+            ) : (
+              <li>
+                Confirm your ngrok/tunnel HTTPS URL ends with <code>/webhook</code> and matches
+                Forward URL below
+              </li>
+            )}
             <li>
               In NinjaTrader 8, enable the Trade Desky add-on and start on <strong>Sim101</strong>
             </li>
@@ -136,87 +147,96 @@ export default function NinjatraderConnectForm({
         </div>
       )}
 
-      <form.Field
-        name="forwardUrl"
-        validators={{
-          onChange: ({ value }) => optionalHttpsUrl(value),
-          onSubmit: ({ value }) => optionalHttpsUrl(value),
-        }}
-      >
-        {(field) => (
-          <label className="block text-sm">
-            Forward URL
-            <input
-              type="url"
-              autoComplete="off"
-              className="demo-input mt-1 w-full"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.value)}
-              placeholder="https://….trycloudflare.com/webhook"
-              required
-            />
-            {field.state.meta.errors.length > 0 && (
-              <span className="mt-1 block text-xs text-red-600">{field.state.meta.errors[0]}</span>
-            )}
-            <FieldHelpDialog title="Forward URL">
-              <p>
-                Paste the public <strong>HTTPS</strong> URL of your local trade-desky-ninjatrader
-                receiver — the address exposed by Cloudflare Tunnel, ngrok, or similar. It must end
-                with <code>/webhook</code> and be reachable from Trade Desky cloud.
-              </p>
-              <p>
-                This is <strong>not</strong> a download link or repository URL. Start on{' '}
-                <strong>Sim101</strong> in NinjaTrader before testing live execution.
-              </p>
-            </FieldHelpDialog>
-          </label>
-        )}
-      </form.Field>
+      <details className="feature-item space-y-3 p-3 text-sm">
+        <summary className="cursor-pointer font-semibold">
+          Advanced (optional) — HTTPS forward URL / tunnel
+        </summary>
+        <p className="text-xs text-[var(--sea-ink-soft)]">
+          Fallback when your paired device is offline. Trade Desky POSTs to this HTTPS tunnel URL
+          if no device is online.
+        </p>
 
-      <form.Field name="bridgeWebhookSecret">
-        {(field) => (
-          <label className="block text-sm">
-            Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-            <div className="relative mt-1">
+        <form.Field
+          name="forwardUrl"
+          validators={{
+            onChange: ({ value }) => optionalHttpsUrl(value),
+            onSubmit: ({ value }) => optionalHttpsUrl(value),
+          }}
+        >
+          {(field) => (
+            <label className="block text-sm">
+              Forward URL
               <input
-                type={secretVisible ? 'text' : 'password'}
+                type="url"
                 autoComplete="off"
-                className="demo-input w-full pr-10"
+                className="demo-input mt-1 w-full"
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(event) => field.handleChange(event.target.value)}
-                placeholder="Only if your local bridge requires it"
+                placeholder="https://….trycloudflare.com/webhook"
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-[var(--sea-ink-soft)] hover:text-[var(--ja-black)]"
-                aria-label={secretVisible ? 'Hide secret' : 'Show secret'}
-                onClick={() => setSecretVisible((visible) => !visible)}
-              >
-                {secretVisible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
-              </button>
-            </div>
-          </label>
-        )}
-      </form.Field>
+              {field.state.meta.errors.length > 0 && (
+                <span className="mt-1 block text-xs text-red-600">{field.state.meta.errors[0]}</span>
+              )}
+              <FieldHelpDialog title="Forward URL">
+                <p>
+                  Paste the public <strong>HTTPS</strong> URL of your local trade-desky-ninjatrader
+                  receiver — the address exposed by Cloudflare Tunnel, ngrok, or similar. It must end
+                  with <code>/webhook</code> and be reachable from Trade Desky cloud.
+                </p>
+                <p>
+                  This is <strong>not</strong> a download link or repository URL. Start on{' '}
+                  <strong>Sim101</strong> in NinjaTrader before testing live execution.
+                </p>
+              </FieldHelpDialog>
+            </label>
+          )}
+        </form.Field>
 
-      <form.Field name="accountLabel">
-        {(field) => (
-          <label className="block text-sm">
-            Account label <span className="text-[var(--sea-ink-soft)]">(optional)</span>
-            <input
-              type="text"
-              autoComplete="off"
-              className="demo-input mt-1 w-full"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(event) => field.handleChange(event.target.value)}
-              placeholder="Note shown in Connections — account is chosen in NT"
-            />
-          </label>
-        )}
-      </form.Field>
+        <form.Field name="bridgeWebhookSecret">
+          {(field) => (
+            <label className="block text-sm">
+              Bridge webhook secret <span className="text-[var(--sea-ink-soft)]">(optional)</span>
+              <div className="relative mt-1">
+                <input
+                  type={secretVisible ? 'text' : 'password'}
+                  autoComplete="off"
+                  className="demo-input w-full pr-10"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  placeholder="Only if your local bridge requires it"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-[var(--sea-ink-soft)] hover:text-[var(--ja-black)]"
+                  aria-label={secretVisible ? 'Hide secret' : 'Show secret'}
+                  onClick={() => setSecretVisible((visible) => !visible)}
+                >
+                  {secretVisible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+                </button>
+              </div>
+            </label>
+          )}
+        </form.Field>
+
+        <form.Field name="accountLabel">
+          {(field) => (
+            <label className="block text-sm">
+              Account label <span className="text-[var(--sea-ink-soft)]">(optional)</span>
+              <input
+                type="text"
+                autoComplete="off"
+                className="demo-input mt-1 w-full"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                placeholder="Note shown in Connections — account is chosen in NT"
+              />
+            </label>
+          )}
+        </form.Field>
+      </details>
 
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -228,14 +248,18 @@ export default function NinjatraderConnectForm({
             {([isSubmitting, forwardUrl, canSubmit]) => {
               const testFlowBusy = testSaving || testLoading
               const forwardUrlMissing = !forwardUrl.trim()
+              const connectDisabled = forwardUrlMissing || !canSubmit || isSubmitting || testFlowBusy
               const testButtonDisabled =
-                testDisabled || testFlowBusy || forwardUrlMissing || isSubmitting
+                testDisabled ||
+                testFlowBusy ||
+                isSubmitting ||
+                (!forwardUrlMissing ? false : !canTestWithoutForwardUrl)
 
               return (
                 <>
                   <button
                     type="submit"
-                    disabled={forwardUrlMissing || !canSubmit || isSubmitting || testFlowBusy}
+                    disabled={connectDisabled}
                     className="btn-primary text-sm disabled:opacity-50"
                   >
                     {isSubmitting
@@ -267,9 +291,9 @@ export default function NinjatraderConnectForm({
         {showTestConnection && (
           <form.Subscribe selector={(state) => state.values.forwardUrl}>
             {(forwardUrl) =>
-              !forwardUrl.trim() && !testDisabled ? (
+              !forwardUrl.trim() && !canTestWithoutForwardUrl && !testDisabled ? (
                 <p className="text-xs text-[var(--sea-ink-soft)]">
-                  Enter a Forward URL to test your connection.
+                  Pair a Windows receiver or enter a Forward URL to test your connection.
                 </p>
               ) : null
             }

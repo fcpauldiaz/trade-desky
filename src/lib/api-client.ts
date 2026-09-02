@@ -85,6 +85,22 @@ export type NinjaTraderConnectResult = {
   forward_url: string
 }
 
+export type PairedDevice = {
+  device_id: string
+  device_token: string
+  ws_url: string
+  name: string
+}
+
+export type UserDevice = {
+  id: string
+  name: string
+  online: boolean
+  last_seen_at: string | null
+  created_at: string
+  revoked: boolean
+}
+
 export type TestOrderRequest = {
   symbol?: string
   quantity?: number
@@ -180,6 +196,17 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+  pairDevice: (body: { name?: string } = {}) =>
+    apiFetch<PairedDevice>('/v1/me/devices/pair', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  devices: () => apiFetch<UserDevice[]>('/v1/me/devices'),
+  revokeDevice: (id: string) =>
+    apiFetch<{ status: string; device_id: string }>(
+      `/v1/me/devices/${encodeURIComponent(id)}`,
+      { method: 'DELETE' },
+    ),
   webhooks: () => apiFetch<InboundWebhook[]>('/v1/me/webhooks'),
   webhook: (id: string) =>
     apiFetch<InboundWebhook>(`/v1/me/webhooks/${encodeURIComponent(id)}`),
