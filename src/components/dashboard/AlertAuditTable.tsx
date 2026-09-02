@@ -1,16 +1,26 @@
 import { Link } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
+import JsonPayloadViewer from '#/components/dashboard/JsonPayloadViewer'
 import type { AlertAudit, AlertOutcome } from '#/lib/api-client'
 import {
   formatAlertOutcome,
+  formatAlertSourceLabel,
+  formatIngestSource,
   formatPlatform,
-  formatSourceApp,
+  formatWebhookLabel,
+  resolveIngestSource,
 } from '#/lib/alert-audit'
 
 function outcomeClass(outcome: AlertOutcome): string {
   if (outcome === 'executed') return 'bg-[var(--ja-green)]'
   if (outcome === 'skipped') return 'bg-[var(--ja-yellow-muted)]'
   return 'bg-[var(--ja-gray-100)]'
+}
+
+function sourceBadgeClass(alert: AlertAudit): string {
+  return resolveIngestSource(alert) === 'webhook'
+    ? 'bg-[var(--ja-pink)]'
+    : 'bg-[var(--ja-gray-100)]'
 }
 
 type AlertAuditTableProps = {
@@ -44,7 +54,7 @@ export default function AlertAuditTable({
     }
     return (
       <p className="text-sm text-[var(--sea-ink-soft)]">
-        No captured alerts yet. When the desktop watcher is running, banners show up here.
+        No captured alerts yet. When the desktop watcher or an inbound webhook sends data, events show up here.
       </p>
     )
   }
@@ -59,7 +69,7 @@ export default function AlertAuditTable({
                 Time{sortAsc ? ' ↑' : ' ↓'}
               </button>
             </th>
-            <th className="px-3 py-2 font-semibold">App</th>
+            <th className="px-3 py-2 font-semibold">Source</th>
             <th className="px-3 py-2 font-semibold">Title</th>
             <th className="px-3 py-2 font-semibold">Outcome</th>
             <th className="px-3 py-2 font-semibold">Reason</th>
@@ -68,46 +78,67 @@ export default function AlertAuditTable({
         <tbody>
           {sorted.map((alert) => {
             const open = openId === alert.id
+            const ingestSource = resolveIngestSource(alert)
             return (
               <tr key={alert.id} className="border-t border-[var(--line)] align-top">
-                <td className="whitespace-nowrap px-3 py-2">{new Date(alert.created_at).toLocaleString()}</td>
-                <td className="px-3 py-2">
-                  <div className="font-medium text-[var(--sea-ink)]">{formatSourceApp(alert.source_app)}</div>
-                  <div className="text-xs text-[var(--sea-ink-soft)]">{formatPlatform(alert.platform)}</div>
-                </td>
-                <td className="px-3 py-2">
-                  <button
-                    type="button"
-                    className="cursor-pointer bg-transparent text-left font-medium text-[var(--sea-ink)]"
-                    onClick={() => setOpenId(open ? null : alert.id)}
-                  >
-                    {alert.title || 'Untitled alert'}
-                  </button>
-                  <p className={`mt-1 max-w-xl text-[var(--sea-ink-soft)] ${open ? '' : 'line-clamp-2'}`}>
-                    {alert.text}
-                  </p>
-                </td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`inline-block border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${outcomeClass(alert.outcome)}`}
-                  >
-                    {formatAlertOutcome(alert.outcome)}
-                  </span>
-                  {alert.trade_status ? (
-                    <div className="mt-1 text-xs text-[var(--sea-ink-soft)]">{alert.trade_status}</div>
-                  ) : null}
-                  {alert.trade_id ? (
-                    <Link
-                      to="/dashboard"
-                      search={{ trade: alert.trade_id }}
-                      className="mt-1 inline-block text-xs font-semibold text-[var(--ja-black)] underline"
+                  <td className="whitespace-nowrap px-3 py-2">{new Date(alert.created_at).toLocaleString()}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-block border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${sourceBadgeClass(alert)}`}
+                      >
+                        {formatIngestSource(ingestSource)}
+                      </span>
+                    </div>
+                    <div className="mt-1 font-medium text-[var(--sea-ink)]">{formatAlertSourceLabel(alert)}</div>
+                    {ingestSource === 'desktop' ? (
+                      <div className="text-xs text-[var(--sea-ink-soft)]">{formatPlatform(alert.platform)}</div>
+                    ) : (
+                      <div className="text-xs text-[var(--sea-ink-soft)]">
+                        {alert.webhook_id ? `ID ${alert.webhook_id.slice(0, 8)}` : 'Inbound webhook'}
+                        {alert.source_ip ? ` · ${alert.source_ip}` : ''}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-2">
+                    <button
+                      type="button"
+                      className="cursor-pointer bg-transparent text-left font-medium text-[var(--sea-ink)]"
+                      onClick={() => setOpenId(open ? null : alert.id)}
+                      aria-expanded={open}
                     >
-                      View trade
-                    </Link>
-                  ) : null}
-                </td>
-                <td className="px-3 py-2 text-[var(--sea-ink-soft)]">{alert.skip_reason ?? '—'}</td>
-              </tr>
+                      {alert.title || (ingestSource === 'webhook' ? formatWebhookLabel(alert) : 'Untitled alert')}
+                    </button>
+                    <p className={`mt-1 max-w-xl text-[var(--sea-ink-soft)] ${open ? '' : 'line-clamp-2'}`}>
+                      {alert.text}
+                    </p>
+                    {open ? (
+                      <div className="mt-3 max-w-3xl">
+                        <JsonPayloadViewer raw={alert.raw_payload ?? ''} />
+                      </div>
+                    ) : null}
+                  </td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={`inline-block border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${outcomeClass(alert.outcome)}`}
+                    >
+                      {formatAlertOutcome(alert.outcome)}
+                    </span>
+                    {alert.trade_status ? (
+                      <div className="mt-1 text-xs text-[var(--sea-ink-soft)]">{alert.trade_status}</div>
+                    ) : null}
+                    {alert.trade_id ? (
+                      <Link
+                        to="/dashboard"
+                        search={{ trade: alert.trade_id }}
+                        className="mt-1 inline-block text-xs font-semibold text-[var(--ja-black)] underline"
+                      >
+                        View trade
+                      </Link>
+                    ) : null}
+                  </td>
+                  <td className="px-3 py-2 text-[var(--sea-ink-soft)]">{alert.skip_reason ?? '—'}</td>
+                </tr>
             )
           })}
         </tbody>

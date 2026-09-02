@@ -1,6 +1,7 @@
-import type { AlertAudit, AlertOutcome } from '#/lib/api-client'
+import type { AlertAudit, AlertOutcome, IngestSource } from '#/lib/api-client'
 
 export type AlertFilter = AlertOutcome | 'all'
+export type IngestSourceFilter = IngestSource | 'all'
 
 export function currentDateKey(now = new Date()): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
@@ -28,6 +29,43 @@ export function filterAlertsByDateRange(
 export function filterAlerts(alerts: AlertAudit[], filter: AlertFilter): AlertAudit[] {
   if (filter === 'all') return alerts
   return alerts.filter((alert) => alert.outcome === filter)
+}
+
+export function filterAlertsByIngestSource(
+  alerts: AlertAudit[],
+  source: IngestSourceFilter,
+): AlertAudit[] {
+  if (source === 'all') return alerts
+  return alerts.filter((alert) => resolveIngestSource(alert) === source)
+}
+
+export function ingestSourceCounts(alerts: AlertAudit[]): Record<IngestSourceFilter, number> {
+  return {
+    all: alerts.length,
+    desktop: alerts.filter((alert) => resolveIngestSource(alert) === 'desktop').length,
+    webhook: alerts.filter((alert) => resolveIngestSource(alert) === 'webhook').length,
+  }
+}
+
+export function resolveIngestSource(alert: AlertAudit): IngestSource {
+  return alert.ingest_source ?? 'desktop'
+}
+
+export function formatIngestSource(source: IngestSource): string {
+  return source === 'webhook' ? 'Webhook' : 'Desktop'
+}
+
+export function formatWebhookLabel(alert: AlertAudit): string {
+  if (alert.webhook_name?.trim()) return alert.webhook_name.trim()
+  if (alert.webhook_id) return `Webhook ${alert.webhook_id.slice(0, 8)}`
+  return 'Webhook'
+}
+
+export function formatAlertSourceLabel(alert: AlertAudit): string {
+  if (resolveIngestSource(alert) === 'webhook') {
+    return formatWebhookLabel(alert)
+  }
+  return formatSourceApp(alert.source_app)
 }
 
 export function alertCounts(alerts: AlertAudit[]): Record<AlertFilter, number> {

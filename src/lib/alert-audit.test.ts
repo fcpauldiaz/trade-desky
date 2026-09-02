@@ -7,15 +7,24 @@ import {
   currentDateKey,
   filterAlerts,
   filterAlertsByDateRange,
+  filterAlertsByIngestSource,
   formatAlertOutcome,
+  formatAlertSourceLabel,
   formatPlatform,
   formatSourceApp,
+  formatWebhookLabel,
+  ingestSourceCounts,
+  resolveIngestSource,
 } from '#/lib/alert-audit'
 
 function alert(partial: Partial<AlertAudit>): AlertAudit {
   return {
     id: '1',
     created_at: '2026-08-16T12:00:00Z',
+    ingest_source: 'desktop',
+    webhook_id: null,
+    webhook_name: null,
+    source_ip: null,
     source_app: 'com.hnc.Discord',
     platform: 'macos',
     title: 'Alerts',
@@ -24,6 +33,7 @@ function alert(partial: Partial<AlertAudit>): AlertAudit {
     skip_reason: 'no broker connected',
     trade_id: null,
     trade_status: null,
+    raw_payload: '{"title":"Alerts","body":"BTO SPY"}',
     ...partial,
   }
 }
@@ -114,5 +124,60 @@ describe('formatPlatform', () => {
     expect(formatPlatform('macos')).toBe('macOS')
     expect(formatPlatform('windows')).toBe('Windows')
     expect(formatPlatform('')).toBe('—')
+  })
+})
+
+describe('filterAlertsByIngestSource', () => {
+  const rows = [
+    alert({ id: 'a', ingest_source: 'desktop' }),
+    alert({ id: 'b', ingest_source: 'webhook', webhook_name: 'TradingView' }),
+  ]
+
+  it('keeps all sources', () => {
+    expect(filterAlertsByIngestSource(rows, 'all')).toHaveLength(2)
+  })
+
+  it('filters webhook ingests', () => {
+    expect(filterAlertsByIngestSource(rows, 'webhook').map((row) => row.id)).toEqual(['b'])
+  })
+})
+
+describe('ingestSourceCounts', () => {
+  it('counts desktop and webhook rows', () => {
+    expect(
+      ingestSourceCounts([
+        alert({ ingest_source: 'desktop' }),
+        alert({ ingest_source: 'webhook' }),
+        alert({ ingest_source: 'webhook' }),
+      ]),
+    ).toEqual({ all: 3, desktop: 1, webhook: 2 })
+  })
+})
+
+describe('formatWebhookLabel', () => {
+  it('prefers webhook name', () => {
+    expect(formatWebhookLabel(alert({ webhook_name: 'TradingView', webhook_id: 'wh_123' }))).toBe(
+      'TradingView',
+    )
+  })
+
+  it('falls back to short id', () => {
+    expect(formatWebhookLabel(alert({ webhook_id: 'wh_abcdef12' }))).toBe('Webhook wh_abcde')
+  })
+})
+
+describe('formatAlertSourceLabel', () => {
+  it('labels webhook and desktop sources', () => {
+    expect(formatAlertSourceLabel(alert({ ingest_source: 'webhook', webhook_name: 'TV' }))).toBe('TV')
+    expect(formatAlertSourceLabel(alert({ ingest_source: 'desktop', source_app: 'com.hnc.Discord' }))).toBe(
+      'Discord',
+    )
+  })
+})
+
+describe('resolveIngestSource', () => {
+  it('defaults missing ingest_source to desktop', () => {
+    const row = alert({ ingest_source: undefined as unknown as AlertAudit['ingest_source'] })
+    expect(resolveIngestSource(row)).toBe('desktop')
   })
 })
