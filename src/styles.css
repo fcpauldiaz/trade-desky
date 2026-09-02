@@ -1676,6 +1676,44 @@ a:hover {
   background: var(--ja-white);
 }
 
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 2px solid var(--ja-black);
+  background: var(--ja-white);
+  color: var(--ja-black);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ja-black);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.copy-btn:hover {
+  background: var(--ja-gray-100);
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 var(--ja-black);
+}
+
+.copy-btn--copied {
+  background: var(--ja-green);
+  box-shadow: 2px 2px 0 var(--ja-black);
+}
+
+.copy-btn--failed {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.copy-btn-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
 .demo-list-item {
   border: 2px solid var(--ja-black);
   border-radius: 0.5rem;

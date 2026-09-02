@@ -13,23 +13,12 @@ import CreateWebhookForm from '#/components/connections/CreateWebhookForm'
 import NinjatraderConnectForm from '#/components/connections/NinjatraderConnectForm'
 import NinjatraderDevicePairing from '#/components/connections/NinjatraderDevicePairing'
 import TradierTokenForm from '#/components/connections/TradierTokenForm'
+import CopyButton from '#/components/CopyButton'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import UpgradeBanner from '#/components/UpgradeBanner'
 import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 
 export const Route = createFileRoute('/_authenticated/connections')({ component: ConnectionsPage })
-
-async function copyText(value: string): Promise<boolean> {
-  if (typeof navigator.clipboard?.writeText === 'function') {
-    try {
-      await navigator.clipboard.writeText(value)
-      return true
-    } catch {
-      return false
-    }
-  }
-  return false
-}
 
 function ConnectionsPage() {
   const navigate = useNavigate()
@@ -48,7 +37,6 @@ function ConnectionsPage() {
   const [pairingDevice, setPairingDevice] = useState(false)
   const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null)
   const [webhookLoading, setWebhookLoading] = useState<string | null>(null)
-  const [copyFeedback, setCopyFeedback] = useState('')
 
   const tradier = brokers.find((b) => b.broker === 'tradier')
   const tradierConnected = tradier?.status === 'connected'
@@ -268,12 +256,6 @@ function ConnectionsPage() {
     }
   }
 
-  async function handleCopy(value: string) {
-    const ok = await copyText(value)
-    setCopyFeedback(ok ? 'Copied' : 'Copy failed')
-    window.setTimeout(() => setCopyFeedback(''), 2000)
-  }
-
   function environmentLabel(environment: string | null | undefined) {
     if (environment === 'live') return 'live'
     if (environment === 'sandbox') return 'paper'
@@ -394,7 +376,6 @@ function ConnectionsPage() {
               revokingId={revokingDeviceId}
               onPair={pairWindowsReceiver}
               onRevoke={revokePairedDevice}
-              onCopy={handleCopy}
             />
             <NinjatraderConnectForm
               connected={ninjatraderConnected}
@@ -430,9 +411,7 @@ function ConnectionsPage() {
                         Webhook URL
                         <div className="mt-1 flex gap-2">
                           <input type="text" readOnly className="demo-input flex-1 text-xs" value={hook.url} />
-                          <button type="button" className="rounded-full border px-3 py-1 text-xs" onClick={() => handleCopy(hook.url)}>
-                            Copy
-                          </button>
+                          <CopyButton value={hook.url} />
                         </div>
                         <FieldHelpDialog title="Inbound webhook URL" triggerLabel="What is this URL?">
                           <p>
@@ -461,7 +440,6 @@ function ConnectionsPage() {
                 </ul>
               )}
               <CreateWebhookForm loading={webhookLoading === 'create'} onSubmit={createWebhook} />
-              {copyFeedback && <p className="text-xs text-[var(--sea-ink-soft)]">{copyFeedback}</p>}
             </div>
           </div>
         </div>
