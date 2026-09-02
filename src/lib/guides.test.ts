@@ -3,7 +3,8 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
-  NINJATRADER_BRIDGE_ZIP_URL,
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
   NINJATRADER_GUIDE_IMAGES,
   NINJATRADER_GUIDE_PATH,
 } from '#/lib/guides'
@@ -18,9 +19,14 @@ describe('guides', () => {
     expect(NINJATRADER_GUIDE_IMAGES.architecture).toMatch(/\.svg$/)
   })
 
-  it('links bridge zip download to the public archive', () => {
-    expect(NINJATRADER_BRIDGE_ZIP_URL).toContain('trade-desky-ninjatrader')
-    expect(NINJATRADER_BRIDGE_ZIP_URL).toContain('archive/refs/heads/main.zip')
+  it('links bridge downloads to hosted desktop assets', () => {
+    expect(NINJATRADER_BRIDGE_WIN_ASSET_PATH).toBe(
+      '/desktop/TradeDeskyNinjaTraderReceiver-setup.exe',
+    )
+    expect(NINJATRADER_BRIDGE_ZIP_PATH).toBe('/desktop/TradeDeskyNinjaTraderReceiver-win.zip')
+    for (const url of [NINJATRADER_BRIDGE_WIN_ASSET_PATH, NINJATRADER_BRIDGE_ZIP_PATH]) {
+      expect(url.includes('github.com')).toBe(false)
+    }
   })
 
   it('ships guide SVG assets without control-byte corruption', () => {

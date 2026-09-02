@@ -1,4 +1,7 @@
-export { NINJATRADER_BRIDGE_ZIP_URL } from '#/lib/ninjatrader-bridge'
+export {
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
+} from '#/lib/ninjatrader-bridge'
 
 export const NINJATRADER_GUIDE_PATH = '/guides/ninjatrader' as const
 

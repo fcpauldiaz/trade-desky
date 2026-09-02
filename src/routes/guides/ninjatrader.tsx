@@ -4,7 +4,8 @@ import GuideFigure from '#/components/marketing/GuideFigure'
 import SeoPage, { RelatedPages, SeoSection } from '#/components/marketing/SeoPage'
 import {
   NINJATRADER_BRIDGE_DOWNLOAD_PATH,
-  NINJATRADER_BRIDGE_ZIP_URL,
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
 } from '#/lib/ninjatrader-bridge'
 import {
   NINJATRADER_GUIDE_IMAGES,
@@ -62,15 +63,19 @@ function NinjaTraderGuidePage() {
         <li className="feature-item space-y-3 p-5">
           <h3 className="text-lg font-black">Install the local bridge (Sim101 first)</h3>
           <p className="text-sm">
-            Download the bridge from the{' '}
+            Download the{' '}
+            <a className="underline" href={NINJATRADER_BRIDGE_WIN_ASSET_PATH}>
+              Windows installer
+            </a>{' '}
+            from the{' '}
             <Link className="underline" to={`${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`}>
               download page
             </Link>{' '}
-            or use the{' '}
-            <a className="underline" href={NINJATRADER_BRIDGE_ZIP_URL} rel="noreferrer" target="_blank">
-              bridge ZIP
+            (or use the{' '}
+            <a className="underline" href={NINJATRADER_BRIDGE_ZIP_PATH}>
+              portable ZIP
             </a>
-            . Copy <code className="text-xs">NinjaTrader/*.cs</code> into{' '}
+            ). Copy <code className="text-xs">NinjaTrader/*.cs</code> into{' '}
             <code className="text-xs">Documents\NinjaTrader 8\bin\Custom\AddOns\</code>, compile in
             NinjaTrader, then open <strong>Trade Desky — NinjaTrader</strong>.
           </p>
@@ -190,7 +195,7 @@ python main.py`}
       <RelatedPages
         links={[
           { to: '/integrations/ninjatrader', label: 'NinjaTrader integration overview' },
-          { to: `${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`, label: 'Download bridge ZIP' },
+          { to: `${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`, label: 'Download bridge' },
           { to: '/connections', label: 'Open Connections' },
           { to: '/integrations/discord', label: 'Desktop alert capture' },
         ]}

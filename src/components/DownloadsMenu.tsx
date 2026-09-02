@@ -1,7 +1,8 @@
 import { DESKTOP_MAC_ASSET_PATH, DESKTOP_WIN_ASSET_PATH } from '#/lib/desktop-app'
 import {
   NINJATRADER_BRIDGE_DOWNLOAD_PATH,
-  NINJATRADER_BRIDGE_ZIP_URL,
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
 } from '#/lib/ninjatrader-bridge'
 
 export default function DownloadsMenu() {
@@ -13,9 +14,8 @@ export default function DownloadsMenu() {
         <a href={DESKTOP_MAC_ASSET_PATH}>macOS</a>
         <a href={DESKTOP_WIN_ASSET_PATH}>Windows</a>
         <p className="downloads-menu-heading">NinjaTrader</p>
-        <a href={NINJATRADER_BRIDGE_ZIP_URL} rel="noreferrer" target="_blank">
-          Bridge ZIP
-        </a>
+        <a href={NINJATRADER_BRIDGE_WIN_ASSET_PATH}>Windows installer</a>
+        <a href={NINJATRADER_BRIDGE_ZIP_PATH}>Portable ZIP</a>
         <a href={`${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`}>On download page</a>
       </div>
     </details>
