@@ -8,7 +8,10 @@ import {
   currentDateKey,
   filterAlerts,
   filterAlertsByDateRange,
+  filterAlertsByIngestSource,
+  ingestSourceCounts,
   type AlertFilter,
+  type IngestSourceFilter,
 } from '#/lib/alert-audit'
 
 export const Route = createFileRoute('/_authenticated/alerts')({ component: AlertsPage })
@@ -20,9 +23,16 @@ const FILTERS: Array<{ id: AlertFilter; label: string }> = [
   { id: 'pending', label: 'Pending' },
 ]
 
+const SOURCE_FILTERS: Array<{ id: IngestSourceFilter; label: string }> = [
+  { id: 'all', label: 'All sources' },
+  { id: 'desktop', label: 'Desktop' },
+  { id: 'webhook', label: 'Webhook' },
+]
+
 function AlertsPage() {
   const [alerts, setAlerts] = useState<AlertAudit[]>([])
   const [filter, setFilter] = useState<AlertFilter>('all')
+  const [sourceFilter, setSourceFilter] = useState<IngestSourceFilter>('all')
   const [fromDate, setFromDate] = useState(() => currentDateKey())
   const [toDate, setToDate] = useState(() => currentDateKey())
   const [canTrade, setCanTrade] = useState(true)
@@ -46,15 +56,20 @@ function AlertsPage() {
     [alerts, fromDate, toDate],
   )
   const counts = useMemo(() => alertCounts(dateFiltered), [dateFiltered])
-  const visible = useMemo(() => filterAlerts(dateFiltered, filter), [dateFiltered, filter])
+  const sourceCounts = useMemo(() => ingestSourceCounts(dateFiltered), [dateFiltered])
+  const sourceFiltered = useMemo(
+    () => filterAlertsByIngestSource(dateFiltered, sourceFilter),
+    [dateFiltered, sourceFilter],
+  )
+  const visible = useMemo(() => filterAlerts(sourceFiltered, filter), [sourceFiltered, filter])
 
   return (
     <main className="page-wrap space-y-6 px-4 py-10">
       <div>
         <h1 className="text-3xl font-black text-[var(--ja-black)]">Alert audit</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ja-gray-600)]">
-          Every banner the desktop watcher sent in. See whether Trade Desky executed a trade, skipped it, or is still
-          waiting.
+          Every banner the desktop watcher sent in and every inbound webhook POST. See whether Trade Desky
+          executed a trade, skipped it, or is still waiting — and inspect the raw JSON payload.
         </p>
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -107,11 +122,26 @@ function AlertsPage() {
           )
         })}
       </div>
+      <div className="flex flex-wrap gap-2">
+        {SOURCE_FILTERS.map(({ id, label }) => {
+          const active = sourceFilter === id
+          return (
+            <button
+              key={id}
+              type="button"
+              className={active ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+              onClick={() => setSourceFilter(id)}
+            >
+              {label} ({sourceCounts[id]})
+            </button>
+          )
+        })}
+      </div>
       <section className="island-shell rounded-2xl p-5">
         {loading ? (
           <p className="text-sm text-[var(--sea-ink-soft)]">Loading alerts…</p>
         ) : (
-          <AlertAuditTable alerts={visible} totalCount={dateFiltered.length} loadFailed={!!error} />
+          <AlertAuditTable alerts={visible} totalCount={sourceFiltered.length} loadFailed={!!error} />
         )}
       </section>
     </main>

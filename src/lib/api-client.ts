@@ -31,9 +31,15 @@ export type Trade = {
 
 export type AlertOutcome = 'executed' | 'skipped' | 'pending'
 
+export type IngestSource = 'desktop' | 'webhook'
+
 export type AlertAudit = {
   id: string
   created_at: string
+  ingest_source: IngestSource
+  webhook_id: string | null
+  webhook_name: string | null
+  source_ip: string | null
   source_app: string
   platform: string
   title: string
@@ -42,6 +48,7 @@ export type AlertAudit = {
   skip_reason: string | null
   trade_id: string | null
   trade_status: string | null
+  raw_payload: string
 }
 
 export type CheckoutPlan = 'monthly' | 'yearly'
