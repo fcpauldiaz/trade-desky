@@ -58,8 +58,11 @@ function ConnectionsPage() {
       setTradierEnvironment(connectedTradier.environment)
     }
     const connectedNt = list.find((b) => b.broker === 'ninjatrader' && b.status === 'connected')
-    if (connectedNt?.account_id) {
-      setNinjatraderAccountLabel(connectedNt.account_id)
+    if (connectedNt) {
+      setNinjatraderForwardUrl(connectedNt.forward_url || '')
+      if (connectedNt.account_id) {
+        setNinjatraderAccountLabel(connectedNt.account_id)
+      }
     }
   }, [])
 
