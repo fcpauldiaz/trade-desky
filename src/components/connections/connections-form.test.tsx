@@ -60,7 +60,6 @@ describe('NinjatraderConnectForm', () => {
     })
   })
 
-<<<<<<< HEAD
   it('keeps bridge secret after submit and shows success guidance', async () => {
     const onSubmit = vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))
 
@@ -91,7 +90,8 @@ describe('NinjatraderConnectForm', () => {
 
     expect(await screen.findByText('NinjaTrader connected')).toBeTruthy()
     expect(screen.getByText(/Confirm the local Trade Desky NinjaTrader Receiver EXE is running/)).toBeTruthy()
-    expect(screen.getByText(/send a smoke order/)).toBeTruthy()
+    expect(screen.getByText(/Test connection/)).toBeTruthy()
+    expect(screen.getByText(/send a Sim101 smoke order/)).toBeTruthy()
 
     const secretInput = screen.getByPlaceholderText('Only if your local bridge requires it') as HTMLInputElement
     expect(secretInput.value).toBe('my-bridge-secret')
@@ -121,7 +121,23 @@ describe('NinjatraderConnectForm', () => {
   it('toggles secret visibility with the eye button', () => {
     render(
       <NinjatraderConnectForm
-=======
+        connected={false}
+        initialForwardUrl=""
+        initialAccountLabel=""
+        onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+      />,
+    )
+
+    const secretInput = screen.getByPlaceholderText('Only if your local bridge requires it') as HTMLInputElement
+    expect(secretInput.type).toBe('password')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show secret' }))
+    expect(secretInput.type).toBe('text')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Hide secret' }))
+    expect(secretInput.type).toBe('password')
+  })
+
   it('shows Test connection when connected and calls onTestConnection', async () => {
     const onTestConnection = vi.fn(async () => ({
       success: true,
@@ -165,24 +181,10 @@ describe('NinjatraderConnectForm', () => {
 
     render(
       <NinjatraderConnectForm
->>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
         connected={false}
         initialForwardUrl=""
         initialAccountLabel=""
         onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
-<<<<<<< HEAD
-      />,
-    )
-
-    const secretInput = screen.getByPlaceholderText('Only if your local bridge requires it') as HTMLInputElement
-    expect(secretInput.type).toBe('password')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Show secret' }))
-    expect(secretInput.type).toBe('text')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Hide secret' }))
-    expect(secretInput.type).toBe('password')
-=======
         onTestConnection={onTestConnection}
       />,
     )
@@ -206,7 +208,6 @@ describe('NinjatraderConnectForm', () => {
     const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
     expect(testButton.disabled).toBe(true)
     expect(screen.getByText('An active subscription is required to test broker connections.')).toBeTruthy()
->>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
   })
 })
 
