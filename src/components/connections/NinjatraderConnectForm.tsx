@@ -13,11 +13,21 @@ export type NinjatraderConnectFormValues = {
 
 type SaveOutcome = 'connected' | 'updated'
 
+type TestConnectionResult = {
+  success: boolean
+  message: string
+}
+
 type NinjatraderConnectFormProps = {
   connected: boolean
   initialForwardUrl: string
   initialAccountLabel: string
   onSubmit: (values: NinjatraderConnectFormValues) => Promise<{ forwardUrl: string }>
+  onTestConnection?: () => Promise<TestConnectionResult>
+  testDisabled?: boolean
+  testDisabledReason?: string
+  testLoading?: boolean
+  testResult?: TestConnectionResult | null
 }
 
 export default function NinjatraderConnectForm({
@@ -25,6 +35,11 @@ export default function NinjatraderConnectForm({
   initialForwardUrl,
   initialAccountLabel,
   onSubmit,
+  onTestConnection,
+  testDisabled = false,
+  testDisabledReason,
+  testLoading = false,
+  testResult = null,
 }: NinjatraderConnectFormProps) {
   const [secretVisible, setSecretVisible] = useState(false)
   const [saveOutcome, setSaveOutcome] = useState<SaveOutcome | null>(null)
@@ -52,6 +67,9 @@ export default function NinjatraderConnectForm({
     form.setFieldValue('accountLabel', initialAccountLabel)
   }, [form, initialAccountLabel, initialForwardUrl])
 
+  const showTestConnection = connected && onTestConnection
+  const testButtonDisabled = testDisabled || testLoading
+
   return (
     <form
       onSubmit={(event) => {
@@ -77,7 +95,7 @@ export default function NinjatraderConnectForm({
               In NinjaTrader 8, enable the Trade Desky add-on and start on <strong>Sim101</strong>
             </li>
             <li>
-              Use <strong>Test</strong> on the NinjaTrader card above to send a smoke order
+              Click <strong>Test connection</strong> below to send a Sim101 smoke order
             </li>
           </ol>
           <p className="text-xs">
@@ -183,6 +201,30 @@ export default function NinjatraderConnectForm({
           </button>
         )}
       </form.Subscribe>
+
+      {showTestConnection && (
+        <div className="space-y-2 border-t border-[var(--line)] pt-4">
+          <button
+            type="button"
+            disabled={testButtonDisabled}
+            onClick={() => void onTestConnection()}
+            className="btn-primary text-sm disabled:opacity-50"
+          >
+            {testLoading ? 'Testing…' : 'Test connection'}
+          </button>
+          {testDisabled && testDisabledReason && (
+            <p className="text-xs text-[var(--sea-ink-soft)]">{testDisabledReason}</p>
+          )}
+          {testResult && (
+            <p
+              className={`text-sm ${testResult.success ? 'text-green-700' : 'text-red-600'}`}
+              role="status"
+            >
+              {testResult.message}
+            </p>
+          )}
+        </div>
+      )}
     </form>
   )
 }
