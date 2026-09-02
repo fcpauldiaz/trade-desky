@@ -42,7 +42,7 @@ Auth migrations run automatically on server startup. To apply them manually: `np
 |-------|-------------|
 | `/` | Marketing landing |
 | `/reviews` | Public customer reviews + submit form for paid subscribers |
-| `/pricing` | Pro plan + Creem checkout |
+| `/pricing` | Pro plan (invite-only) |
 | `/login`, `/signup` | Email + password (Better Auth) |
 | `/dashboard` | P&L calendar + trade table |
 | `/connections` | Tradier, Schwab, and NinjaTrader connect + inbound JSON webhook |

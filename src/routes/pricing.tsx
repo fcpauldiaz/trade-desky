@@ -1,22 +1,20 @@
 import { createFileRoute, Link, Navigate } from '@tanstack/react-router'
-import { useState } from 'react'
 import HeroHighlight from '#/components/marketing/HeroHighlight'
 import SocialProof from '#/components/marketing/SocialProof'
 import FaqSection from '#/components/marketing/FaqSection'
 import FinalCta from '#/components/marketing/FinalCta'
 import JsonLd from '#/components/JsonLd'
-import { api, type CheckoutPlan } from '#/lib/api-client'
 import { showPricingForUser } from '#/lib/pricing-visibility'
 import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 import { faqPageJsonLd, HOME_FAQ, softwareApplicationJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
-import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL, PRO_YEARLY_SAVINGS_PILL } from '#/lib/site'
+import { PRO_PRICE_LABEL, PRO_YEARLY_PRICE_LABEL, SUPPORT_EMAIL } from '#/lib/site'
 
 export const Route = createFileRoute('/pricing')({
   head: () =>
     pageHead({
-      title: `Trade Desky pricing — ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr`,
-      description: `Pro is ${PRO_PRICE_LABEL} per month or ${PRO_YEARLY_PRICE_LABEL} per year for desktop alert capture, AI parsing, and Tradier or Schwab execution. Cancel anytime in the billing portal.`,
+      title: `Trade Desky pricing — Pro by invitation`,
+      description: `Trade Desky Pro includes desktop alert capture, AI parsing, and Tradier or Schwab execution. Access is granted by invitation.`,
       path: '/pricing',
     }),
   component: PricingPage,
@@ -67,9 +65,6 @@ const ADVANTAGE_FEATURES = [
 
 function PricingPage() {
   const { loggedIn, canProcessTrades, isPending } = useCanProcessTrades()
-  const [plan, setPlan] = useState<CheckoutPlan>('yearly')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   if (loggedIn && isPending) {
     return null
@@ -81,38 +76,6 @@ function PricingPage() {
     return <Navigate to="/billing" />
   }
 
-  async function startCheckout() {
-    setError('')
-    setLoading(true)
-    try {
-      const { checkout_url } = await api.createCheckout(plan)
-      window.location.assign(checkout_url)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not start checkout')
-      setLoading(false)
-    }
-  }
-
-  function renderCta() {
-    if (loggedIn) {
-      return (
-        <button
-          type="button"
-          className="btn-primary btn-primary-lg pricing-cta"
-          onClick={startCheckout}
-          disabled={loading}
-        >
-          {loading ? 'Starting checkout…' : 'Get Started'}
-        </button>
-      )
-    }
-    return (
-      <Link to="/signup" className="btn-primary btn-primary-lg pricing-cta">
-        Get Started
-      </Link>
-    )
-  }
-
   return (
     <main className="marketing-page">
       <JsonLd data={[softwareApplicationJsonLd(), faqPageJsonLd(HOME_FAQ)]} />
@@ -120,28 +83,22 @@ function PricingPage() {
         <div className="page-wrap px-4 sm:px-6 lg:px-8">
           <div className="pricing-hero-head">
             <h1 className="marketing-hero-title pricing-hero-title">
-              Simple, <HeroHighlight variant="yellow">Transparent</HeroHighlight> Pricing
+              Simple, <HeroHighlight variant="yellow">Invite-only</HeroHighlight> Pricing
             </h1>
             <p className="marketing-section-subtitle pricing-hero-sub">
-              Pro at {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year for automated
-              alert capture and broker execution. Cancel anytime.
+              Pro includes automated alert capture and broker execution. Reference rates are{' '}
+              {PRO_PRICE_LABEL}/mo or {PRO_YEARLY_PRICE_LABEL}/yr — access is granted by invitation,
+              not self-serve checkout.
             </p>
           </div>
 
           <div className="pricing-plan-grid">
-            <button
-              type="button"
-              className={`pricing-plan-card${plan === 'monthly' ? ' is-selected' : ''}`}
-              onClick={() => setPlan('monthly')}
-            >
+            <div className="pricing-plan-card">
               <div className="pricing-plan-top">
                 <div>
                   <h2 className="pricing-plan-name">Monthly</h2>
-                  <p className="pricing-plan-billing">Billed monthly via Creem</p>
+                  <p className="pricing-plan-billing">Reference rate</p>
                 </div>
-                <span className="pricing-plan-radio" aria-hidden="true">
-                  {plan === 'monthly' ? '✓' : ''}
-                </span>
               </div>
               <p className="pricing-plan-price">
                 <span className="pricing-plan-price-main">{PRO_PRICE_LABEL}</span>
@@ -153,40 +110,42 @@ function PricingPage() {
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-            </button>
-            <button
-              type="button"
-              className={`pricing-plan-card is-featured${plan === 'yearly' ? ' is-selected' : ''}`}
-              onClick={() => setPlan('yearly')}
-            >
-              <span className="pricing-plan-badge">{PRO_YEARLY_SAVINGS_PILL}</span>
+            </div>
+            <div className="pricing-plan-card is-featured is-selected">
               <div className="pricing-plan-top">
                 <div>
                   <h2 className="pricing-plan-name">Yearly</h2>
-                  <p className="pricing-plan-billing">Billed yearly via Creem</p>
+                  <p className="pricing-plan-billing">Reference rate</p>
                 </div>
-                <span className="pricing-plan-radio" aria-hidden="true">
-                  {plan === 'yearly' ? '✓' : ''}
-                </span>
               </div>
               <p className="pricing-plan-price">
                 <span className="pricing-plan-price-main">{PRO_YEARLY_PRICE_LABEL}</span>
                 <span className="pricing-plan-price-period">/yr</span>
               </p>
-              <span className="pricing-plan-offer">Same Pro features, one yearly charge</span>
+              <span className="pricing-plan-offer">Same Pro features</span>
               <ul className="pricing-plan-features">
                 {PRO_FEATURES.map((feature) => (
                   <li key={`year-${feature}`}>{feature}</li>
                 ))}
               </ul>
-            </button>
+            </div>
           </div>
 
           <div className="pricing-cta-block">
-            {renderCta()}
-            {error ? <p className="pricing-cta-error">{error}</p> : null}
+            {loggedIn ? (
+              <a
+                className="btn-primary btn-primary-lg pricing-cta"
+                href={`mailto:${SUPPORT_EMAIL}?subject=Trade%20Desky%20Pro%20access`}
+              >
+                Request access
+              </a>
+            ) : (
+              <Link to="/signup" className="btn-primary btn-primary-lg pricing-cta">
+                Get Started
+              </Link>
+            )}
             <ul className="pricing-trust-list">
-              <li>Cancel anytime</li>
+              <li>Invite-only Pro</li>
               <li>Paper and live trading</li>
               <li>Tradier &amp; Schwab</li>
             </ul>
@@ -200,65 +159,49 @@ function PricingPage() {
       <section className="marketing-section marketing-section-gray">
         <div className="page-wrap px-4 sm:px-6 lg:px-8">
           <div className="section-head">
-            <h2 className="marketing-section-title">
-              What you get with <HeroHighlight variant="yellow">Trade Desky</HeroHighlight>
-            </h2>
+            <p className="section-badge">Before / with Trade Desky</p>
+            <h2 className="marketing-section-title">Stop babysitting every alert</h2>
           </div>
-          <div className="pricing-compare-grid">
-            <article className="pricing-compare-card pricing-compare-before">
-              <span className="pricing-compare-tag">Before</span>
-              <ul className="pricing-compare-list">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="feature-item">
+              <h3 className="mb-3 text-lg font-black">Before</h3>
+              <ul className="space-y-2 text-sm text-[var(--ja-gray-600)]">
                 {BEFORE_ITEMS.map((item) => (
                   <li key={item.text}>
-                    <span className="pricing-compare-icon" aria-hidden="true">
-                      {item.icon}
-                    </span>
-                    <span>{item.text}</span>
+                    <span className="mr-2">{item.icon}</span>
+                    {item.text}
                   </li>
                 ))}
               </ul>
-            </article>
-            <article className="pricing-compare-card pricing-compare-with">
-              <span className="pricing-compare-tag pricing-compare-tag-with">With Trade Desky</span>
-              <ul className="pricing-compare-list">
+            </div>
+            <div className="feature-item">
+              <h3 className="mb-3 text-lg font-black">With Trade Desky</h3>
+              <ul className="space-y-2 text-sm text-[var(--ja-gray-600)]">
                 {WITH_ITEMS.map((item) => (
                   <li key={item.text}>
-                    <span className="pricing-compare-icon pricing-compare-icon-with" aria-hidden="true">
-                      {item.icon}
-                    </span>
-                    <span>{item.text}</span>
+                    <span className="mr-2">{item.icon}</span>
+                    {item.text}
                   </li>
                 ))}
               </ul>
-            </article>
+            </div>
           </div>
-          <div className="pricing-mid-cta">{renderCta()}</div>
         </div>
       </section>
 
       <section className="marketing-section marketing-section-white">
         <div className="page-wrap px-4 sm:px-6 lg:px-8">
           <div className="section-head">
-            <h2 className="marketing-section-title">Your advantage over time</h2>
-            <p className="marketing-section-subtitle">
-              Traders who automate alert capture spend less time babysitting Discord and more time
-              managing risk.
-            </p>
+            <p className="section-badge">Included</p>
+            <h2 className="marketing-section-title">What Pro unlocks</h2>
           </div>
-          <div className="pricing-advantage-list">
+          <div className="grid gap-4 sm:grid-cols-2">
             {ADVANTAGE_FEATURES.map((feature) => (
-              <article key={feature.title} className="pricing-advantage-item">
-                <div className="pricing-advantage-mark" aria-hidden="true" />
-                <div>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </div>
-              </article>
+              <div key={feature.title} className="feature-item">
+                <h3 className="mb-2 text-base font-black">{feature.title}</h3>
+                <p className="text-sm text-[var(--ja-gray-600)]">{feature.description}</p>
+              </div>
             ))}
-          </div>
-          <div className="pricing-mid-cta">
-            <p className="pricing-mid-cta-label">Maximize your alert-to-fill speed</p>
-            {renderCta()}
           </div>
         </div>
       </section>

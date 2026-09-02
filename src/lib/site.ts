@@ -19,10 +19,8 @@ function roundUsd(amount: number): number {
   return Math.round(amount * 100) / 100
 }
 
-export const LEGAL_UPDATED = 'August 15, 2026'
+export const LEGAL_UPDATED = 'September 2, 2026'
 export const LEGAL_REGION = 'the United States'
-export const CREEM_TERMS_URL = 'https://www.creem.io/terms'
-export const CREEM_PRIVACY_URL = 'https://www.creem.io/privacy'
 export const OG_IMAGE_PATH = '/og.png'
 
 export function canonicalUrl(path: string): string {

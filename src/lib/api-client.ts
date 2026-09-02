@@ -11,7 +11,6 @@ export type BillingStatus = {
   renews_at: string | null
   ends_at: string | null
   can_process_trades: boolean
-  customer_portal_url: string | null
 }
 
 export type Trade = {
@@ -50,8 +49,6 @@ export type AlertAudit = {
   trade_status: string | null
   raw_payload: string
 }
-
-export type CheckoutPlan = 'monthly' | 'yearly'
 
 export type TradierEnvironment = 'sandbox' | 'live'
 
@@ -164,17 +161,6 @@ export const api = {
       onboarding_completed: boolean
     }>('/v1/me'),
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
-  createCheckout: (plan: CheckoutPlan = 'monthly') =>
-    apiFetch<{ checkout_url: string; checkout_id: string | null }>('/v1/me/billing/checkout', {
-      method: 'POST',
-      body: JSON.stringify({ plan }),
-    }),
-  confirmCheckout: (checkoutId: string) =>
-    apiFetch<BillingStatus>('/v1/me/billing/confirm', {
-      method: 'POST',
-      body: JSON.stringify({ checkout_id: checkoutId }),
-    }),
-  createBillingPortal: () => apiFetch<{ url: string }>('/v1/me/billing/portal', { method: 'POST' }),
   brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),
   tradierAuthorize: (environment: TradierEnvironment = 'sandbox') =>
     apiFetch<{ url: string }>(`/v1/me/brokers/tradier/authorize?environment=${environment}`),

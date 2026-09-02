@@ -29,8 +29,7 @@ function CompareNyriaPage() {
       <SeoSection title="Pricing model">
         <p className="text-sm">
           Nyria’s public Pro pricing (August 2026) is $100 per month per $10,000 of max entry
-          allocation. Trade Desky Pro is a flat {PRO_PRICE_LABEL} per month, billed through Creem,
-          with cancel in the customer portal.
+          allocation. Trade Desky Pro is a flat {PRO_PRICE_LABEL} per month (invite-only).
         </p>
       </SeoSection>
       <SeoSection title="How alerts arrive">

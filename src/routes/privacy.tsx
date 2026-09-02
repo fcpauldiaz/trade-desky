@@ -4,7 +4,6 @@ import LegalLayout from '#/components/legal/LegalLayout'
 import { pageHead } from '#/lib/seo'
 import {
   COMPANY_NAME,
-  CREEM_PRIVACY_URL,
   PRODUCT_NAME,
   SUPPORT_EMAIL,
 } from '#/lib/site'
@@ -27,12 +26,8 @@ function PrivacyPage() {
     >
       <p>
         {COMPANY_NAME} (“we”) provides {PRODUCT_NAME}. This policy covers the website, the
-        Trade Desky Watcher desktop app, and the receiver API. It does not cover Tradier, Schwab,
-        Discord, or Creem’s own sites. Creem’s privacy notice is at{' '}
-        <a href={CREEM_PRIVACY_URL} rel="noreferrer" target="_blank">
-          creem.io/privacy
-        </a>
-        .
+        Trade Desky Watcher desktop app, and the receiver API. It does not cover Tradier, Schwab, or
+        Discord’s own sites.
       </p>
 
       <h2>1. Data we collect</h2>
@@ -57,9 +52,8 @@ function PrivacyPage() {
       </p>
       <h3>Billing</h3>
       <p>
-        Subscription status, plan name, renewal/end dates, and Creem customer and subscription ids.
-        We do not receive or store full card numbers. Creem processes the payment as merchant of
-        record.
+        Subscription status, plan name, and renewal/end dates when present. We do not store full
+        card numbers.
       </p>
       <h3>Reviews and support</h3>
       <p>
@@ -91,7 +85,6 @@ function PrivacyPage() {
       <p>We share data only as needed to run the product:</p>
       <ul>
         <li>Infrastructure and database hosting (including Turso / libSQL and the server that runs the API)</li>
-        <li>Creem, for checkout, tax invoices, subscription state, and customer portal</li>
         <li>Tradier and Charles Schwab, after you connect them, to authorize and place orders</li>
         <li>The AI inference provider configured for parsing</li>
         <li>Authorities if the law requires it</li>

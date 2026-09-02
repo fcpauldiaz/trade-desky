@@ -4,7 +4,6 @@ import LegalLayout from '#/components/legal/LegalLayout'
 import { pageHead } from '#/lib/seo'
 import {
   COMPANY_NAME,
-  CREEM_TERMS_URL,
   LEGAL_REGION,
   PRODUCT_NAME,
   PRO_PRICE_LABEL,
@@ -17,7 +16,7 @@ export const Route = createFileRoute('/terms')({
   head: () =>
     pageHead({
       title: 'Terms of Service',
-      description: `Terms for using ${PRODUCT_NAME}: automated broker orders, Creem billing, acceptable use, and liability limits.`,
+      description: `Terms for using ${PRODUCT_NAME}: automated broker orders, Pro access, acceptable use, and liability limits.`,
       path: '/terms',
     }),
   component: TermsPage,
@@ -30,19 +29,12 @@ function TermsPage() {
       summary="These terms are a contract between you and us for use of the Trade Desky website, API, and desktop app."
     >
       <p>
-        By creating an account, installing Trade Desky Watcher, or paying for Pro, you agree to
-        these Terms, the <Link to="/privacy">Privacy Policy</Link>, the{' '}
+        By creating an account, installing Trade Desky Watcher, or using Pro, you agree to these
+        Terms, the <Link to="/privacy">Privacy Policy</Link>, the{' '}
         <Link to="/refund">Refund Policy</Link>, and the <Link to="/risk">Risk Disclosure</Link>. If
         you do not agree, do not use the service.
       </p>
-      <p>
-        Card payments are sold by Creem as merchant of record. If these Terms conflict with{' '}
-        <a href={CREEM_TERMS_URL} rel="noreferrer" target="_blank">
-          Creem’s buyer terms
-        </a>{' '}
-        on a payment issue, Creem’s terms control that payment. This page is product documentation,
-        not legal, tax, or investment advice.
-      </p>
+      <p>This page is product documentation, not legal, tax, or investment advice.</p>
 
       <h2>1. Who we are</h2>
       <p>
@@ -117,12 +109,10 @@ function TermsPage() {
 
       <h2>7. Billing</h2>
       <p>
-        Pro is {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year unless we post a
-        different price before you pay. Creem
-        charges your payment method, collects applicable tax, and issues receipts. Manage or cancel
-        in the billing portal from <Link to="/billing">Billing</Link>. Cancellation stops the next
-        renewal; access to automated execution lasts until the paid period ends unless we or Creem
-        end it sooner. Details are in the <Link to="/refund">Refund Policy</Link>.
+        Pro reference rates are {PRO_PRICE_LABEL} per month or {PRO_YEARLY_PRICE_LABEL} per year
+        unless we agree a different price for your account. Pro is invite-only; there is no
+        self-serve checkout. Check status on <Link to="/billing">Billing</Link>. To cancel or change
+        access, email {SUPPORT_EMAIL}. Details are in the <Link to="/refund">Refund Policy</Link>.
       </p>
 
       <h2>8. Intellectual property</h2>
