@@ -10,7 +10,8 @@ import { breadcrumbJsonLd } from '#/lib/json-ld'
 import {
   NINJATRADER_BRIDGE_GUIDE_PATH,
   NINJATRADER_BRIDGE_NAME,
-  NINJATRADER_BRIDGE_ZIP_URL,
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
 } from '#/lib/ninjatrader-bridge'
 import { pageHead } from '#/lib/seo'
 
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/download')({
     pageHead({
       title: 'Download Trade Desky Watcher & NinjaTrader bridge',
       description:
-        'Download Trade Desky Watcher for macOS and Windows, or the NinjaTrader 8 bridge ZIP for futures execution on Windows. Sign in with your Trade Desky account.',
+        'Download Trade Desky Watcher for macOS and Windows, or the NinjaTrader 8 bridge installer for futures execution on Windows. Sign in with your Trade Desky account.',
       path: '/download',
     }),
   component: DownloadPage,
@@ -85,20 +86,16 @@ function DownloadPage() {
             Trade Desky cloud to your NinjaTrader workstation.
           </p>
           <div className="download-product-actions">
-            <a
-              className="btn-primary"
-              href={NINJATRADER_BRIDGE_ZIP_URL}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Download bridge ZIP
+            <a className="btn-primary" href={NINJATRADER_BRIDGE_WIN_ASSET_PATH}>
+              Download for Windows
             </a>
-            <Link className="btn-secondary" to={NINJATRADER_BRIDGE_GUIDE_PATH}>
-              Setup guide
-            </Link>
+            <a className="btn-secondary" href={NINJATRADER_BRIDGE_ZIP_PATH}>
+              Portable ZIP
+            </a>
           </div>
           <p className="download-product-note">
-            Unzip and copy add-on files into{' '}
+            Windows: run the setup installer (per-user). Or unzip the portable ZIP and copy add-on
+            files into{' '}
             <code className="text-xs">Documents\NinjaTrader 8\bin\Custom\AddOns\</code>, then compile
             in NinjaTrader. Start on Sim101 before enabling live trading.
           </p>

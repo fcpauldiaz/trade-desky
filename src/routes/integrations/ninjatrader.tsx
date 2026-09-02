@@ -6,7 +6,8 @@ import { NINJATRADER_GUIDE_IMAGES, NINJATRADER_GUIDE_PATH } from '#/lib/guides'
 import {
   NINJATRADER_BRIDGE_DOWNLOAD_PATH,
   NINJATRADER_BRIDGE_NAME,
-  NINJATRADER_BRIDGE_ZIP_URL,
+  NINJATRADER_BRIDGE_WIN_ASSET_PATH,
+  NINJATRADER_BRIDGE_ZIP_PATH,
 } from '#/lib/ninjatrader-bridge'
 import { breadcrumbJsonLd, faqPageJsonLd } from '#/lib/json-ld'
 import { pageHead } from '#/lib/seo'
@@ -85,15 +86,19 @@ function NinjaTraderIntegrationPage() {
           <li className="feature-item space-y-3 p-5">
             <h3 className="text-lg font-black">Download the bridge</h3>
             <p className="text-sm">
-              Get {NINJATRADER_BRIDGE_NAME} from the{' '}
+              Get {NINJATRADER_BRIDGE_NAME} via the{' '}
+              <a className="underline" href={NINJATRADER_BRIDGE_WIN_ASSET_PATH}>
+                Windows installer
+              </a>{' '}
+              on the{' '}
               <Link className="underline" to={`${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`}>
                 download page
               </Link>{' '}
-              or{' '}
-              <a className="underline" href={NINJATRADER_BRIDGE_ZIP_URL} rel="noreferrer" target="_blank">
-                bridge ZIP
+              (or{' '}
+              <a className="underline" href={NINJATRADER_BRIDGE_ZIP_PATH}>
+                portable ZIP
               </a>
-              . Copy add-ons into{' '}
+              ). Copy add-ons into{' '}
               <code className="text-xs">Documents\NinjaTrader 8\bin\Custom\AddOns\</code>, compile, and
               open the Trade Desky panel. Select <strong>Sim101</strong> and click{' '}
               <strong>Start Listener</strong>.
@@ -177,7 +182,7 @@ function NinjaTraderIntegrationPage() {
       <RelatedPages
         links={[
           { to: NINJATRADER_GUIDE_PATH, label: 'NinjaTrader setup guide' },
-          { to: `${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`, label: 'Download bridge ZIP' },
+          { to: `${NINJATRADER_BRIDGE_DOWNLOAD_PATH}#ninjatrader`, label: 'Download bridge' },
           { to: '/integrations/tradier', label: 'Tradier paper + live' },
           { to: '/integrations/schwab', label: 'Schwab OAuth' },
           { to: '/integrations/discord', label: 'Desktop alert capture' },
