@@ -166,6 +166,12 @@ describe('NinjatraderConnectForm', () => {
 
     const testButton = screen.getByRole('button', { name: 'Test connection' })
     expect(testButton).toBeTruthy()
+    expect(testButton.className).toContain('btn-secondary')
+
+    const updateButton = screen.getByRole('button', { name: 'Update NinjaTrader' })
+    expect(
+      updateButton.compareDocumentPosition(testButton) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
 
     fireEvent.click(testButton)
 
