@@ -167,11 +167,19 @@ describe('NinjatraderConnectForm', () => {
     expect(secretInput.type).toBe('password')
   })
 
-  it('shows Test connection when connected and calls onTestConnection', async () => {
-    const onTestConnection = vi.fn(async () => ({
-      success: true,
-      message: 'Connection verified with simulated order',
-    }))
+  it('shows Test connection when connected and saves before testing', async () => {
+    const callOrder: string[] = []
+    const onSubmit = vi.fn(async () => {
+      callOrder.push('submit')
+      return { forwardUrl: 'https://tunnel.example.com/webhook' }
+    })
+    const onTestConnection = vi.fn(async () => {
+      callOrder.push('test')
+      return {
+        success: true,
+        message: 'Connection verified with simulated order',
+      }
+    })
 
     function Wrapper() {
       const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
@@ -180,7 +188,7 @@ describe('NinjatraderConnectForm', () => {
           connected
           initialForwardUrl="https://tunnel.example.com/webhook"
           initialAccountLabel="Sim101"
-          onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+          onSubmit={onSubmit}
           onTestConnection={async () => {
             const result = await onTestConnection()
             setTestResult(result)
@@ -205,10 +213,66 @@ describe('NinjatraderConnectForm', () => {
     fireEvent.click(testButton)
 
     await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1)
       expect(onTestConnection).toHaveBeenCalledTimes(1)
     })
 
+    expect(callOrder).toEqual(['submit', 'test'])
     expect(await screen.findByText('Connection verified with simulated order')).toBeTruthy()
+  })
+
+  it('saves changed forward URL before testing', async () => {
+    const callOrder: string[] = []
+    const onSubmit = vi.fn(async (values) => {
+      callOrder.push('submit')
+      return { forwardUrl: values.forwardUrl }
+    })
+    const onTestConnection = vi.fn(async () => {
+      callOrder.push('test')
+      return { success: true, message: 'ok' }
+    })
+
+    render(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl="https://old.example.com/webhook"
+        initialAccountLabel="Sim101"
+        onSubmit={onSubmit}
+        onTestConnection={onTestConnection}
+      />,
+    )
+
+    fireEvent.change(screen.getByPlaceholderText('https://….trycloudflare.com/webhook'), {
+      target: { value: 'https://new.example.com/webhook' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        forwardUrl: 'https://new.example.com/webhook',
+        bridgeWebhookSecret: '',
+        accountLabel: 'Sim101',
+      })
+      expect(onTestConnection).toHaveBeenCalledTimes(1)
+    })
+
+    expect(callOrder).toEqual(['submit', 'test'])
+  })
+
+  it('disables Test connection when forward URL is empty', () => {
+    render(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl=""
+        initialAccountLabel=""
+        onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+        onTestConnection={vi.fn(async () => ({ success: true, message: 'ok' }))}
+      />,
+    )
+
+    const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
+    expect(testButton.disabled).toBe(true)
+    expect(screen.getByText('Enter a Forward URL to test your connection.')).toBeTruthy()
   })
 
   it('hides Test connection when not connected', () => {
