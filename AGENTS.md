@@ -151,7 +151,7 @@ Underline = thick absolute bar (`height: 1rem`), rotated ±1deg, text on `z-inde
 
 Single-product **TanStack Start** app (React 19 + Vite/Nitro SSR). Package manager is **npm** (`package-lock.json`); do **not** use pnpm even though `package.json` has a `pnpm.onlyBuiltDependencies` block. Standard commands live in `package.json` and `README.md`: `npm run dev` (port 3000), `npm run test` (vitest), `npm run build`, `npm run db:migrate`.
 
-The VM update script runs `npm install`. The app runs with sane local defaults **without a `.env`**: `DATABASE_URL` falls back to `file:./data/trade.db`, the Better Auth secret falls back to a dev default, and **auth migrations run automatically on server startup** (`ensureAuthMigrations()` in `src/lib/auth.server.ts`). A `.env` is only needed to point at a real `trade-receiver`/Turso DB or override secrets.
+The VM update script runs `npm install`. The app runs with sane local defaults **without a `.env`**: `DATABASE_URL` falls back to `file:./data/trade.db`, `BETTER_AUTH_SECRET` falls back to a dev default only for localhost development, and **auth migrations run automatically on server startup** (`ensureAuthMigrations()` in `src/lib/auth.server.ts`). A `.env` is only needed to point at a real `trade-receiver`/Turso DB or override secrets; production and non-localhost `BETTER_AUTH_URL` require `BETTER_AUTH_SECRET`.
 
 Non-obvious gotchas:
 - `npm run db:migrate` (drizzle-kit) fails with `Unable to open connection ... 14` if `./data/` does not exist — run `mkdir -p data` first. The runtime `src/lib/db.ts` auto-creates that dir, but drizzle-kit does not. Because migrations auto-run at server startup, `db:migrate` is optional for dev.

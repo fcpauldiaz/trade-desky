@@ -4,6 +4,10 @@ import { jwt } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 
 import * as authSchema from '#/db/auth-schema'
+import {
+  resolveBetterAuthBaseUrl,
+  resolveBetterAuthSecret,
+} from '#/lib/auth-config'
 import { db } from '#/lib/db'
 import { ensureAuthMigrations } from '#/lib/migrate-auth'
 import { provisionReceiverUser } from '#/lib/provision-receiver'
@@ -11,8 +15,8 @@ import { provisionReceiverUser } from '#/lib/provision-receiver'
 await ensureAuthMigrations()
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
-  secret: process.env.BETTER_AUTH_SECRET ?? 'dev-better-auth-secret-change-in-production',
+  baseURL: resolveBetterAuthBaseUrl(),
+  secret: resolveBetterAuthSecret(),
   database: drizzleAdapter(db, {
     provider: 'sqlite',
     schema: authSchema,
