@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CreateWebhookForm from '#/components/connections/CreateWebhookForm'
 import NinjatraderConnectForm from '#/components/connections/NinjatraderConnectForm'
@@ -59,6 +60,7 @@ describe('NinjatraderConnectForm', () => {
     })
   })
 
+<<<<<<< HEAD
   it('keeps bridge secret after submit and shows success guidance', async () => {
     const onSubmit = vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))
 
@@ -119,10 +121,56 @@ describe('NinjatraderConnectForm', () => {
   it('toggles secret visibility with the eye button', () => {
     render(
       <NinjatraderConnectForm
+=======
+  it('shows Test connection when connected and calls onTestConnection', async () => {
+    const onTestConnection = vi.fn(async () => ({
+      success: true,
+      message: 'Connection verified with simulated order',
+    }))
+
+    function Wrapper() {
+      const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
+      return (
+        <NinjatraderConnectForm
+          connected
+          initialForwardUrl="https://tunnel.example.com/webhook"
+          initialAccountLabel="Sim101"
+          onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+          onTestConnection={async () => {
+            const result = await onTestConnection()
+            setTestResult(result)
+            return result
+          }}
+          testResult={testResult}
+        />
+      )
+    }
+
+    render(<Wrapper />)
+
+    const testButton = screen.getByRole('button', { name: 'Test connection' })
+    expect(testButton).toBeTruthy()
+
+    fireEvent.click(testButton)
+
+    await waitFor(() => {
+      expect(onTestConnection).toHaveBeenCalledTimes(1)
+    })
+
+    expect(await screen.findByText('Connection verified with simulated order')).toBeTruthy()
+  })
+
+  it('hides Test connection when not connected', () => {
+    const onTestConnection = vi.fn(async () => ({ success: true, message: 'ok' }))
+
+    render(
+      <NinjatraderConnectForm
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
         connected={false}
         initialForwardUrl=""
         initialAccountLabel=""
         onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+<<<<<<< HEAD
       />,
     )
 
@@ -134,6 +182,31 @@ describe('NinjatraderConnectForm', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Hide secret' }))
     expect(secretInput.type).toBe('password')
+=======
+        onTestConnection={onTestConnection}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: 'Test connection' })).toBeNull()
+  })
+
+  it('shows disabled reason when test is disabled', () => {
+    render(
+      <NinjatraderConnectForm
+        connected
+        initialForwardUrl="https://tunnel.example.com/webhook"
+        initialAccountLabel=""
+        onSubmit={vi.fn(async () => ({ forwardUrl: 'https://tunnel.example.com/webhook' }))}
+        onTestConnection={vi.fn(async () => ({ success: true, message: 'ok' }))}
+        testDisabled
+        testDisabledReason="An active subscription is required to test broker connections."
+      />,
+    )
+
+    const testButton = screen.getByRole('button', { name: 'Test connection' }) as HTMLButtonElement
+    expect(testButton.disabled).toBe(true)
+    expect(screen.getByText('An active subscription is required to test broker connections.')).toBeTruthy()
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
   })
 })
 

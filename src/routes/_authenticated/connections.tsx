@@ -33,7 +33,7 @@ function ConnectionsPage() {
   const [brokers, setBrokers] = useState<BrokerConnection[]>([])
   const [canTrade, setCanTrade] = useState(false)
   const [defaultBroker, setDefaultBroker] = useState<string | null>(null)
-  const [testMsg, setTestMsg] = useState<Record<string, string>>({})
+  const [testMsg, setTestMsg] = useState<Record<string, { message: string; success: boolean }>>({})
   const [testing, setTesting] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [tradierEnvironment, setTradierEnvironment] = useState<TradierEnvironment>('sandbox')
@@ -146,20 +146,34 @@ function ConnectionsPage() {
     }
   }
 
-  async function testConnection(broker: string) {
+  async function testConnection(broker: string): Promise<{ success: boolean; message: string }> {
     setTesting(broker)
     try {
       const res =
         broker === 'ninjatrader'
           ? await api.testBrokerOrder(broker, DEFAULT_NINJATRADER_TEST_ORDER)
           : await api.testBrokerOrder(broker)
-      setTestMsg((prev) => ({ ...prev, [broker]: res.message }))
+      const result = { success: res.success, message: res.message }
+      setTestMsg((prev) => ({ ...prev, [broker]: result }))
+      return result
     } catch (e) {
-      setTestMsg((prev) => ({ ...prev, [broker]: e instanceof Error ? e.message : 'Test failed' }))
+      const result = {
+        success: false,
+        message: e instanceof Error ? e.message : 'Test failed',
+      }
+      setTestMsg((prev) => ({ ...prev, [broker]: result }))
+      return result
     } finally {
       setTesting(null)
     }
   }
+
+  const ninjatraderTestDisabled = !ninjatraderConnected || !canTrade
+  const ninjatraderTestDisabledReason = !canTrade
+    ? 'An active subscription is required to test broker connections.'
+    : !ninjatraderConnected
+      ? 'Connect NinjaTrader before running a test order.'
+      : undefined
 
   async function setDefault(broker: string) {
     await api.setDefaultBroker(broker)
@@ -271,7 +285,13 @@ function ConnectionsPage() {
                 </div>
               )}
             </div>
-            {testMsg[b.broker] && <p className="mt-2 text-xs text-[var(--sea-ink-soft)]">{testMsg[b.broker]}</p>}
+            {testMsg[b.broker] && (
+              <p
+                className={`mt-2 text-xs ${testMsg[b.broker].success ? 'text-green-700' : 'text-red-600'}`}
+              >
+                {testMsg[b.broker].message}
+              </p>
+            )}
           </li>
         ))}
       </ul>
@@ -338,6 +358,11 @@ function ConnectionsPage() {
               initialForwardUrl={ninjatraderForwardUrl}
               initialAccountLabel={ninjatraderAccountLabel}
               onSubmit={connectNinjatrader}
+              onTestConnection={() => testConnection('ninjatrader')}
+              testDisabled={ninjatraderTestDisabled}
+              testDisabledReason={ninjatraderTestDisabledReason}
+              testLoading={testing === 'ninjatrader'}
+              testResult={testMsg.ninjatrader ?? null}
             />
             <div className="border-t border-[var(--line)] pt-4 space-y-3">
               <h3 className="text-sm font-semibold">Inbound JSON webhooks</h3>

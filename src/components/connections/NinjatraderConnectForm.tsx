@@ -1,5 +1,8 @@
 import { useForm } from '@tanstack/react-form'
+<<<<<<< HEAD
 import { Eye, EyeOff } from 'lucide-react'
+=======
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
 import { useEffect, useState } from 'react'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import { optionalHttpsUrl } from '#/lib/connection-form-validators'
@@ -11,13 +14,25 @@ export type NinjatraderConnectFormValues = {
   accountLabel: string
 }
 
+<<<<<<< HEAD
 type SaveOutcome = 'connected' | 'updated'
+=======
+type TestConnectionResult = {
+  success: boolean
+  message: string
+}
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
 
 type NinjatraderConnectFormProps = {
   connected: boolean
   initialForwardUrl: string
   initialAccountLabel: string
   onSubmit: (values: NinjatraderConnectFormValues) => Promise<{ forwardUrl: string }>
+  onTestConnection?: () => Promise<TestConnectionResult>
+  testDisabled?: boolean
+  testDisabledReason?: string
+  testLoading?: boolean
+  testResult?: TestConnectionResult | null
 }
 
 export default function NinjatraderConnectForm({
@@ -25,9 +40,18 @@ export default function NinjatraderConnectForm({
   initialForwardUrl,
   initialAccountLabel,
   onSubmit,
+  onTestConnection,
+  testDisabled = false,
+  testDisabledReason,
+  testLoading = false,
+  testResult = null,
 }: NinjatraderConnectFormProps) {
+<<<<<<< HEAD
   const [secretVisible, setSecretVisible] = useState(false)
   const [saveOutcome, setSaveOutcome] = useState<SaveOutcome | null>(null)
+=======
+  const [justSaved, setJustSaved] = useState(false)
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
 
   const form = useForm({
     defaultValues: {
@@ -43,7 +67,12 @@ export default function NinjatraderConnectForm({
         accountLabel: value.accountLabel,
       })
       form.setFieldValue('forwardUrl', result.forwardUrl)
+<<<<<<< HEAD
       setSaveOutcome(wasConnected ? 'updated' : 'connected')
+=======
+      form.setFieldValue('bridgeWebhookSecret', '')
+      setJustSaved(true)
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
     },
   })
 
@@ -51,6 +80,9 @@ export default function NinjatraderConnectForm({
     form.setFieldValue('forwardUrl', initialForwardUrl)
     form.setFieldValue('accountLabel', initialAccountLabel)
   }, [form, initialAccountLabel, initialForwardUrl])
+
+  const showTestConnection = connected && onTestConnection
+  const testButtonDisabled = testDisabled || testLoading
 
   return (
     <form
@@ -61,6 +93,7 @@ export default function NinjatraderConnectForm({
       }}
       className="space-y-3"
     >
+<<<<<<< HEAD
       {saveOutcome && (
         <div className="feature-item space-y-2 p-3 text-sm">
           <p className="font-semibold">
@@ -84,6 +117,14 @@ export default function NinjatraderConnectForm({
             <a href={NINJATRADER_GUIDE_PATH} className="underline">
               Full setup guide
             </a>
+=======
+      {justSaved && connected && (
+        <div className="feature-item border-green-600 bg-green-50 p-3 text-sm">
+          <p className="font-semibold text-green-900">NinjaTrader connection saved</p>
+          <p className="mt-1 text-green-800">
+            Click <strong>Test connection</strong> below to verify your bridge reaches NinjaTrader on
+            Sim101 before routing live alerts.
+>>>>>>> b46fc26 (feat(connections): add prominent NinjaTrader Test connection button)
           </p>
         </div>
       )}
@@ -183,6 +224,30 @@ export default function NinjatraderConnectForm({
           </button>
         )}
       </form.Subscribe>
+
+      {showTestConnection && (
+        <div className="space-y-2 border-t border-[var(--line)] pt-4">
+          <button
+            type="button"
+            disabled={testButtonDisabled}
+            onClick={() => void onTestConnection()}
+            className="btn-primary text-sm disabled:opacity-50"
+          >
+            {testLoading ? 'Testing…' : 'Test connection'}
+          </button>
+          {testDisabled && testDisabledReason && (
+            <p className="text-xs text-[var(--sea-ink-soft)]">{testDisabledReason}</p>
+          )}
+          {testResult && (
+            <p
+              className={`text-sm ${testResult.success ? 'text-green-700' : 'text-red-600'}`}
+              role="status"
+            >
+              {testResult.message}
+            </p>
+          )}
+        </div>
+      )}
     </form>
   )
 }
