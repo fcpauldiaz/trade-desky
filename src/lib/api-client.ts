@@ -94,7 +94,7 @@ export type TestOrderRequest = {
 }
 
 export const DEFAULT_NINJATRADER_TEST_ORDER: TestOrderRequest = {
-  symbol: 'ES',
+  symbol: 'ES1!',
   quantity: 1,
   action: 'BUY',
   dry_run: true,

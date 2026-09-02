@@ -5,7 +5,7 @@ import { DEFAULT_NINJATRADER_TEST_ORDER } from '#/lib/api-client'
 describe('DEFAULT_NINJATRADER_TEST_ORDER', () => {
   it('targets futures with a dry-run test order', () => {
     expect(DEFAULT_NINJATRADER_TEST_ORDER).toEqual({
-      symbol: 'ES',
+      symbol: 'ES1!',
       quantity: 1,
       action: 'BUY',
       dry_run: true,

@@ -153,7 +153,7 @@ python main.py`}
             <li>Optionally add the bridge webhook secret and an account label.</li>
             <li>Click <strong>Connect NinjaTrader</strong>.</li>
             <li>Set NinjaTrader as <strong>default</strong> if futures should route there.</li>
-            <li>Run <strong>Test</strong> — uses a dry-run ES order while in paper mode.</li>
+            <li>Run <strong>Test</strong> — uses a dry-run ES1! order while in paper mode.</li>
           </ol>
           <GuideFigure
             src={NINJATRADER_GUIDE_IMAGES.connections}
