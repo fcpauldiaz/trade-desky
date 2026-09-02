@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import FieldHelpDialog from '#/components/FieldHelpDialog'
 import { optionalHttpsUrl } from '#/lib/connection-form-validators'
 import { NINJATRADER_GUIDE_PATH } from '#/lib/guides'
@@ -43,6 +43,8 @@ export default function NinjatraderConnectForm({
 }: NinjatraderConnectFormProps) {
   const [secretVisible, setSecretVisible] = useState(false)
   const [saveOutcome, setSaveOutcome] = useState<SaveOutcome | null>(null)
+  const [testSaving, setTestSaving] = useState(false)
+  const testActionInFlight = useRef(false)
 
   const form = useForm({
     defaultValues: {
@@ -68,7 +70,35 @@ export default function NinjatraderConnectForm({
   }, [form, initialAccountLabel, initialForwardUrl])
 
   const showTestConnection = connected && onTestConnection
-  const testButtonDisabled = testDisabled || testLoading
+
+  async function handleTestConnection() {
+    if (
+      testActionInFlight.current ||
+      testDisabled ||
+      testLoading ||
+      testSaving ||
+      !onTestConnection
+    ) {
+      return
+    }
+
+    const forwardUrl = form.state.values.forwardUrl.trim()
+    if (!forwardUrl) {
+      return
+    }
+
+    testActionInFlight.current = true
+    setTestSaving(true)
+    try {
+      await form.handleSubmit()
+      await onTestConnection()
+    } catch {
+      // Validation or save/test errors surface via form state or testResult
+    } finally {
+      testActionInFlight.current = false
+      setTestSaving(false)
+    }
+  }
 
   return (
     <form
@@ -191,33 +221,59 @@ export default function NinjatraderConnectForm({
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <form.Subscribe
-            selector={(state) => [state.isSubmitting, state.values.forwardUrl, state.canSubmit] as const}
+            selector={(state) =>
+              [state.isSubmitting, state.values.forwardUrl, state.canSubmit] as const
+            }
           >
-            {([isSubmitting, forwardUrl, canSubmit]) => (
-              <button
-                type="submit"
-                disabled={!forwardUrl.trim() || !canSubmit || isSubmitting}
-                className="btn-primary text-sm disabled:opacity-50"
-              >
-                {isSubmitting ? 'Saving…' : connected ? 'Update NinjaTrader' : 'Connect NinjaTrader'}
-              </button>
-            )}
-          </form.Subscribe>
+            {([isSubmitting, forwardUrl, canSubmit]) => {
+              const testFlowBusy = testSaving || testLoading
+              const forwardUrlMissing = !forwardUrl.trim()
+              const testButtonDisabled =
+                testDisabled || testFlowBusy || forwardUrlMissing || isSubmitting
 
-          {showTestConnection && (
-            <button
-              type="button"
-              disabled={testButtonDisabled}
-              onClick={() => void onTestConnection()}
-              className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-50"
-            >
-              {testLoading ? 'Testing…' : 'Test connection'}
-            </button>
-          )}
+              return (
+                <>
+                  <button
+                    type="submit"
+                    disabled={forwardUrlMissing || !canSubmit || isSubmitting || testFlowBusy}
+                    className="btn-primary text-sm disabled:opacity-50"
+                  >
+                    {isSubmitting
+                      ? 'Saving…'
+                      : connected
+                        ? 'Update NinjaTrader'
+                        : 'Connect NinjaTrader'}
+                  </button>
+
+                  {showTestConnection && (
+                    <button
+                      type="button"
+                      disabled={testButtonDisabled}
+                      onClick={() => void handleTestConnection()}
+                      className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-50"
+                    >
+                      {testSaving ? 'Saving…' : testLoading ? 'Testing…' : 'Test connection'}
+                    </button>
+                  )}
+                </>
+              )
+            }}
+          </form.Subscribe>
         </div>
 
         {showTestConnection && testDisabled && testDisabledReason && (
           <p className="text-xs text-[var(--sea-ink-soft)]">{testDisabledReason}</p>
+        )}
+        {showTestConnection && (
+          <form.Subscribe selector={(state) => state.values.forwardUrl}>
+            {(forwardUrl) =>
+              !forwardUrl.trim() && !testDisabled ? (
+                <p className="text-xs text-[var(--sea-ink-soft)]">
+                  Enter a Forward URL to test your connection.
+                </p>
+              ) : null
+            }
+          </form.Subscribe>
         )}
         {showTestConnection && testResult && (
           <p
