@@ -10,6 +10,7 @@ import { breadcrumbJsonLd } from '#/lib/json-ld'
 import {
   NINJATRADER_BRIDGE_GUIDE_PATH,
   NINJATRADER_BRIDGE_NAME,
+  NINJATRADER_BRIDGE_VERSION_LABEL,
   NINJATRADER_BRIDGE_WIN_ASSET_PATH,
   NINJATRADER_BRIDGE_ZIP_PATH,
 } from '#/lib/ninjatrader-bridge'
@@ -67,7 +68,9 @@ function DownloadPage() {
         <article className="download-product-card" id="ninjatrader">
           <div className="download-product-card-top">
             <span className="section-badge section-badge-yellow">Futures</span>
-            <p className="download-product-platforms">Windows · NT8</p>
+            <p className="download-product-platforms">
+              Windows · NT8 · {NINJATRADER_BRIDGE_VERSION_LABEL}
+            </p>
           </div>
           <div className="download-product-logo-wrap">
             <img
