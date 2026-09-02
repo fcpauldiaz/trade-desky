@@ -107,29 +107,27 @@ function AlertsPage() {
           Today
         </button>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
         {FILTERS.map(({ id, label }) => {
           const active = filter === id
           return (
             <button
               key={id}
               type="button"
-              className={active ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+              className={`shrink-0 ${active ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}`}
               onClick={() => setFilter(id)}
             >
               {label} ({counts[id]})
             </button>
           )
         })}
-      </div>
-      <div className="flex flex-wrap gap-2">
         {SOURCE_FILTERS.map(({ id, label }) => {
           const active = sourceFilter === id
           return (
             <button
-              key={id}
+              key={`source-${id}`}
               type="button"
-              className={active ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+              className={`shrink-0 ${active ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}`}
               onClick={() => setSourceFilter(id)}
             >
               {label} ({sourceCounts[id]})
