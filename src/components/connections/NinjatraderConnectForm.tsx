@@ -188,43 +188,46 @@ export default function NinjatraderConnectForm({
         )}
       </form.Field>
 
-      <form.Subscribe
-        selector={(state) => [state.isSubmitting, state.values.forwardUrl, state.canSubmit] as const}
-      >
-        {([isSubmitting, forwardUrl, canSubmit]) => (
-          <button
-            type="submit"
-            disabled={!forwardUrl.trim() || !canSubmit || isSubmitting}
-            className="btn-primary text-sm disabled:opacity-50"
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <form.Subscribe
+            selector={(state) => [state.isSubmitting, state.values.forwardUrl, state.canSubmit] as const}
           >
-            {isSubmitting ? 'Saving…' : connected ? 'Update NinjaTrader' : 'Connect NinjaTrader'}
-          </button>
-        )}
-      </form.Subscribe>
+            {([isSubmitting, forwardUrl, canSubmit]) => (
+              <button
+                type="submit"
+                disabled={!forwardUrl.trim() || !canSubmit || isSubmitting}
+                className="btn-primary text-sm disabled:opacity-50"
+              >
+                {isSubmitting ? 'Saving…' : connected ? 'Update NinjaTrader' : 'Connect NinjaTrader'}
+              </button>
+            )}
+          </form.Subscribe>
 
-      {showTestConnection && (
-        <div className="space-y-2 border-t border-[var(--line)] pt-4">
-          <button
-            type="button"
-            disabled={testButtonDisabled}
-            onClick={() => void onTestConnection()}
-            className="btn-primary text-sm disabled:opacity-50"
-          >
-            {testLoading ? 'Testing…' : 'Test connection'}
-          </button>
-          {testDisabled && testDisabledReason && (
-            <p className="text-xs text-[var(--sea-ink-soft)]">{testDisabledReason}</p>
-          )}
-          {testResult && (
-            <p
-              className={`text-sm ${testResult.success ? 'text-green-700' : 'text-red-600'}`}
-              role="status"
+          {showTestConnection && (
+            <button
+              type="button"
+              disabled={testButtonDisabled}
+              onClick={() => void onTestConnection()}
+              className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-50"
             >
-              {testResult.message}
-            </p>
+              {testLoading ? 'Testing…' : 'Test connection'}
+            </button>
           )}
         </div>
-      )}
+
+        {showTestConnection && testDisabled && testDisabledReason && (
+          <p className="text-xs text-[var(--sea-ink-soft)]">{testDisabledReason}</p>
+        )}
+        {showTestConnection && testResult && (
+          <p
+            className={`text-sm ${testResult.success ? 'text-green-700' : 'text-red-600'}`}
+            role="status"
+          >
+            {testResult.message}
+          </p>
+        )}
+      </div>
     </form>
   )
 }
