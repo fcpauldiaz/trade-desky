@@ -378,6 +378,30 @@ describe('NinjatraderDevicePairing', () => {
     expect(screen.getByDisplayValue('wss://api.example.com/v1/devices/ws')).toBeTruthy()
     expect(screen.getByDisplayValue('dev_123')).toBeTruthy()
     expect(screen.getByDisplayValue(/"device_token": "ntd_secret_token"/)).toBeTruthy()
+    expect(screen.getByText(/receiver adds the token to the URL automatically/i)).toBeTruthy()
+    expect(screen.queryByText(/\?token=/i)).toBeNull()
+  })
+
+  it('shows base WebSocket URL when pair API includes a token query param', () => {
+    render(
+      <NinjatraderDevicePairing
+        devices={[]}
+        pairedDevice={{
+          device_id: 'dev_123',
+          device_token: 'ntd_secret_token',
+          ws_url: 'wss://api.example.com/v1/devices/ws?token=ntd_secret_token',
+          name: 'Office PC',
+        }}
+        pairing={false}
+        revokingId={null}
+        onPair={vi.fn(async () => {})}
+        onRevoke={vi.fn(async () => {})}
+      />,
+    )
+
+    expect(screen.getByDisplayValue('wss://api.example.com/v1/devices/ws')).toBeTruthy()
+    expect(screen.queryByDisplayValue(/token=ntd_secret_token/)).toBeNull()
+    expect(screen.getByDisplayValue(/"ws_url": "wss:\/\/api.example.com\/v1\/devices\/ws"/)).toBeTruthy()
   })
 
   it('lists paired devices with online status and revoke action', async () => {

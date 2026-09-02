@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import CopyButton from '#/components/CopyButton'
 import type { PairedDevice, UserDevice } from '#/lib/api-client'
+import { baseDeviceWsUrl } from '#/lib/device-pairing'
 
 export type NinjatraderDevicePairingProps = {
   devices: UserDevice[]
@@ -23,12 +24,12 @@ function formatTimestamp(value: string | null) {
   return date.toLocaleString()
 }
 
-function agentConfigSnippet(paired: PairedDevice) {
+function agentConfigSnippet(paired: PairedDevice, wsUrl: string) {
   return JSON.stringify(
     {
       agent: {
         device_token: paired.device_token,
-        ws_url: paired.ws_url,
+        ws_url: wsUrl,
       },
     },
     null,
@@ -55,6 +56,7 @@ export default function NinjatraderDevicePairing({
   })
 
   const activeDevices = devices.filter((device) => !device.revoked)
+  const pairedWsUrl = pairedDevice ? baseDeviceWsUrl(pairedDevice.ws_url) : ''
 
   return (
     <div className="space-y-4">
@@ -112,11 +114,12 @@ export default function NinjatraderDevicePairing({
             Save this device token now — it is only shown once.
           </p>
           <ol className="list-decimal space-y-1 pl-4 text-xs text-[var(--sea-ink-soft)]">
-            <li>Copy the device token and WebSocket URL below.</li>
+            <li>Copy the device token and WebSocket URL below (two separate values).</li>
             <li>
-              Paste them into the receiver installer/setup or your{' '}
+              Paste them into the receiver installer or your{' '}
               <code className="text-xs">config.json</code> <code className="text-xs">agent</code>{' '}
-              section.
+              section — one field for each. The receiver adds the token to the URL automatically; do
+              not append anything to the WebSocket URL.
             </li>
             <li>Start the Windows receiver — it connects outbound to Trade Desky.</li>
             <li>Use Test connection below once the device shows online.</li>
@@ -142,12 +145,12 @@ export default function NinjatraderDevicePairing({
                 type="text"
                 readOnly
                 className="demo-input flex-1 font-mono text-xs"
-                value={pairedDevice.ws_url}
+                value={pairedWsUrl}
               />
-              <CopyButton value={pairedDevice.ws_url} />
+              <CopyButton value={pairedWsUrl} />
             </div>
             <p className="mt-1 text-xs text-[var(--sea-ink-soft)]">
-              Append <code>?token=</code> plus your device token when connecting.
+              Paste this URL as-is. The Windows receiver appends your device token automatically.
             </p>
           </label>
 
@@ -171,9 +174,9 @@ export default function NinjatraderDevicePairing({
                 readOnly
                 rows={6}
                 className="demo-input flex-1 font-mono text-xs"
-                value={agentConfigSnippet(pairedDevice)}
+                value={agentConfigSnippet(pairedDevice, pairedWsUrl)}
               />
-              <CopyButton value={agentConfigSnippet(pairedDevice)} />
+              <CopyButton value={agentConfigSnippet(pairedDevice, pairedWsUrl)} />
             </div>
           </label>
         </div>
