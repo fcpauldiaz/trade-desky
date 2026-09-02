@@ -15,7 +15,7 @@
     "preview": "NODE_OPTIONS='--import ./instrument.server.mjs' vite preview",
     "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
     "test": "vitest run",
-    "test:server-runtime": "vitest run src/lib/server-runtime-deps.test.ts",
+    "test:server-runtime": "node scripts/verify-server-runtime.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
