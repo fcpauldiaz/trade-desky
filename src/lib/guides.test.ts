@@ -19,12 +19,16 @@ describe('guides', () => {
     expect(NINJATRADER_GUIDE_IMAGES.architecture).toMatch(/\.svg$/)
   })
 
-  it('links bridge downloads to hosted desktop assets', () => {
+  it('links bridge downloads to trade-receiver desktop assets', () => {
+    const receiverDesktop = 'https://trade-receiver.chapilabs.com/desktop'
     expect(NINJATRADER_BRIDGE_WIN_ASSET_PATH).toBe(
-      '/desktop/TradeDeskyNinjaTraderReceiver-setup.exe',
+      `${receiverDesktop}/TradeDeskyNinjaTraderReceiver-setup.exe`,
     )
-    expect(NINJATRADER_BRIDGE_ZIP_PATH).toBe('/desktop/TradeDeskyNinjaTraderReceiver-win.zip')
+    expect(NINJATRADER_BRIDGE_ZIP_PATH).toBe(
+      `${receiverDesktop}/TradeDeskyNinjaTraderReceiver-win.zip`,
+    )
     for (const url of [NINJATRADER_BRIDGE_WIN_ASSET_PATH, NINJATRADER_BRIDGE_ZIP_PATH]) {
+      expect(url.startsWith(`${receiverDesktop}/`)).toBe(true)
       expect(url.includes('github.com')).toBe(false)
     }
   })
