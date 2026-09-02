@@ -21,7 +21,7 @@ Active options traders who follow Discord alert channels and want automated exec
 | Route | Purpose |
 |-------|---------|
 | `/` | Marketing |
-| `/pricing` | Creem checkout |
+| `/pricing` | Pro plan (invite-only) |
 | `/dashboard` | Performance |
 | `/connections` | Broker OAuth |
 | `/settings` | Paper/live, caps, tickers |

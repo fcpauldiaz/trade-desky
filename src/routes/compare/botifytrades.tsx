@@ -36,7 +36,7 @@ function CompareBotifyPage() {
       <SeoSection title="Cost">
         <p className="text-sm">
           BotifyTrades itself is not a {PRO_PRICE_LABEL}/mo SaaS bill; you pay infrastructure and
-          time. Trade Desky is {PRO_PRICE_LABEL}/mo via Creem. See{' '}
+          time. Trade Desky is {PRO_PRICE_LABEL}/mo (invite-only). See{' '}
           <Link className="underline" to="/pricing">
             pricing
           </Link>

@@ -59,7 +59,7 @@ export const LLMS_SECTIONS: readonly LlmsSection[] = [
       {
         path: '/pricing',
         title: 'Pricing',
-        summary: `Pro is ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr. Cancel anytime via Creem.`,
+        summary: `Pro reference rates are ${PRO_PRICE_LABEL}/mo or ${PRO_YEARLY_PRICE_LABEL}/yr. Access is invite-only.`,
       },
       {
         path: '/download',

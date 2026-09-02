@@ -21,7 +21,7 @@ export const HOME_FAQ: readonly FaqItem[] = [
   },
   {
     q: 'Can I cancel anytime?',
-    a: 'Yes. Manage billing from your account. When a subscription lapses, automated execution stops until you resubscribe.',
+    a: 'Yes. Manage billing from your account. When Pro access lapses, automated execution stops until it is restored.',
   },
 ]
 

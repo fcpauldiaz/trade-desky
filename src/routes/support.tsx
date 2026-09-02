@@ -41,7 +41,7 @@ function SupportPage() {
             <Link to="/connections">Broker connections</Link> — Tradier API token or OAuth, Schwab OAuth
           </li>
           <li>
-            <Link to="/billing">Billing</Link> — subscribe, cancel, or open the Creem customer portal
+            <Link to="/billing">Billing</Link> — view subscription status or request Pro access
           </li>
           <li>
             <Link to="/refund">Refunds</Link> — how cancellations and refund requests work
