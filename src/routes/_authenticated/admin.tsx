@@ -7,12 +7,13 @@ export const Route = createFileRoute('/_authenticated/admin')({
 })
 
 const NAV: Array<{
-  to: '/admin' | '/admin/ai-evaluations' | '/admin/users' | '/admin/alerts'
+  to: '/admin' | '/admin/ai-evaluations' | '/admin/agents' | '/admin/users' | '/admin/alerts'
   label: string
   exact?: boolean
 }> = [
   { to: '/admin', label: 'Overview', exact: true },
   { to: '/admin/ai-evaluations', label: 'AI evaluations' },
+  { to: '/admin/agents', label: 'Agents' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/alerts', label: 'Alerts' },
 ]

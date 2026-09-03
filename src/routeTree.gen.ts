@@ -49,6 +49,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminAlertsRouteImport } from './routes/_authenticated/admin/alerts'
 import { Route as AuthenticatedAdminAiEvaluationsRouteImport } from './routes/_authenticated/admin/ai-evaluations'
+import { Route as AuthenticatedAdminAgentsRouteImport } from './routes/_authenticated/admin/agents'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -253,6 +254,12 @@ const AuthenticatedAdminAiEvaluationsRoute =
     path: '/ai-evaluations',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAgentsRoute =
+  AuthenticatedAdminAgentsRouteImport.update({
+    id: '/agents',
+    path: '/agents',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/integrations/tradier': typeof IntegrationsTradierRoute
   '/compare/': typeof CompareIndexRoute
   '/integrations/': typeof IntegrationsIndexRoute
+  '/admin/agents': typeof AuthenticatedAdminAgentsRoute
   '/admin/ai-evaluations': typeof AuthenticatedAdminAiEvaluationsRoute
   '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -328,6 +336,7 @@ export interface FileRoutesByTo {
   '/integrations/tradier': typeof IntegrationsTradierRoute
   '/compare': typeof CompareIndexRoute
   '/integrations': typeof IntegrationsIndexRoute
+  '/admin/agents': typeof AuthenticatedAdminAgentsRoute
   '/admin/ai-evaluations': typeof AuthenticatedAdminAiEvaluationsRoute
   '/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -371,6 +380,7 @@ export interface FileRoutesById {
   '/integrations/tradier': typeof IntegrationsTradierRoute
   '/compare/': typeof CompareIndexRoute
   '/integrations/': typeof IntegrationsIndexRoute
+  '/_authenticated/admin/agents': typeof AuthenticatedAdminAgentsRoute
   '/_authenticated/admin/ai-evaluations': typeof AuthenticatedAdminAiEvaluationsRoute
   '/_authenticated/admin/alerts': typeof AuthenticatedAdminAlertsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -414,6 +424,7 @@ export interface FileRouteTypes {
     | '/integrations/tradier'
     | '/compare/'
     | '/integrations/'
+    | '/admin/agents'
     | '/admin/ai-evaluations'
     | '/admin/alerts'
     | '/admin/users'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/integrations/tradier'
     | '/compare'
     | '/integrations'
+    | '/admin/agents'
     | '/admin/ai-evaluations'
     | '/admin/alerts'
     | '/admin/users'
@@ -496,6 +508,7 @@ export interface FileRouteTypes {
     | '/integrations/tradier'
     | '/compare/'
     | '/integrations/'
+    | '/_authenticated/admin/agents'
     | '/_authenticated/admin/ai-evaluations'
     | '/_authenticated/admin/alerts'
     | '/_authenticated/admin/users'
@@ -818,10 +831,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAiEvaluationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/agents': {
+      id: '/_authenticated/admin/agents'
+      path: '/agents'
+      fullPath: '/admin/agents'
+      preLoaderRoute: typeof AuthenticatedAdminAgentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAgentsRoute: typeof AuthenticatedAdminAgentsRoute
   AuthenticatedAdminAiEvaluationsRoute: typeof AuthenticatedAdminAiEvaluationsRoute
   AuthenticatedAdminAlertsRoute: typeof AuthenticatedAdminAlertsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -829,6 +850,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAgentsRoute: AuthenticatedAdminAgentsRoute,
   AuthenticatedAdminAiEvaluationsRoute: AuthenticatedAdminAiEvaluationsRoute,
   AuthenticatedAdminAlertsRoute: AuthenticatedAdminAlertsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,

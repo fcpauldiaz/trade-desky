@@ -186,6 +186,30 @@ export type AdminAlertAudit = {
   title?: string
 }
 
+export type AdminAgentKey = 'parse' | 'filter'
+
+export type AdminAgentConfig = {
+  agent_key: AdminAgentKey
+  model: string
+  system_prompt: string
+  user_prompt_template: string
+  model_overridden: boolean
+  system_prompt_overridden: boolean
+  user_prompt_template_overridden: boolean
+  default_model: string
+  default_system_prompt: string
+  default_user_prompt_template: string
+  updated_at: string | null
+  updated_by: string | null
+}
+
+export type AdminAgentUpdate = {
+  model?: string | null
+  system_prompt?: string | null
+  user_prompt_template?: string | null
+  reset?: boolean
+}
+
 export const DEFAULT_NINJATRADER_TEST_ORDER: TestOrderRequest = {
   symbol: 'ES1!',
   quantity: 1,
@@ -362,4 +386,10 @@ export const api = {
     const query = qs.toString()
     return apiFetch<AdminAlertAudit[]>(`/v1/admin/alerts${query ? `?${query}` : ''}`)
   },
+  adminAgents: () => apiFetch<AdminAgentConfig[]>('/v1/admin/agents'),
+  adminUpdateAgent: (agentKey: AdminAgentKey, body: AdminAgentUpdate) =>
+    apiFetch<AdminAgentConfig>(`/v1/admin/agents/${encodeURIComponent(agentKey)}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
 }
