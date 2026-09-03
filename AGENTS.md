@@ -139,7 +139,7 @@ Underline = thick absolute bar (`height: 1rem`), rotated ±1deg, text on `z-inde
 
 ### Auth & data (not visual)
 
-- Better Auth + shared Turso DB with trade-receiver
+- Better Auth + shared PostgreSQL 18 DB with trade-receiver
 - Desktop ingest via device token; no per-user webhook URLs
 - Receiver API client: `src/lib/api-client.ts`
 
@@ -149,11 +149,11 @@ Underline = thick absolute bar (`height: 1rem`), rotated ±1deg, text on `z-inde
 
 ## Cursor Cloud specific instructions
 
-Single-product **TanStack Start** app (React 19 + Vite/Nitro SSR). Package manager is **npm** (`package-lock.json`); do **not** use pnpm even though `package.json` has a `pnpm.onlyBuiltDependencies` block. Standard commands live in `package.json` and `README.md`: `npm run dev` (port 3000), `npm run test` (vitest), `npm run build`, `npm run db:migrate`.
+Single-product **TanStack Start** app (React 19 + Vite/Nitro SSR). Package manager is **npm** (`package-lock.json`); do **not** use pnpm even though `package.json` has a `pnpm.onlyBuiltDependencies` block. Standard commands live in `package.json` and `README.md`: `npm run dev` (port 3000), `npm run test` (vitest), `npm run build`.
 
-The VM update script runs `npm install`. The app runs with sane local defaults **without a `.env`**: `DATABASE_URL` falls back to `file:./data/trade.db`, `BETTER_AUTH_SECRET` falls back to a dev default only for localhost development, and **auth migrations run automatically on server startup** (`ensureAuthMigrations()` in `src/lib/auth.server.ts`). A `.env` is only needed to point at a real `trade-receiver`/Turso DB or override secrets; production and non-localhost `BETTER_AUTH_URL` require `BETTER_AUTH_SECRET`.
+The VM update script runs `npm install`. The app runs with sane local defaults **without a `.env`**: `DATABASE_URL` falls back to `postgresql://trade:trade@localhost:5432/trade`, `BETTER_AUTH_SECRET` falls back to a dev default only for localhost development. Auth tables are created by **trade-receiver Alembic** on startup, not by this app. A `.env` is only needed to point at a deployed `trade-receiver`/Postgres or override secrets; production and non-localhost `BETTER_AUTH_URL` require `BETTER_AUTH_SECRET`.
 
 Non-obvious gotchas:
-- `npm run db:migrate` (drizzle-kit) fails with `Unable to open connection ... 14` if `./data/` does not exist — run `mkdir -p data` first. The runtime `src/lib/db.ts` auto-creates that dir, but drizzle-kit does not. Because migrations auto-run at server startup, `db:migrate` is optional for dev.
+- Local Postgres is started from the trade-receiver repo: `docker compose up -d db`.
 - Authenticated features depend on the **external `trade-receiver` API on port 8000** (separate repo `github.com/fcpauldiaz/trade-receiver`, not in this repo). Without it: marketing pages work; **signup returns 500 because the Better Auth `user.create.after` provision hook (`src/lib/provision-receiver.ts`) can't reach the receiver — note the user row is still persisted before the hook throws**; dashboard/billing/trades calls fail gracefully with inline error text; social proof hides. To exercise the full signup + dashboard flow without the real receiver, run a small local stub that returns `200` for `POST /v1/internal/provision` and JSON for the `/v1/me*`, `/v1/reviews`, and `/v1/stats/public` read endpoints on port 8000.
 - `npm run test` prints a harmless Vitest 4 teardown warning (`module is not defined` / `close timed out`) after `Tests ... passed`; exit code is still 0.

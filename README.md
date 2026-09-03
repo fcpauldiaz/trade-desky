@@ -8,15 +8,16 @@ TanStack Start marketing site and logged-in app for broker connections, desktop 
 cd trade-desky
 cp .env.example .env
 npm install
-npm run db:migrate
 npm run dev
 ```
 
-Also run [trade-receiver](https://github.com/fcpauldiaz/trade-receiver) on port 8000. Use the **same `DATABASE_URL`** (and `TURSO_AUTH_TOKEN` when remote) on both services. Set `VITE_RECEIVER_API_URL` and matching `INTERNAL_API_SECRET` on both services.
+Also run [trade-receiver](https://github.com/fcpauldiaz/trade-receiver) on port 8000 with local Postgres (`docker compose up -d db` in that repo). Use the **same `DATABASE_URL`** on both services. Set `VITE_RECEIVER_API_URL` and matching `INTERNAL_API_SECRET` on both services.
+
+Alembic in trade-receiver owns the schema, including Better Auth tables. Do not run Drizzle migrate against production.
 
 ## Auth
 
-Sign up and log in use **Better Auth** (email + password). Auth lives in the **same libSQL `users` table** as trade-receiver (plus `session` / `account` / `jwks`). On signup, the platform ensures a receiver subscription row via `POST /v1/internal/provision`.
+Sign up and log in use **Better Auth** (email + password). Auth lives in the **same PostgreSQL `users` table** as trade-receiver (plus `session` / `account` / `jwks`). On signup, the platform ensures a receiver subscription row via `POST /v1/internal/provision`.
 
 API calls to trade-receiver use a **Better Auth JWT** (`Authorization: Bearer …`), not cookies.
 
@@ -28,13 +29,12 @@ Desktop apps sign in via `POST /api/desktop/auth` and receive a device API key +
 |----------|---------|
 | `BETTER_AUTH_SECRET` | Session signing (32+ chars) |
 | `BETTER_AUTH_URL` | Public platform URL |
-| `DATABASE_URL` | Same libSQL DB as trade-receiver |
-| `TURSO_AUTH_TOKEN` | Required when `DATABASE_URL` is `libsql://…` |
+| `DATABASE_URL` | Same PostgreSQL DB as trade-receiver |
 | `INTERNAL_API_SECRET` | Must match receiver — provisions users on signup |
 | `VITE_RECEIVER_API_URL` | trade-receiver API base |
 | `SENTRY_DSN` | Boop/Sentry DSN as `key@domain` — server runtime + Docker build arg for client (tunneled via same-origin route) |
 
-Auth migrations run automatically on server startup. To apply them manually: `npm run db:migrate`.
+Schema migrations run in trade-receiver (Alembic) on startup.
 
 ## Routes
 
@@ -75,13 +75,12 @@ Use the repo **Dockerfile** — do not use Nixpacks (it pins Node 22.11, which i
 |----------|---------|
 | `BETTER_AUTH_SECRET` | 32+ char secret |
 | `BETTER_AUTH_URL` | `https://app.yourdomain.com` |
-| `DATABASE_URL` | `libsql://your-db-org.turso.io` (same as trade-receiver) |
-| `TURSO_AUTH_TOKEN` | Turso auth token (same as trade-receiver) |
+| `DATABASE_URL` | `postgresql://…` (same as trade-receiver) |
 | `INTERNAL_API_SECRET` | same as trade-receiver |
 | `RECEIVER_API_URL` | trade-receiver URL (server-side provisioning) |
 | `PORT` | `3000` |
 
-No separate auth database volume is required when using Turso. For local dev, point `DATABASE_URL` at the receiver SQLite file (see `.env.example`).
+Both apps share one PostgreSQL 18 database. For local dev, start Postgres from trade-receiver (`docker compose up -d db`) and point `DATABASE_URL` at `postgresql://trade:trade@localhost:5432/trade`.
 
 ## Tests & CI
 

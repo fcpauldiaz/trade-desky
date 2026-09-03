@@ -84,7 +84,7 @@ function PrivacyPage() {
       <h2>4. Processors and sharing</h2>
       <p>We share data only as needed to run the product:</p>
       <ul>
-        <li>Infrastructure and database hosting (including Turso / libSQL and the server that runs the API)</li>
+        <li>Infrastructure and database hosting (including PostgreSQL and the server that runs the API)</li>
         <li>Tradier and Charles Schwab, after you connect them, to authorize and place orders</li>
         <li>The AI inference provider configured for parsing</li>
         <li>Authorities if the law requires it</li>

@@ -1,31 +1,42 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveLibsqlConfig } from '#/lib/database-url'
+import { resolveDatabaseUrl } from '#/lib/database-url'
 
-describe('resolveLibsqlConfig', () => {
-  it('maps receiver sqlite URL to libsql file URL', () => {
-    expect(resolveLibsqlConfig('sqlite:///./data/trade.db')).toEqual({
-      url: 'file:./data/trade.db',
-    })
+describe('resolveDatabaseUrl', () => {
+  it('defaults to local postgres when DATABASE_URL is unset', () => {
+    const previous = process.env.DATABASE_URL
+    delete process.env.DATABASE_URL
+    try {
+      expect(resolveDatabaseUrl()).toBe('postgresql://trade:trade@localhost:5432/trade')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.DATABASE_URL
+      } else {
+        process.env.DATABASE_URL = previous
+      }
+    }
   })
 
-  it('passes through libsql remote URLs with auth token from env', () => {
-    const previous = process.env.TURSO_AUTH_TOKEN
-    process.env.TURSO_AUTH_TOKEN = 'token-123'
-    expect(resolveLibsqlConfig('libsql://db-org.turso.io')).toEqual({
-      url: 'libsql://db-org.turso.io',
-      authToken: 'token-123',
-    })
-    process.env.TURSO_AUTH_TOKEN = previous
+  it('accepts postgresql URLs', () => {
+    expect(resolveDatabaseUrl('postgresql://trade:trade@db:5432/trade')).toBe(
+      'postgresql://trade:trade@db:5432/trade',
+    )
   })
 
-  it('supports embedded replica URLs', () => {
-    const previous = process.env.TURSO_AUTH_TOKEN
-    process.env.TURSO_AUTH_TOKEN = 'token-123'
-    expect(resolveLibsqlConfig('sqlite+libsql:///./data/trade.db')).toEqual({
-      url: 'file:./data/trade.db',
-      authToken: 'token-123',
-    })
-    process.env.TURSO_AUTH_TOKEN = previous
+  it('accepts postgres URLs', () => {
+    expect(resolveDatabaseUrl('postgres://trade:trade@db:5432/trade')).toBe(
+      'postgres://trade:trade@db:5432/trade',
+    )
+  })
+
+  it('strips wrapping quotes', () => {
+    expect(resolveDatabaseUrl('"postgresql://trade:trade@localhost:5432/trade"')).toBe(
+      'postgresql://trade:trade@localhost:5432/trade',
+    )
+  })
+
+  it('rejects libsql and sqlite URLs', () => {
+    expect(() => resolveDatabaseUrl('libsql://db-org.turso.io')).toThrow(/postgresql/)
+    expect(() => resolveDatabaseUrl('file:./data/trade.db')).toThrow(/postgresql/)
   })
 })

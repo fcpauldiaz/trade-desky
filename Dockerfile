@@ -30,9 +30,6 @@ ENV NODE_ENV=production \
     PORT=3000
 
 COPY --from=build /app/.output ./.output
-COPY --from=build /app/drizzle ./drizzle
-
-ENV AUTH_MIGRATIONS_DIR=/app/drizzle
 
 EXPOSE 3000
 

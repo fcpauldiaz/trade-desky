@@ -9,16 +9,13 @@ import {
   resolveBetterAuthSecret,
 } from '#/lib/auth-config'
 import { db } from '#/lib/db'
-import { ensureAuthMigrations } from '#/lib/migrate-auth'
 import { provisionReceiverUser } from '#/lib/provision-receiver'
-
-await ensureAuthMigrations()
 
 export const auth = betterAuth({
   baseURL: resolveBetterAuthBaseUrl(),
   secret: resolveBetterAuthSecret(),
   database: drizzleAdapter(db, {
-    provider: 'sqlite',
+    provider: 'pg',
     schema: authSchema,
   }),
   emailAndPassword: {

@@ -1,15 +1,12 @@
 import { defineConfig } from 'drizzle-kit'
 
-import { resolveLibsqlConfig } from './src/lib/database-url.ts'
-
-const { url, authToken } = resolveLibsqlConfig()
+import { resolveDatabaseUrl } from './src/lib/database-url.ts'
 
 export default defineConfig({
   schema: './src/db/auth-schema.ts',
   out: './drizzle',
-  dialect: 'turso',
+  dialect: 'postgresql',
   dbCredentials: {
-    url,
-    authToken,
+    url: resolveDatabaseUrl(),
   },
 })

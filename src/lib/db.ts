@@ -1,25 +1,9 @@
-import { mkdirSync } from 'node:fs'
-import { dirname } from 'node:path'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
 
-import { createClient } from '@libsql/client'
-import { drizzle } from 'drizzle-orm/libsql'
+import { resolveDatabaseUrl } from '#/lib/database-url'
 
-import { resolveLibsqlConfig } from '#/lib/database-url'
+const url = resolveDatabaseUrl()
 
-function ensureLocalDatabaseDirectory(url: string): void {
-  if (!url.startsWith('file:')) {
-    return
-  }
-  const path = url.slice('file:'.length)
-  mkdirSync(dirname(path), { recursive: true })
-}
-
-const config = resolveLibsqlConfig()
-ensureLocalDatabaseDirectory(config.url)
-
-export const dbClient = createClient({
-  url: config.url,
-  authToken: config.authToken,
-})
-
+export const dbClient = postgres(url, { max: 10 })
 export const db = drizzle(dbClient)

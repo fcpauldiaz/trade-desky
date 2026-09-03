@@ -1,8 +1,3 @@
-type LibsqlConfig = {
-  url: string
-  authToken?: string
-}
-
 function stripQuotes(value: string): string {
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
@@ -13,32 +8,16 @@ function stripQuotes(value: string): string {
   return value
 }
 
-export function resolveLibsqlConfig(rawUrl?: string): LibsqlConfig {
-  const raw = stripQuotes(rawUrl ?? process.env.DATABASE_URL ?? 'file:./data/trade.db')
+export function resolveDatabaseUrl(rawUrl?: string): string {
+  const raw = stripQuotes(
+    rawUrl ?? process.env.DATABASE_URL ?? 'postgresql://trade:trade@localhost:5432/trade',
+  )
 
-  if (raw.startsWith('sqlite:///')) {
-    return { url: `file:${raw.slice('sqlite:///'.length)}` }
-  }
-
-  if (raw.startsWith('sqlite+libsql:///')) {
-    return {
-      url: `file:${raw.slice('sqlite+libsql:///'.length)}`,
-      authToken: process.env.TURSO_AUTH_TOKEN,
-    }
-  }
-
-  if (raw.startsWith('libsql://')) {
-    return {
-      url: raw,
-      authToken: process.env.TURSO_AUTH_TOKEN,
-    }
-  }
-
-  if (raw.startsWith('file:')) {
-    return { url: raw }
+  if (raw.startsWith('postgresql://') || raw.startsWith('postgres://')) {
+    return raw
   }
 
   throw new Error(
-    'DATABASE_URL must be file:, libsql://, sqlite:///, or sqlite+libsql:/// to match trade-receiver.',
+    'DATABASE_URL must be postgresql:// or postgres:// to match trade-receiver.',
   )
 }

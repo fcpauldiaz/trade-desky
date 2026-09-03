@@ -1,4 +1,4 @@
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -7,7 +7,13 @@ const serverDir = join(root, '.output/server')
 const serverPkgPath = join(serverDir, 'package.json')
 
 const rootPkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
-const serverPkg = JSON.parse(readFileSync(serverPkgPath, 'utf8'))
+const serverPkg = existsSync(serverPkgPath)
+  ? JSON.parse(readFileSync(serverPkgPath, 'utf8'))
+  : { type: 'module', dependencies: {} }
+
+if (!serverPkg.dependencies) {
+  serverPkg.dependencies = {}
+}
 
 const runtimeExternals = ['@sentry/tanstackstart-react']
 
