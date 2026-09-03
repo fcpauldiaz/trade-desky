@@ -9,9 +9,10 @@ export function unpaidAuthenticatedRedirect(options: {
   const path = normalizePath(options.pathname)
   const onOnboarding = path === '/onboarding'
   const onBilling = path === '/billing'
+  const onAdmin = path === '/admin' || path.startsWith('/admin/')
 
   if (!options.canProcessTrades) {
-    if (onOnboarding || onBilling) return null
+    if (onOnboarding || onBilling || onAdmin) return null
     return '/onboarding'
   }
 

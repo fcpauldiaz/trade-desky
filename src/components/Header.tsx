@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import DownloadsMenu from '#/components/DownloadsMenu'
+import { useIsAdmin } from '#/lib/admin'
 import { clearReceiverTokenCache } from '#/lib/api-client'
 import { signOut, useSession } from '#/lib/auth-client'
 import { showDownloadsForUser, showPricingForUser } from '#/lib/pricing-visibility'
@@ -8,6 +9,7 @@ import { useCanProcessTrades } from '#/lib/use-can-process-trades'
 export default function Header() {
   const { data: session, isPending } = useSession()
   const { canProcessTrades, isPending: subscriptionPending } = useCanProcessTrades()
+  const { isAdmin } = useIsAdmin()
   const navigate = useNavigate()
   const loggedIn = Boolean(session?.user)
   const showPricing = showPricingForUser(loggedIn, canProcessTrades, subscriptionPending)
@@ -64,6 +66,11 @@ export default function Header() {
               <Link to="/settings" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
                 Settings
               </Link>
+              {isAdmin ? (
+                <Link to="/admin" className="nav-link" activeProps={{ className: 'nav-link is-active' }}>
+                  Admin
+                </Link>
+              ) : null}
               <button type="button" onClick={logout} className="nav-link">
                 Log out
               </button>

@@ -142,6 +142,9 @@ Underline = thick absolute bar (`height: 1rem`), rotated ±1deg, text on `z-inde
 - Better Auth + shared PostgreSQL 18 DB with trade-receiver
 - Desktop ingest via device token; no per-user webhook URLs
 - Receiver API client: `src/lib/api-client.ts`
+- Super admin: `/admin/*` for users with `users.role = 'admin'` (via receiver
+  `/v1/me` / `/v1/admin/*`). Bootstrap:
+  `UPDATE users SET role = 'admin' WHERE email = 'you@example.com';`
 
 ### Outdated docs
 

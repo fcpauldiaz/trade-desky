@@ -105,6 +105,87 @@ export type TestOrderRequest = {
   dry_run?: boolean
 }
 
+export type AdminAiEvaluation = {
+  id: string
+  created_at: string
+  user_id: string
+  user_email: string
+  alert_id: string | null
+  kind: string
+  decision: string
+  rationale: string | null
+  model: string | null
+  prompt_tokens: number | null
+  completion_tokens: number | null
+  total_tokens: number | null
+  cost_usd: number | null
+  latency_ms: number | null
+  generation_id?: string | null
+  output_json?: string | null
+}
+
+export type AdminOverview = {
+  user_count: number
+  active_subscription_count: number
+  alerts_today: number
+  ai_calls_today: number
+  tokens_today: number
+  tokens_mtd: number
+  cost_usd_today: number
+  cost_usd_mtd: number
+  latest_evaluations: AdminAiEvaluation[]
+}
+
+export type AdminAiEvaluationPage = {
+  items: AdminAiEvaluation[]
+  total: number
+  cost_usd_sum: number
+  limit: number
+  offset: number
+}
+
+export type AdminAiEvaluationParams = {
+  kind?: string
+  decision?: string
+  email?: string
+  from?: string
+  to?: string
+  limit?: number
+  offset?: number
+}
+
+export type AdminUser = {
+  id: string
+  email: string
+  name: string | null
+  created_at: string
+  plan_name: string
+  status: string
+  can_process_trades: boolean
+  role: string
+}
+
+export type AdminAlertParams = {
+  email?: string
+  outcome?: string
+  from?: string
+  to?: string
+  limit?: number
+}
+
+export type AdminAlertAudit = {
+  id: string
+  created_at: string
+  source: 'ingest' | 'webhook'
+  user_id?: string | null
+  user_email?: string | null
+  outcome: AlertOutcome
+  skip_reason: string | null
+  payload?: unknown
+  text?: string
+  title?: string
+}
+
 export const DEFAULT_NINJATRADER_TEST_ORDER: TestOrderRequest = {
   symbol: 'ES1!',
   quantity: 1,
@@ -159,6 +240,7 @@ export const api = {
       email: string
       can_process_trades: boolean
       onboarding_completed: boolean
+      role: string
     }>('/v1/me'),
   billing: () => apiFetch<BillingStatus>('/v1/me/billing'),
   brokers: () => apiFetch<BrokerConnection[]>('/v1/me/brokers'),
@@ -242,4 +324,42 @@ export const api = {
   myReview: () => apiFetch<Review | null>('/v1/me/review'),
   submitReview: (body: { rating: number; body: string }) =>
     apiFetch<Review>('/v1/me/reviews', { method: 'POST', body: JSON.stringify(body) }),
+
+  adminOverview: () => apiFetch<AdminOverview>('/v1/admin/overview'),
+  adminAiEvaluations: (params?: AdminAiEvaluationParams) => {
+    const qs = new URLSearchParams()
+    if (params?.kind) qs.set('kind', params.kind)
+    if (params?.decision) qs.set('decision', params.decision)
+    if (params?.email) qs.set('email', params.email)
+    if (params?.from) qs.set('from', params.from)
+    if (params?.to) qs.set('to', params.to)
+    if (params?.limit != null) qs.set('limit', String(params.limit))
+    if (params?.offset != null) qs.set('offset', String(params.offset))
+    const query = qs.toString()
+    return apiFetch<AdminAiEvaluationPage>(`/v1/admin/ai-evaluations${query ? `?${query}` : ''}`)
+  },
+  adminUsers: (email?: string) => {
+    const qs = email ? `?email=${encodeURIComponent(email)}` : ''
+    return apiFetch<AdminUser[]>(`/v1/admin/users${qs}`)
+  },
+  adminUpdateSubscription: (userId: string, body: { status: string; plan_name: string }) =>
+    apiFetch<{ user_id: string; status: string; plan_name: string; can_process_trades: boolean }>(
+      `/v1/admin/users/${encodeURIComponent(userId)}/subscription`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+  adminUpdateRole: (userId: string, body: { role: 'user' | 'admin' }) =>
+    apiFetch<{ user_id: string; role: string }>(
+      `/v1/admin/users/${encodeURIComponent(userId)}/role`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+  adminAlerts: (params?: AdminAlertParams) => {
+    const qs = new URLSearchParams()
+    if (params?.email) qs.set('email', params.email)
+    if (params?.outcome) qs.set('outcome', params.outcome)
+    if (params?.from) qs.set('from', params.from)
+    if (params?.to) qs.set('to', params.to)
+    if (params?.limit != null) qs.set('limit', String(params.limit))
+    const query = qs.toString()
+    return apiFetch<AdminAlertAudit[]>(`/v1/admin/alerts${query ? `?${query}` : ''}`)
+  },
 }

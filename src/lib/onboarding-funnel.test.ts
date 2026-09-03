@@ -18,6 +18,13 @@ describe('unpaidAuthenticatedRedirect', () => {
     expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/billing' })).toBeNull()
   })
 
+  it('keeps unpaid admins on admin routes', () => {
+    expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/admin' })).toBeNull()
+    expect(
+      unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/admin/users' }),
+    ).toBeNull()
+  })
+
   it('sends unpaid users on other app pages to onboarding', () => {
     expect(unpaidAuthenticatedRedirect({ canProcessTrades: false, pathname: '/dashboard' })).toBe(
       '/onboarding',
