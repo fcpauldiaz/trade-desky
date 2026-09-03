@@ -69,9 +69,9 @@ export default function AlertAuditTable({
                 Time{sortAsc ? ' ↑' : ' ↓'}
               </button>
             </th>
-            <th className="px-3 py-2 font-semibold">Source</th>
+            <th className="min-w-[8.5rem] px-3 py-2 font-semibold">Source</th>
             <th className="px-3 py-2 font-semibold">Title</th>
-            <th className="px-3 py-2 font-semibold">Outcome</th>
+            <th className="min-w-[7.5rem] whitespace-nowrap px-3 py-2 font-semibold">Outcome</th>
             <th className="px-3 py-2 font-semibold">Reason</th>
           </tr>
         </thead>
@@ -82,10 +82,10 @@ export default function AlertAuditTable({
             return (
               <tr key={alert.id} className="border-t border-[var(--line)] align-top">
                   <td className="whitespace-nowrap px-3 py-2">{new Date(alert.created_at).toLocaleString()}</td>
-                  <td className="px-3 py-2">
-                    <div className="flex flex-wrap items-center gap-2">
+                  <td className="min-w-[8.5rem] px-3 py-2">
+                    <div className="flex items-center gap-2">
                       <span
-                        className={`inline-block border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${sourceBadgeClass(alert)}`}
+                        className={`inline-block whitespace-nowrap border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${sourceBadgeClass(alert)}`}
                       >
                         {formatIngestSource(ingestSource)}
                       </span>
@@ -118,9 +118,9 @@ export default function AlertAuditTable({
                       </div>
                     ) : null}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="min-w-[7.5rem] whitespace-nowrap px-3 py-2">
                     <span
-                      className={`inline-block border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${outcomeClass(alert.outcome)}`}
+                      className={`inline-block whitespace-nowrap border-2 border-[var(--ja-black)] px-2 py-0.5 text-xs font-bold ${outcomeClass(alert.outcome)}`}
                     >
                       {formatAlertOutcome(alert.outcome)}
                     </span>
