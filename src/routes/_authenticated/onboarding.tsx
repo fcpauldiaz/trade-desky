@@ -58,7 +58,7 @@ function OnboardingPage() {
   return (
     <main className="page-wrap max-w-xl space-y-6 px-4 py-10">
       <header>
-        <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Get set up</h1>
+        <h1 className="app-page-title text-[var(--sea-ink)]">Get set up</h1>
         <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
           Install desktop capture, optionally add an AI trade filter, then subscribe.
         </p>

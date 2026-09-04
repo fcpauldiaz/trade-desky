@@ -66,7 +66,7 @@ function AlertsPage() {
   return (
     <main className="page-wrap space-y-6 px-4 py-10">
       <div>
-        <h1 className="text-3xl font-black text-[var(--ja-black)]">Alert audit</h1>
+        <h1 className="app-page-title text-[var(--ja-black)]">Alert audit</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ja-gray-600)]">
           Every banner the desktop watcher sent in and every inbound webhook POST. See whether Trade Desky
           executed a trade, skipped it, or is still waiting — and inspect the raw JSON payload.
@@ -79,7 +79,7 @@ function AlertsPage() {
           From
           <input
             type="date"
-            className="demo-input w-auto"
+            className="demo-input w-full sm:w-auto"
             value={fromDate}
             max={toDate || undefined}
             onChange={(event) => setFromDate(event.target.value)}
@@ -89,7 +89,7 @@ function AlertsPage() {
           To
           <input
             type="date"
-            className="demo-input w-auto"
+            className="demo-input w-full sm:w-auto"
             value={toDate}
             min={fromDate || undefined}
             onChange={(event) => setToDate(event.target.value)}
@@ -107,7 +107,7 @@ function AlertsPage() {
           Today
         </button>
       </div>
-      <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+      <div className="filter-chip-row">
         {FILTERS.map(({ id, label }) => {
           const active = filter === id
           return (

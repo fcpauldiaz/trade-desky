@@ -32,7 +32,7 @@ function BillingPage() {
 
   return (
     <main className="page-wrap max-w-2xl space-y-6 px-4 py-10">
-      <h1 className="text-3xl font-bold">Billing</h1>
+      <h1 className="app-page-title">Billing</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {billing && !billing.can_process_trades && <UpgradeBanner />}
       {billing && (

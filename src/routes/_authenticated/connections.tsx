@@ -273,7 +273,7 @@ function ConnectionsPage() {
 
   return (
     <main className="page-wrap max-w-2xl space-y-6 px-4 py-10">
-      <h1 className="text-3xl font-bold">Broker connections</h1>
+      <h1 className="app-page-title">Broker connections</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {!canTrade && <UpgradeBanner />}
       <ul className="space-y-2 text-sm">
@@ -288,13 +288,13 @@ function ConnectionsPage() {
               </span>
               {b.status === 'connected' && canTrade && (
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => setDefault(b.broker)} className="rounded-full border px-3 py-1 text-xs">
+                  <button type="button" onClick={() => setDefault(b.broker)} className="btn-secondary btn-sm">
                     Set default
                   </button>
-                  <button type="button" onClick={() => testConnection(b.broker)} disabled={testing === b.broker} className="rounded-full border px-3 py-1 text-xs">
+                  <button type="button" onClick={() => testConnection(b.broker)} disabled={testing === b.broker} className="btn-secondary btn-sm">
                     {testing === b.broker ? 'Testing…' : 'Test'}
                   </button>
-                  <button type="button" onClick={() => disconnect(b.broker)} className="rounded-full border px-3 py-1 text-xs">
+                  <button type="button" onClick={() => disconnect(b.broker)} className="btn-secondary btn-sm">
                     Disconnect
                   </button>
                 </div>
@@ -342,14 +342,14 @@ function ConnectionsPage() {
               <p className="mb-2 text-xs text-[var(--sea-ink-soft)]">
                 Partner OAuth (requires TRADIER_CLIENT_ID / SECRET on the server):
               </p>
-              <button type="button" onClick={connectTradierOAuth} className="rounded-full border px-4 py-2 text-sm">
+              <button type="button" onClick={connectTradierOAuth} className="btn-secondary btn-sm">
                 Connect via OAuth ({tradierEnvironment === 'sandbox' ? 'paper' : 'live'})
               </button>
             </div>
           </div>
           <div className="island-shell rounded-2xl p-5">
             <h2 className="mb-3 font-semibold">Charles Schwab</h2>
-            <button type="button" onClick={connectSchwab} className="rounded-full border px-4 py-2 text-sm">
+            <button type="button" onClick={connectSchwab} className="btn-secondary btn-sm">
               Authorize Schwab
             </button>
           </div>
@@ -409,8 +409,8 @@ function ConnectionsPage() {
                       </div>
                       <label className="block">
                         Webhook URL
-                        <div className="mt-1 flex gap-2">
-                          <input type="text" readOnly className="demo-input flex-1 text-xs" value={hook.url} />
+                        <div className="mt-1 flex min-w-0 flex-wrap gap-2">
+                          <input type="text" readOnly className="demo-input min-w-0 flex-1 text-xs" value={hook.url} />
                           <CopyButton value={hook.url} />
                         </div>
                         <FieldHelpDialog title="Inbound webhook URL" triggerLabel="What is this URL?">
@@ -430,7 +430,7 @@ function ConnectionsPage() {
                           type="button"
                           disabled={webhookLoading === hook.id}
                           onClick={() => removeWebhook(hook.id)}
-                          className="rounded-full border px-3 py-1 text-xs"
+                          className="btn-secondary btn-sm"
                         >
                           Delete
                         </button>

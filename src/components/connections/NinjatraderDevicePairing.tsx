@@ -79,7 +79,7 @@ export default function NinjatraderDevicePairing({
         >
           <form.Field name="name">
             {(field) => (
-              <label className="block min-w-[12rem] flex-1 text-sm">
+              <label className="block min-w-0 flex-1 text-sm sm:min-w-[12rem]">
                 Device name <span className="text-[var(--sea-ink-soft)]">(optional)</span>
                 <input
                   type="text"

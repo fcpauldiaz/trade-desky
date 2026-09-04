@@ -52,13 +52,13 @@ function SettingsPage() {
 
   return (
     <main className="page-wrap max-w-lg space-y-4 px-4 py-10">
-      <h1 className="text-3xl font-bold">Settings</h1>
+      <h1 className="app-page-title">Settings</h1>
       {!canTrade && <UpgradeBanner />}
       <form onSubmit={save} className="island-shell space-y-4 rounded-2xl p-5">
         <label className="block text-sm">
           Default mode
           <select
-            className="mt-1 w-full rounded-lg border px-2 py-1"
+            className="demo-select mt-1 w-full"
             value={settings.default_mode}
             onChange={(e) => setSettings({ ...settings, default_mode: e.target.value })}
           >
@@ -93,7 +93,7 @@ function SettingsPage() {
             Fixed contracts
             <input
               type="number"
-              className="mt-1 w-full rounded-lg border px-2 py-1"
+              className="demo-input mt-1 w-full"
               value={settings.fixed_contracts}
               onChange={(e) => setSettings({ ...settings, fixed_contracts: Number(e.target.value) })}
             />
@@ -106,7 +106,7 @@ function SettingsPage() {
             <input
               type="number"
               step={0.1}
-              className="mt-1 w-full rounded-lg border px-2 py-1"
+              className="demo-input mt-1 w-full"
               value={settings.risk_percent}
               onChange={(e) => setSettings({ ...settings, risk_percent: Number(e.target.value) })}
             />
@@ -117,7 +117,7 @@ function SettingsPage() {
           Max contracts
           <input
             type="number"
-            className="mt-1 w-full rounded-lg border px-2 py-1"
+            className="demo-input mt-1 w-full"
             value={settings.max_contracts}
             onChange={(e) => setSettings({ ...settings, max_contracts: Number(e.target.value) })}
           />
