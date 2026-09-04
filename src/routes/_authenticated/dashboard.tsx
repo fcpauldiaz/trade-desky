@@ -111,7 +111,7 @@ function DashboardPage() {
 
   return (
     <main className="page-wrap space-y-6 px-4 py-10">
-      <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Dashboard</h1>
+      <h1 className="app-page-title text-[var(--sea-ink)]">Dashboard</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {billing && !billing.can_process_trades && <UpgradeBanner />}
       <KpiStrip

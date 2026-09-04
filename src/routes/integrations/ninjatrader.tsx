@@ -60,8 +60,6 @@ function NinjaTraderIntegrationPage() {
         src="/brokers/ninjatrader.png"
         alt="NinjaTrader"
         className="guide-brand-mark"
-        width={800}
-        height={101}
         loading="eager"
         decoding="async"
       />

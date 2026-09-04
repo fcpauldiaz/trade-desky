@@ -40,8 +40,6 @@ function NinjaTraderGuidePage() {
         src="/brokers/ninjatrader.png"
         alt="NinjaTrader"
         className="guide-brand-mark"
-        width={800}
-        height={101}
         loading="eager"
         decoding="async"
       />
@@ -97,13 +95,13 @@ function NinjaTraderGuidePage() {
             In the bridge repo, create a venv, install dependencies, then run setup and start the
             receiver:
           </p>
-          <pre className="overflow-x-auto rounded-lg border-2 border-[var(--ja-black)] bg-[var(--ja-gray-50)] p-3 text-xs">
-{`python -m venv .venv
+          <div className="guide-code-block">
+            <pre>{`python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
 python main.py --setup
-python main.py`}
-          </pre>
+python main.py`}</pre>
+          </div>
           <p className="text-sm">
             Note the local webhook URL (for example <code className="text-xs">http://127.0.0.1:8787/webhook</code>)
             and secret. Keep <code className="text-xs">dry_run: true</code> in config until Sim101
