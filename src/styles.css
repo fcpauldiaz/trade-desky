@@ -275,6 +275,9 @@ body.site-nav-open {
   padding: 0;
   cursor: pointer;
   font: inherit;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
 }
 
 .nav-link:hover,
@@ -646,11 +649,14 @@ body.site-nav-open {
   box-shadow: 4px 4px 0 var(--ja-black);
   overflow: hidden;
   background: var(--ja-white);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .guide-figure img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: auto;
 }
 
@@ -660,6 +666,7 @@ body.site-nav-open {
   color: var(--ja-gray-600);
   border-top: 2px solid var(--ja-black);
   background: var(--ja-gray-50);
+  overflow-wrap: anywhere;
 }
 
 .guide-step-list {
@@ -669,10 +676,14 @@ body.site-nav-open {
   display: grid;
   gap: 1.5rem;
   counter-reset: guide-step;
+  min-width: 0;
 }
 
 .guide-step-list > li {
   counter-increment: guide-step;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .guide-step-list h3::before {
@@ -687,14 +698,53 @@ body.site-nav-open {
   border-radius: 0.5rem;
   background: var(--ja-yellow-muted);
   font-size: 0.875rem;
+  overflow-wrap: anywhere;
 }
 
 .guide-brand-mark {
   display: block;
   width: auto;
   height: 1.5rem;
-  max-width: 12rem;
+  max-width: min(12rem, 100%);
   margin-bottom: 0.5rem;
+}
+
+.guide-code-block {
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  border: 2px solid var(--ja-black);
+  background: var(--ja-gray-50);
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  -webkit-overflow-scrolling: touch;
+}
+
+.guide-code-block pre {
+  margin: 0;
+  white-space: pre;
+}
+
+.marketing-page .feature-item {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.marketing-page .seo-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.marketing-page code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.marketing-page pre {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .field-help-trigger {

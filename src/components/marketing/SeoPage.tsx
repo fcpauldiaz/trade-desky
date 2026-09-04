@@ -23,7 +23,7 @@ export default function SeoPage({
             <h1>{title}</h1>
             <p>{lede}</p>
           </header>
-          <div className="space-y-6">{children}</div>
+          <div className="seo-content space-y-6">{children}</div>
         </div>
       </section>
       <FinalCta />
