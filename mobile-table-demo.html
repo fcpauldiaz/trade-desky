@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trade Desky mobile tables demo</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <style>
+      body { margin: 0; padding: 1rem; background: #fff; }
+      h1 { font-size: 1.25rem; margin: 0 0 1rem; }
+      section { margin-bottom: 2rem; }
+      section h2 { font-size: 1rem; margin: 0 0 0.75rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Mobile tables @ 390px</h1>
+
+    <section>
+      <h2>Trade cards (md+ table)</h2>
+      <div class="data-table-card-list" aria-label="Recent trades">
+        <article class="data-table-card is-highlighted">
+          <div class="data-table-card-head">
+            <h3 class="data-table-card-title">SPY</h3>
+            <span class="data-table-card-metric is-positive">42.50</span>
+          </div>
+          <div class="data-table-card-badges">
+            <span class="data-table-card-badge">filled</span>
+            <span class="data-table-card-badge">live</span>
+          </div>
+          <dl class="data-table-card-meta">
+            <div class="data-table-card-meta-row"><dt>Time</dt><dd>1/10/2026, 3:30 PM</dd></div>
+            <div class="data-table-card-meta-row"><dt>Status</dt><dd>filled</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Admin user card</h2>
+      <div class="data-table-card-list" aria-label="Admin users">
+        <article class="data-table-card">
+          <div class="data-table-card-head">
+            <h3 class="data-table-card-title">trader@example.com</h3>
+            <span class="data-table-card-badge">user</span>
+          </div>
+          <dl class="data-table-card-meta">
+            <div class="data-table-card-meta-row"><dt>Name</dt><dd>Alex Trader</dd></div>
+            <div class="data-table-card-meta-row"><dt>Created</dt><dd>1/1/2026</dd></div>
+          </dl>
+          <div class="admin-card-actions">
+            <button type="button" class="btn-primary btn-sm">Update</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Admin alerts card</h2>
+      <div class="data-table-card-list" aria-label="Admin alerts">
+        <article class="data-table-card">
+          <div class="data-table-card-head">
+            <h3 class="data-table-card-title">trader@example.com</h3>
+            <span class="data-table-card-badge">executed</span>
+          </div>
+          <p class="admin-card-payload line-clamp-3">{"symbol":"SPY","side":"buy"}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-wrap min-w-0">
+      <h2>Desktop-only table (hidden below md in app)</h2>
+      <p style="font-size:0.875rem;color:var(--ja-gray-600)">720px min-width only applies from md breakpoint in production.</p>
+    </section>
+  </body>
+</html>

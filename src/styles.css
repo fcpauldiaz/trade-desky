@@ -1965,7 +1965,7 @@ body.site-nav-open {
   background: linear-gradient(to left, rgba(255, 255, 255, 0.95), transparent);
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .data-table-scroll-hint::after {
     display: none;
   }
@@ -1992,10 +1992,12 @@ body.site-nav-open {
   font-weight: 700;
 }
 
-.data-table th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+@media (min-width: 768px) {
+  .data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
 }
 
 .data-table tbody tr {
@@ -2384,13 +2386,15 @@ code {
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+}
+
+@media (min-width: 768px) {
+  .admin-table {
+    min-width: 720px;
+  }
 }
 
 .admin-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
   text-align: left;
   font-size: 0.7rem;
   font-weight: 800;
@@ -2415,6 +2419,111 @@ code {
 
 .admin-table-row:hover td {
   background: var(--ja-yellow-muted);
+}
+
+.admin-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.admin-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ja-black);
+}
+
+.admin-card-field-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+@media (min-width: 480px) {
+  .admin-card-field-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-card-payload {
+  margin-top: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  word-break: break-word;
+  color: var(--ja-gray-700);
+}
+
+.pnl-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--sea-ink-soft);
+}
+
+@media (min-width: 640px) {
+  .pnl-calendar-grid {
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+.pnl-calendar-cell {
+  min-width: 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  padding: 0.25rem 0.125rem;
+  font-size: 0.75rem;
+  transition: box-shadow 0.15s ease;
+}
+
+@media (min-width: 640px) {
+  .pnl-calendar-cell {
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+.pnl-calendar-cell:hover {
+  box-shadow: 0 0 0 2px var(--ja-yellow);
+}
+
+.pnl-calendar-day {
+  font-weight: 700;
+  color: var(--sea-ink);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .pnl-calendar-day {
+    font-size: 0.875rem;
+  }
+}
+
+.pnl-calendar-value {
+  margin-top: 0.125rem;
+  font-size: 0.5625rem;
+  line-height: 1.1;
+  color: var(--sea-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .pnl-calendar-value {
+    font-size: 0.625rem;
+  }
 }
 
 .admin-decision {

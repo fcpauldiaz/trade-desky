@@ -66,7 +66,7 @@ export default function TradeTable({ trades, highlightTradeId }: TradeTableProps
 
   return (
     <>
-      <div className="data-table-mobile-toolbar sm:hidden">
+      <div className="data-table-mobile-toolbar md:hidden">
         <label>
           Sort
           <select
@@ -91,7 +91,7 @@ export default function TradeTable({ trades, highlightTradeId }: TradeTableProps
         </label>
       </div>
 
-      <div className="data-table-card-list sm:hidden" aria-label="Recent trades">
+      <div className="data-table-card-list md:hidden" aria-label="Recent trades">
         {sorted.map((trade) => {
           const highlighted = trade.id === highlightTradeId
           return (
@@ -130,7 +130,7 @@ export default function TradeTable({ trades, highlightTradeId }: TradeTableProps
         })}
       </div>
 
-      <div className="data-table-scroll hidden sm:block">
+      <div className="data-table-scroll hidden md:block">
         <table className="data-table min-w-[40rem] text-left text-sm">
           <thead className="bg-[var(--chip-bg)] text-[var(--sea-ink-soft)]">
             <tr>

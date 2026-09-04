@@ -103,21 +103,24 @@ export default function MonthlyPnLCalendar({
           {sharing === 'month' ? 'Sharing…' : 'Share month'}
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-2 text-center text-xs font-medium text-[var(--sea-ink-soft)]">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => (
-          <div key={label}>{label}</div>
+      <div className="pnl-calendar-grid">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label, index) => (
+          <div key={label}>
+            <span className="hidden sm:inline">{label}</span>
+            <span className="sm:hidden">{label[0]}</span>
+          </div>
         ))}
         {cells.map((day, idx) =>
           day ? (
             <button
               key={idx}
               type="button"
-              className="rounded-lg border border-[var(--line)] p-2 text-sm transition hover:ring-2 hover:ring-[var(--ja-yellow)]"
+              className="pnl-calendar-cell"
               style={{ backgroundColor: pnlHeatColor(dailyPnl[dayKeyFor(month, day)], maxAbs) }}
               onClick={() => setSelectedDay(dayKeyFor(month, day))}
             >
-              <div className="font-semibold text-[var(--sea-ink)]">{day}</div>
-              <div className="text-[10px] text-[var(--sea-ink-soft)]">
+              <div className="pnl-calendar-day">{day}</div>
+              <div className="pnl-calendar-value">
                 {dailyPnl[dayKeyFor(month, day)]?.toFixed(0) ?? '—'}
               </div>
             </button>

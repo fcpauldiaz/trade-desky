@@ -61,7 +61,7 @@ export default function AlertAuditTable({
 
   return (
     <>
-      <div className="data-table-mobile-toolbar sm:hidden">
+      <div className="data-table-mobile-toolbar md:hidden">
         <button
           type="button"
           className="btn-secondary btn-sm"
@@ -71,7 +71,7 @@ export default function AlertAuditTable({
         </button>
       </div>
 
-      <div className="data-table-card-list sm:hidden" aria-label="Alert audit">
+      <div className="data-table-card-list md:hidden" aria-label="Alert audit">
         {sorted.map((alert) => {
           const open = openId === alert.id
           const ingestSource = resolveIngestSource(alert)
@@ -160,7 +160,7 @@ export default function AlertAuditTable({
         })}
       </div>
 
-      <div className="data-table-scroll hidden sm:block">
+      <div className="data-table-scroll hidden md:block">
         <table className="data-table min-w-[48rem] text-left text-sm">
           <thead className="bg-[var(--chip-bg)] text-[var(--sea-ink-soft)]">
             <tr>

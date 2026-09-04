@@ -111,7 +111,54 @@ function AdminAlertsPage() {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {loading ? <p className="text-sm text-[var(--ja-gray-600)]">Loading…</p> : null}
       {!loading ? (
-        <div className="admin-table-wrap">
+        <>
+          <div className="data-table-card-list md:hidden" aria-label="Admin alerts">
+            {alerts.map((row) => {
+              const expanded = expandedId === row.id
+              const preview =
+                typeof row.payload === 'string'
+                  ? row.payload
+                  : JSON.stringify(row.payload ?? row.text ?? '')
+              return (
+                <article
+                  key={row.id}
+                  className="data-table-card"
+                  onClick={() => setExpandedId(expanded ? null : row.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      setExpandedId(expanded ? null : row.id)
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="data-table-card-head">
+                    <h3 className="data-table-card-title">{row.user_email || 'Unknown user'}</h3>
+                    <span className="data-table-card-badge">{row.outcome}</span>
+                  </div>
+                  <dl className="data-table-card-meta">
+                    <div className="data-table-card-meta-row">
+                      <dt>Time</dt>
+                      <dd>{new Date(row.created_at).toLocaleString()}</dd>
+                    </div>
+                    <div className="data-table-card-meta-row">
+                      <dt>Skip reason</dt>
+                      <dd>{row.skip_reason || '—'}</dd>
+                    </div>
+                  </dl>
+                  <p className={`admin-card-payload ${expanded ? '' : 'line-clamp-3'}`}>
+                    {expanded ? preview : `${preview.slice(0, 120)}${preview.length > 120 ? '…' : ''}`}
+                  </p>
+                </article>
+              )
+            })}
+            {alerts.length === 0 ? (
+              <p className="text-sm text-[var(--ja-gray-600)]">No alerts</p>
+            ) : null}
+          </div>
+
+          <div className="admin-table-wrap hidden md:block">
           <table className="admin-table">
             <thead>
               <tr>
@@ -140,9 +187,11 @@ function AdminAlertsPage() {
                     </td>
                     <td className="text-xs font-semibold">{row.user_email || '—'}</td>
                     <td className="text-xs">{row.outcome}</td>
-                    <td className="max-w-[14rem] text-xs">{row.skip_reason || '—'}</td>
+                    <td className="max-w-[14rem] truncate text-xs">{row.skip_reason || '—'}</td>
                     <td className="max-w-[18rem] font-mono text-[11px]">
-                      {expanded ? preview : `${preview.slice(0, 80)}${preview.length > 80 ? '…' : ''}`}
+                      <span className={`block ${expanded ? 'whitespace-pre-wrap break-words' : 'truncate'}`}>
+                        {expanded ? preview : `${preview.slice(0, 80)}${preview.length > 80 ? '…' : ''}`}
+                      </span>
                     </td>
                   </tr>
                 )
@@ -153,6 +202,7 @@ function AdminAlertsPage() {
             <p className="mt-3 text-sm text-[var(--ja-gray-600)]">No alerts</p>
           ) : null}
         </div>
+        </>
       ) : null}
     </div>
   )

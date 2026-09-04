@@ -4,6 +4,7 @@ import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import TradeTable from '#/components/dashboard/TradeTable'
 import AlertAuditTable from '#/components/dashboard/AlertAuditTable'
+import AiEvaluationsTable from '#/components/admin/AiEvaluationsTable'
 import type { AlertAudit, Trade } from '#/lib/api-client'
 
 afterEach(() => {
@@ -72,5 +73,36 @@ describe('AlertAuditTable', () => {
   it('shows filter empty state when alerts are hidden by filters', () => {
     render(<AlertAuditTable alerts={[]} totalCount={3} />)
     expect(screen.getByText('No alerts match the current filters.')).toBeTruthy()
+  })
+})
+
+describe('AiEvaluationsTable', () => {
+  it('renders mobile cards and desktop table regions', () => {
+    render(
+      <AiEvaluationsTable
+        items={[
+          {
+            id: 'eval-1',
+            created_at: '2026-01-10T15:30:00.000Z',
+            user_id: 'user-1',
+            user_email: 'admin@example.com',
+            alert_id: null,
+            kind: 'filter',
+            decision: 'take',
+            rationale: 'Looks like a valid trade signal.',
+            model: 'gpt-4.1-mini',
+            prompt_tokens: 100,
+            completion_tokens: 20,
+            total_tokens: 120,
+            cost_usd: 0.00012,
+            latency_ms: 340,
+          },
+        ]}
+      />,
+    )
+
+    const mobileList = screen.getByLabelText('AI evaluations')
+    expect(within(mobileList).getByText('admin@example.com')).toBeTruthy()
+    expect(document.querySelector('.admin-table-wrap table')).toBeTruthy()
   })
 })
