@@ -1,7 +1,7 @@
 From e76c8c3943dbed045df482984812cbfb3500e875 Mon Sep 17 00:00:00 2001
 From: Cursor Agent <cursoragent@cursor.com>
 Date: Fri, 4 Sep 2026 18:40:59 +0000
-Subject: [PATCH] Log inbound payloads on webhook and desktop ingest
+Subject: [PATCH 1/2] Log inbound payloads on webhook and desktop ingest
 
 Emit structured INFO logs for received request bodies and completion
 status so operators can inspect TradingView/webhook traffic in server
@@ -292,6 +292,47 @@ index 45ea505..f2670ff 100644
  def test_ingest_inactive_subscription(ingest_client, db_session: Session):
      token = secrets.token_urlsafe(16)
      user = User(
+-- 
+2.43.0
+
+
+From 72376df80ec0496a16c21c71297e2ad3b418bbab Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 4 Sep 2026 18:45:09 +0000
+Subject: [PATCH 2/2] Expose app INFO logs after Alembic fileConfig
+
+Register an app logger at INFO in alembic.ini so ingest webhook
+payload logs appear in process stderr after startup migrations.
+---
+ alembic.ini | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/alembic.ini b/alembic.ini
+index f30a53e..7da0dfd 100644
+--- a/alembic.ini
++++ b/alembic.ini
+@@ -8,7 +8,7 @@ sqlalchemy.url = postgresql://trade:trade@localhost:5432/trade
+ [post_write_hooks]
+ 
+ [loggers]
+-keys = root,sqlalchemy,alembic
++keys = root,sqlalchemy,alembic,app
+ 
+ [handlers]
+ keys = console
+@@ -31,6 +31,12 @@ level = INFO
+ handlers =
+ qualname = alembic
+ 
++[logger_app]
++level = INFO
++handlers = console
++qualname = app
++propagate = 0
++
+ [handler_console]
+ class = StreamHandler
+ args = (sys.stderr,)
 -- 
 2.43.0
 
