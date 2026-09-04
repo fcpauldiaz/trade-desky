@@ -7,9 +7,14 @@ export const Route = createFileRoute('/_authenticated/admin/agents')({
 })
 
 const MODEL_SUGGESTIONS = [
-  'openai/gpt-4o-mini',
-  'openai/gpt-4o',
-  'openai/gpt-4.1-mini',
+  'zai/glm-5.3-flash',
+  'zai/glm-5.3',
+  'zai/glm-4.7-flash',
+  'deepseek/deepseek-v4-flash',
+  'deepseek/deepseek-v4-pro',
+  'google/gemini-2.5-flash-lite',
+  'google/gemini-3.7-flash',
+  'google/gemini-3.8-flash',
 ] as const
 
 const PLACEHOLDER_HINT: Record<AdminAgentKey, string> = {
