@@ -1,0 +1,338 @@
+From e76c8c3943dbed045df482984812cbfb3500e875 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 4 Sep 2026 18:40:59 +0000
+Subject: [PATCH 1/2] Log inbound payloads on webhook and desktop ingest
+
+Emit structured INFO logs for received request bodies and completion
+status so operators can inspect TradingView/webhook traffic in server
+logs without querying the audit table.
+---
+ app/api/deps.py                | 10 ++++++++
+ app/api/ingest.py              | 26 ++++++++++++++++++---
+ app/api/webhooks.py            | 36 ++++++++++++++++++++++++++---
+ tests/test_inbound_webhooks.py | 42 ++++++++++++++++++++++++++++++++++
+ tests/test_ingest.py           | 36 +++++++++++++++++++++++++++++
+ 5 files changed, 144 insertions(+), 6 deletions(-)
+
+diff --git a/app/api/deps.py b/app/api/deps.py
+index 3768b7a..3c84c2c 100644
+--- a/app/api/deps.py
++++ b/app/api/deps.py
+@@ -12,6 +12,16 @@ from app.services.jwt_auth import hash_api_key, verify_better_auth_jwt
+ logger = logging.getLogger(__name__)
+ 
+ 
++def client_ip(request: Request) -> str | None:
++    forwarded = request.headers.get("x-forwarded-for")
++    if forwarded:
++        ip = forwarded.split(",")[0].strip()
++        return ip[:64] if ip else None
++    if request.client:
++        return request.client.host[:64]
++    return None
++
++
+ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+     auth = request.headers.get("Authorization", "")
+     if auth.startswith("Bearer "):
+diff --git a/app/api/ingest.py b/app/api/ingest.py
+index 5e2cb81..f8af521 100644
+--- a/app/api/ingest.py
++++ b/app/api/ingest.py
+@@ -1,12 +1,17 @@
++import logging
++
+ from fastapi import APIRouter, Depends, Request
+ from sqlalchemy.exc import IntegrityError
+ from sqlalchemy.orm import Session
+ 
+-from app.api.deps import get_current_user
++from app.api.deps import client_ip, get_current_user
+ from app.database import get_db
+ from app.models.tables import User
+ from app.services.ingest_gate import ingest_processing_slot
+ from app.services.ingest_pipeline import duplicate_response, process_inbound_alert
++from app.services.webhook_ingest_audit import serialize_webhook_payload
++
++logger = logging.getLogger(__name__)
+ 
+ router = APIRouter(tags=["ingest"])
+ 
+@@ -18,9 +23,24 @@ async def ingest_alert(
+     db: Session = Depends(get_db),
+ ):
+     body = await request.json()
++    source = client_ip(request)
++    logger.info(
++        "desktop ingest received user_id=%s source_ip=%s payload=%s",
++        user.id,
++        source or "-",
++        serialize_webhook_payload(body),
++    )
+     async with ingest_processing_slot(user.id):
+         try:
+-            return await process_inbound_alert(db, user, body)
++            result = await process_inbound_alert(db, user, body)
+         except IntegrityError:
+             db.rollback()
+-            return duplicate_response(db, user, body)
++            result = duplicate_response(db, user, body)
++
++    logger.info(
++        "desktop ingest completed user_id=%s status=%s alert_id=%s",
++        user.id,
++        result.get("status"),
++        result.get("alert_id"),
++    )
++    return result
+diff --git a/app/api/webhooks.py b/app/api/webhooks.py
+index f31f449..0611a1e 100644
+--- a/app/api/webhooks.py
++++ b/app/api/webhooks.py
+@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
+ from sqlalchemy.exc import IntegrityError
+ from sqlalchemy.orm import Session
+ 
+-from app.api.deps import get_current_user
++from app.api.deps import client_ip, get_current_user
+ from app.config import settings
+ from app.database import get_db
+ from app.models.tables import InboundAlert, InboundWebhook, User
+@@ -16,7 +16,10 @@ from app.services.ingest_pipeline import (
+     process_inbound_alert,
+     resolve_idempotency_key,
+ )
+-from app.services.webhook_ingest_audit import safe_record_webhook_ingest_event
++from app.services.webhook_ingest_audit import (
++    safe_record_webhook_ingest_event,
++    serialize_webhook_payload,
++)
+ 
+ logger = logging.getLogger(__name__)
+ 
+@@ -122,6 +125,14 @@ async def receive_webhook(
+         raise HTTPException(status_code=404, detail="Webhook owner not found")
+ 
+     body = await request.json()
++    source = client_ip(request)
++    logger.info(
++        "webhook ingest received webhook_id=%s user_id=%s source_ip=%s payload=%s",
++        webhook_id,
++        user.id,
++        source or "-",
++        serialize_webhook_payload(body),
++    )
+     async with ingest_processing_slot(user.id):
+         try:
+             result = await process_inbound_alert(db, user, body, webhook_id=webhook_id)
+@@ -141,6 +152,13 @@ async def receive_webhook(
+                     "alert_id": alert.id if alert is not None else None,
+                     "detail": exc.detail,
+                 }
++                logger.info(
++                    "webhook ingest completed webhook_id=%s user_id=%s status=%s alert_id=%s",
++                    webhook_id,
++                    user.id,
++                    inactive_result["status"],
++                    inactive_result["alert_id"],
++                )
+                 safe_record_webhook_ingest_event(
+                     db,
+                     user_id=user.id,
+@@ -150,7 +168,12 @@ async def receive_webhook(
+                 )
+             raise
+         except Exception as exc:
+-            logger.exception("webhook processing failed webhook_id=%s", webhook_id)
++            logger.exception(
++                "webhook processing failed webhook_id=%s user_id=%s payload=%s",
++                webhook_id,
++                user.id,
++                serialize_webhook_payload(body),
++            )
+             db.rollback()
+             raise HTTPException(status_code=500, detail=str(exc)) from exc
+ 
+@@ -160,6 +183,13 @@ async def receive_webhook(
+         if alert is not None:
+             result = {**result, "alert_id": alert.id}
+ 
++    logger.info(
++        "webhook ingest completed webhook_id=%s user_id=%s status=%s alert_id=%s",
++        webhook_id,
++        user.id,
++        result.get("status"),
++        result.get("alert_id"),
++    )
+     safe_record_webhook_ingest_event(
+         db,
+         user_id=user.id,
+diff --git a/tests/test_inbound_webhooks.py b/tests/test_inbound_webhooks.py
+index 3afd045..b8cbab3 100644
+--- a/tests/test_inbound_webhooks.py
++++ b/tests/test_inbound_webhooks.py
+@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
+ from sqlalchemy.orm import Session
+ 
+ from app.agents.parse_alert import parse_alert, parse_alert_rules
++from app.api import webhooks as webhooks_api
+ from app.brokers.ninjatrader import NinjaTraderAdapter
+ from app.config import settings
+ from app.models.tables import BrokerConnection, Subscription, User
+@@ -18,6 +19,8 @@ from app.services.futures_trade import (
+ )
+ from tests.test_e2e import FakeAdapter, _seed_paid_user
+ 
++webhooks_logger = webhooks_api.logger
++
+ 
+ @pytest.fixture(autouse=True)
+ def _ingest_patches(monkeypatch):
+@@ -66,6 +69,45 @@ def test_receive_webhook_unknown_id_returns_404(client):
+     assert res.status_code == 404
+ 
+ 
++def test_receive_webhook_logs_incoming_payload(client, db_session: Session, monkeypatch):
++    user, _ = _seed_paid_user(db_session)
++    token = "user-api-key-logs"
++    user.api_key_hash = hashlib.sha256(token.encode()).hexdigest()
++    db_session.commit()
++
++    create = client.post(
++        "/v1/me/webhooks",
++        json={"name": "LogCheck"},
++        headers={"Authorization": f"Bearer {token}"},
++    )
++    assert create.status_code == 200
++    webhook_id = create.json()["id"]
++    payload = {"title": "Log Alert", "body": "BTO SPY 580C 6/20 @ 2.50"}
++
++    messages: list[str] = []
++    original_info = webhooks_logger.info
++
++    def capture_info(msg, *args, **kwargs):
++        messages.append(msg % args if args else str(msg))
++        return original_info(msg, *args, **kwargs)
++
++    monkeypatch.setattr(webhooks_logger, "info", capture_info)
++
++    ok = client.post(f"/v1/webhooks/{webhook_id}", json=payload)
++
++    assert ok.status_code == 200
++    received = [m for m in messages if "webhook ingest received" in m]
++    completed = [m for m in messages if "webhook ingest completed" in m]
++    assert len(received) == 1
++    assert webhook_id in received[0]
++    assert user.id in received[0]
++    assert "Log Alert" in received[0]
++    assert "BTO SPY 580C" in received[0]
++    assert len(completed) == 1
++    assert webhook_id in completed[0]
++    assert f"status={ok.json()['status']}" in completed[0]
++
++
+ def test_structured_futures_payload_mapping():
+     body = {
+         "id": "alert-1",
+diff --git a/tests/test_ingest.py b/tests/test_ingest.py
+index 45ea505..f2670ff 100644
+--- a/tests/test_ingest.py
++++ b/tests/test_ingest.py
+@@ -7,10 +7,13 @@ from fastapi.testclient import TestClient
+ from sqlalchemy.orm import Session
+ 
+ from app.agents.filter_trade import FilterDecision
++from app.api import ingest as ingest_api
+ from app.config import settings
+ from app.models.tables import InboundAlert, Subscription, User
+ from tests.test_e2e import FakeAdapter, _seed_paid_user
+ 
++ingest_logger = ingest_api.logger
++
+ _ALERT = {"title": "Alert", "body": "BTO SPY 580C 6/20 @ 2.50"}
+ _ETERMINAL = {
+     "type": "signal",
+@@ -74,6 +77,39 @@ def test_ingest_active_subscription(ingest_client, db_session: Session):
+     assert res.json()["status"] in {"filled", "skipped", "rejected", "duplicate", "validation_failed"}
+ 
+ 
++def test_ingest_logs_incoming_payload(ingest_client, db_session: Session, monkeypatch):
++    user, _ = _seed_paid_user(db_session)
++    token = "test-api-key-logs"
++    user.api_key_hash = hashlib.sha256(token.encode()).hexdigest()
++    db_session.commit()
++
++    messages: list[str] = []
++    original_info = ingest_logger.info
++
++    def capture_info(msg, *args, **kwargs):
++        messages.append(msg % args if args else str(msg))
++        return original_info(msg, *args, **kwargs)
++
++    monkeypatch.setattr(ingest_logger, "info", capture_info)
++
++    payload = {"title": "Desktop Log", "body": "BTO SPY 580C 6/20 @ 2.50"}
++    res = ingest_client.post(
++        "/v1/ingest",
++        json=payload,
++        headers={"Authorization": f"Bearer {token}"},
++    )
++
++    assert res.status_code == 200
++    received = [m for m in messages if "desktop ingest received" in m]
++    completed = [m for m in messages if "desktop ingest completed" in m]
++    assert len(received) == 1
++    assert user.id in received[0]
++    assert "Desktop Log" in received[0]
++    assert "BTO SPY 580C" in received[0]
++    assert len(completed) == 1
++    assert f"status={res.json()['status']}" in completed[0]
++
++
+ def test_ingest_inactive_subscription(ingest_client, db_session: Session):
+     token = secrets.token_urlsafe(16)
+     user = User(
+-- 
+2.43.0
+
+
+From 72376df80ec0496a16c21c71297e2ad3b418bbab Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 4 Sep 2026 18:45:09 +0000
+Subject: [PATCH 2/2] Expose app INFO logs after Alembic fileConfig
+
+Register an app logger at INFO in alembic.ini so ingest webhook
+payload logs appear in process stderr after startup migrations.
+---
+ alembic.ini | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/alembic.ini b/alembic.ini
+index f30a53e..7da0dfd 100644
+--- a/alembic.ini
++++ b/alembic.ini
+@@ -8,7 +8,7 @@ sqlalchemy.url = postgresql://trade:trade@localhost:5432/trade
+ [post_write_hooks]
+ 
+ [loggers]
+-keys = root,sqlalchemy,alembic
++keys = root,sqlalchemy,alembic,app
+ 
+ [handlers]
+ keys = console
+@@ -31,6 +31,12 @@ level = INFO
+ handlers =
+ qualname = alembic
+ 
++[logger_app]
++level = INFO
++handlers = console
++qualname = app
++propagate = 0
++
+ [handler_console]
+ class = StreamHandler
+ args = (sys.stderr,)
+-- 
+2.43.0
+
