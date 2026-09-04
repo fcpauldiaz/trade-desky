@@ -64,7 +64,7 @@ function AlertsPage() {
   const visible = useMemo(() => filterAlerts(sourceFiltered, filter), [sourceFiltered, filter])
 
   return (
-    <main className="page-wrap space-y-6 px-4 py-10">
+    <main className="page-wrap min-w-0 space-y-6 px-4 py-10">
       <div>
         <h1 className="app-page-title text-[var(--ja-black)]">Alert audit</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ja-gray-600)]">
@@ -135,7 +135,7 @@ function AlertsPage() {
           )
         })}
       </div>
-      <section className="island-shell rounded-2xl p-5">
+      <section className="island-shell min-w-0 rounded-2xl p-5">
         {loading ? (
           <p className="text-sm text-[var(--sea-ink-soft)]">Loading alerts…</p>
         ) : (

@@ -93,7 +93,7 @@ function AdminUsersPage() {
   }
 
   return (
-    <div className="admin-fade space-y-4">
+    <div className="admin-fade min-w-0 space-y-4">
       <div className="admin-filter-bar">
         <label className="admin-filter-field">
           Email
@@ -123,7 +123,127 @@ function AdminUsersPage() {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {loading ? <p className="text-sm text-[var(--ja-gray-600)]">Loading…</p> : null}
       {!loading ? (
-        <div className="admin-table-wrap">
+        <>
+          <div className="data-table-card-list md:hidden" aria-label="Admin users">
+            {users.map((user) => {
+              const draft =
+                drafts[user.id] ||
+                ({
+                  status: user.status,
+                  plan_name: user.plan_name,
+                  role: user.role === 'admin' ? 'admin' : 'user',
+                } satisfies Draft)
+              return (
+                <article key={user.id} className="data-table-card">
+                  <div className="data-table-card-head">
+                    <h3 className="data-table-card-title">{user.email}</h3>
+                    <span className="data-table-card-badge">{draft.role}</span>
+                  </div>
+                  <dl className="data-table-card-meta">
+                    <div className="data-table-card-meta-row">
+                      <dt>Name</dt>
+                      <dd>{user.name || '—'}</dd>
+                    </div>
+                    <div className="data-table-card-meta-row">
+                      <dt>Created</dt>
+                      <dd>{new Date(user.created_at).toLocaleDateString()}</dd>
+                    </div>
+                  </dl>
+                  <label className="admin-card-field">
+                    Role
+                    <select
+                      className="demo-input"
+                      value={draft.role}
+                      onChange={(e) =>
+                        setDrafts((prev) => ({
+                          ...prev,
+                          [user.id]: {
+                            ...draft,
+                            role: e.target.value === 'admin' ? 'admin' : 'user',
+                          },
+                        }))
+                      }
+                    >
+                      <option value="user">user</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  </label>
+                  <div className="admin-card-field-row">
+                    <label className="admin-card-field">
+                      Plan
+                      <select
+                        className="demo-input"
+                        value={draft.plan_name}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [user.id]: { ...draft, plan_name: e.target.value },
+                          }))
+                        }
+                      >
+                        <option value="free">free</option>
+                        <option value="pro">pro</option>
+                      </select>
+                    </label>
+                    <label className="admin-card-field">
+                      Status
+                      <select
+                        className="demo-input"
+                        value={draft.status}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [user.id]: { ...draft, status: e.target.value },
+                          }))
+                        }
+                      >
+                        <option value="none">none</option>
+                        <option value="active">active</option>
+                        <option value="trialing">trialing</option>
+                        <option value="cancelled">cancelled</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="admin-card-actions">
+                    {confirmRevoke === user.id ? (
+                      <>
+                        <span className="text-xs text-[var(--ja-gray-600)]">Confirm revoke?</span>
+                        <button
+                          type="button"
+                          className="btn-primary btn-sm"
+                          disabled={savingId === user.id}
+                          onClick={() => void updateUser(user)}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-secondary btn-sm"
+                          onClick={() => setConfirmRevoke(null)}
+                        >
+                          No
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-primary btn-sm"
+                        disabled={savingId === user.id}
+                        onClick={() => void updateUser(user)}
+                      >
+                        Update
+                      </button>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+            {users.length === 0 ? (
+              <p className="text-sm text-[var(--ja-gray-600)]">No users</p>
+            ) : null}
+          </div>
+
+          <div className="admin-table-wrap hidden md:block">
           <table className="admin-table">
             <thead>
               <tr>
@@ -243,6 +363,7 @@ function AdminUsersPage() {
             <p className="mt-3 text-sm text-[var(--ja-gray-600)]">No users</p>
           ) : null}
         </div>
+        </>
       ) : null}
     </div>
   )

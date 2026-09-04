@@ -110,7 +110,7 @@ function DashboardPage() {
   }, [mode, month])
 
   return (
-    <main className="page-wrap space-y-6 px-4 py-10">
+    <main className="page-wrap min-w-0 space-y-6 px-4 py-10">
       <h1 className="app-page-title text-[var(--sea-ink)]">Dashboard</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {billing && !billing.can_process_trades && <UpgradeBanner />}
@@ -136,7 +136,7 @@ function DashboardPage() {
           })
         }}
       />
-      <section>
+      <section className="min-w-0">
         <h2 className="mb-3 text-lg font-semibold">Recent trades</h2>
         <TradeTable trades={trades} highlightTradeId={highlightTradeId} />
       </section>
