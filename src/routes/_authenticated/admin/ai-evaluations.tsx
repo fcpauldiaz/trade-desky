@@ -70,7 +70,7 @@ function AdminAiEvaluationsPage() {
   }
 
   return (
-    <div className="admin-fade space-y-4">
+    <div className="admin-fade min-w-0 space-y-4">
       <div className="admin-filter-bar">
         <label className="admin-filter-field">
           Kind

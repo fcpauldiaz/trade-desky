@@ -46,7 +46,7 @@ function AdminLayout() {
   if (!ready) return null
 
   return (
-    <main className="page-wrap admin-page space-y-6 px-4 py-10">
+    <main className="page-wrap admin-page min-w-0 space-y-6 px-4 py-10">
       <div>
         <h1 className="app-page-title text-[var(--ja-black)]">Admin</h1>
         <p className="mt-1 text-sm text-[var(--ja-gray-600)]">Supervise AI, users, and ingest</p>

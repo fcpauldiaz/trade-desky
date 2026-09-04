@@ -27,7 +27,7 @@ function AdminOverviewPage() {
   }, [])
 
   return (
-    <div className="admin-fade space-y-8">
+    <div className="admin-fade min-w-0 space-y-8">
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {data ? (
         <>
@@ -63,7 +63,7 @@ function AdminOverviewPage() {
             </span>
           </section>
 
-          <section className="space-y-3">
+          <section className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-lg font-black text-[var(--ja-black)]">Latest evaluations</h2>
               <Link to="/admin/ai-evaluations" className="text-sm font-semibold">
